@@ -126,12 +126,24 @@ function setSpeaker(name) {
 // ── Эффекты: дождь ──
 const cv = $('#fx'), cx = cv.getContext('2d'); let drops = [], raining = false;
 function resize() { cv.width = cv.clientWidth; cv.height = cv.clientHeight; } addEventListener('resize', resize); resize();
-function setRain(on) { raining = on; st.rain = on; if (on && !drops.length) drops = Array.from({ length: 220 }, () => ({ x: Math.random(), y: Math.random(), s: .6 + Math.random() * .8 })); }
+// дождь рисуется на слое ПОД персонажами: на весь экран, но не поверх них
+function setRain(on) { raining = on; st.rain = on; if (on && !drops.length) drops = Array.from({ length: 650 }, () => newDrop(true)); }
+function newDrop(any) { const z = Math.random(); return { x: Math.random() * 1.15 - .05, y: any ? Math.random() : -.1 - Math.random() * .2, z, l: 18 + z * 46, v: .55 + z * .9, a: .12 + z * .38 }; }
+const RAIN_SLANT = .12;
 (function frame() {
   cx.clearRect(0, 0, cv.width, cv.height);
-  if (raining) { cx.strokeStyle = 'rgba(190,200,230,.35)'; cx.lineWidth = 1; cx.beginPath();
-    drops.forEach(d => { const x = d.x * cv.width, y = d.y * cv.height; cx.moveTo(x, y); cx.lineTo(x - 3 * d.s, y + 16 * d.s); d.y += .018 * d.s; d.x -= .002 * d.s; if (d.y > 1) { d.y = -.05; d.x = Math.random() * 1.1; } });
-    cx.stroke(); }
+  if (raining) {
+    const W = cv.width, H = cv.height, k = H / 720;
+    const mg = cx.createLinearGradient(0, H * .45, 0, H); mg.addColorStop(0, 'rgba(150,160,200,0)'); mg.addColorStop(1, 'rgba(150,160,200,.10)'); cx.fillStyle = mg; cx.fillRect(0, 0, W, H);
+    cx.lineCap = 'round';
+    [0, 1, 2].forEach(band => {
+      cx.beginPath(); cx.lineWidth = band === 2 ? 1.9 * k : band === 1 ? 1.3 * k : 1 * k;
+      cx.strokeStyle = `rgba(215,222,245,${[.38, .58, .85][band]})`;
+      drops.forEach(d => { if ((d.z * 3 | 0) !== band) return; const x = d.x * W, y = d.y * H, L = d.l * k; cx.moveTo(x, y); cx.lineTo(x - L * RAIN_SLANT, y + L); });
+      cx.stroke();
+    });
+    drops.forEach((d, i) => { d.y += .022 * d.v; d.x -= .022 * d.v * RAIN_SLANT * (H / W); if (d.y > 1.05) drops[i] = newDrop(false); });
+  }
   requestAnimationFrame(frame);
 })();
 function fx(kind) { const g = $('#game'); g.classList.remove(kind); void g.offsetWidth; g.classList.add(kind); setTimeout(() => g.classList.remove(kind), 700); }
