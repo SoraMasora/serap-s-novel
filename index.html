@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@600;800&family=Cormorant+SC:wght@500;700&display=swap" rel="stylesheet">
 <title>S^erap^S — визуальная новелла</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
@@ -11,6 +13,7 @@
   <div id="bg" class="layer"></div>
   <div id="bg2" class="layer"></div>
   <div id="chars" class="layer"></div>
+  <div id="fxl" class="layer"></div>
   <canvas id="fx" class="layer"></canvas>
   <div id="vignette" class="layer"></div>
 
@@ -23,6 +26,7 @@
   </div>
   <div id="toast"></div>
 
+  <div id="side" class="hidden"><img alt=""></div>
   <div id="textbox" class="hidden">
     <div id="namebox"></div>
     <div id="text"></div>
@@ -40,17 +44,17 @@
   <div id="choices" class="hidden"></div>
 
   <div id="title" class="screen">
-    <div class="title-art"></div>
-    <div class="title-inner">
-      <h1>S<sup>^</sup>erap<sup>^</sup>S</h1>
-      <p class="sub">визуальная новелла</p>
-      <div class="menu">
-        <button id="btnNew">Новая игра</button>
-        <button id="btnContinue">Продолжить</button>
-        <button id="btnSettings">Настройки</button>
-        <button id="btnEndings">Концовки</button>
-      </div>
-    </div>
+    <div id="tAnim"><img class="tf on" data-f="t0" alt=""><img class="tf" data-f="t1" alt=""><img class="tf" data-f="t2" alt=""><img class="tf" data-f="tb" alt=""></div>
+    <div class="tShade"></div>
+    <canvas id="tDust"></canvas>
+    <div class="logo"><img id="logoImg" alt=""><div class="logoText">S^erap^S</div></div>
+    <nav class="bar">
+      <button class="vbtn" id="btnNew">Новая игра</button>
+      <button class="vbtn" id="btnContinue">Продолжить</button>
+      <button class="vbtn" id="btnLoadT">Загрузить</button>
+      <button class="vbtn" id="btnEndings">Концовки</button>
+      <button class="vbtn" id="btnSettings">Настройки</button>
+    </nav>
   </div>
 
   <div id="nameScreen" class="screen hidden">
@@ -71,7 +75,10 @@
     </div>
   </div>
 </div>
-<script src="assets/sprites.js"></script>
+<script src="assets/sprites1.js"></script>
+<script src="assets/sprites2.js"></script>
+<script src="assets/title.js"></script>
+<script src="assets/ui.js"></script>
 <script src="assets/bg1.js"></script>
 <script src="assets/bg2.js"></script>
 <script src="js/audio.js"></script>

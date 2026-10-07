@@ -9,12 +9,46 @@ const opts = Object.assign({ speed: 28, music: 0.6, autoDelay: 1800 }, JSON.pars
 Sound.setVol('music', opts.music);
 
 // ── Заставка ──
-$('.title-art').style.backgroundImage = `url(${A.bg.roof})`;
-$('#title').style.setProperty('--sera', `url(${A.sprites.sera_neutral})`);
+A.title = A.title || {}; A.ui = A.ui || {};
+document.documentElement.style.setProperty('--vine', `url(${A.ui.vine})`);
+$('#logoImg').src = A.ui.logo;
+document.querySelectorAll('#tAnim .tf').forEach(i => i.src = A.title[i.dataset.f]);
+// ветки цветов на кнопках
+function vineify(btn) { ['l','r'].forEach(s => { const v = document.createElement('span'); v.className = 'vine ' + s; btn.appendChild(v); }); }
+document.querySelectorAll('.vbtn').forEach(vineify);
+// анимация титульного экрана: Сера перебирает пальцами + моргает
+const TF = {}; document.querySelectorAll('#tAnim .tf').forEach(i => TF[i.dataset.f] = i);
+let tfCur = 't0', tfTimer = null, tfStep = 0;
+const tfSeq = ['t0','t1','t0','t2','t1','t0','t2','t0'];
+function tfShow(k) { if (k === tfCur) return; TF[k].classList.add('on'); const old = TF[tfCur]; tfCur = k; setTimeout(() => { if (old !== TF[tfCur]) old.classList.remove('on'); }, 360); }
+function titleAnim(on) {
+  clearTimeout(tfTimer); if (!on) return;
+  (function loop() {
+    let k = tfSeq[tfStep++ % tfSeq.length], d = 520 + Math.random() * 380;
+    if (k === 't0' && Math.random() < .35) { // моргание
+      TF.tb.classList.add('on'); setTimeout(() => TF.tb.classList.remove('on'), 140);
+    }
+    tfShow(k); tfTimer = setTimeout(loop, d);
+  })();
+}
+titleAnim(true);
+// пылинки и неон
+const dc = $('#tDust'), dx = dc.getContext('2d'); let motes = [];
+function dResize() { dc.width = dc.clientWidth; dc.height = dc.clientHeight; motes = Array.from({ length: 45 }, () => ({ x: Math.random(), y: Math.random(), r: .5 + Math.random() * 1.8, v: .0002 + Math.random() * .0005, p: Math.random() * 6 })); }
+addEventListener('resize', dResize); dResize();
+(function dFrame(t) {
+  if (!$('#title').classList.contains('hidden')) {
+    dx.clearRect(0, 0, dc.width, dc.height);
+    motes.forEach(m => { m.y -= m.v; m.x += Math.sin(t / 2000 + m.p) * .0003; if (m.y < 0) m.y = 1;
+      dx.fillStyle = `rgba(255,${170 + 60 * Math.sin(m.p)},200,${.25 + .25 * Math.sin(t / 700 + m.p)})`; dx.beginPath(); dx.arc(m.x * dc.width, m.y * dc.height, m.r, 0, 7); dx.fill(); });
+  }
+  requestAnimationFrame(dFrame);
+})(0);
+$('#btnLoadT').onclick = () => { Sound.init(); slotsUI('load'); };
 const refreshContinue = () => $('#btnContinue').disabled = !localStorage.getItem('serap_save_auto');
 refreshContinue();
 
-$('#btnNew').onclick = () => { Sound.init(); $('#title').classList.add('hidden'); $('#nameScreen').classList.remove('hidden'); $('#nameInput').focus(); };
+$('#btnNew').onclick = () => { Sound.init(); titleAnim(false); $('#title').classList.add('hidden'); $('#nameScreen').classList.remove('hidden'); $('#nameInput').focus(); };
 $('#nameOk').onclick = () => {
   const n = $('#nameInput').value.trim(); Object.assign(st, { scene:'start', i:0, feel:50, press:0, flags:{}, name: n || 'Кирилл', bg:null, chars:{}, music:null, rain:false });
   log.length = 0; $('#nameScreen').classList.add('hidden'); begin();
@@ -25,12 +59,12 @@ $('#btnSettings').onclick = settings;
 $('#btnEndings').onclick = endingsList;
 $('#endBack').onclick = toTitle;
 
-function begin() { $('#title').classList.add('hidden'); $('#textbox').classList.remove('hidden'); $('#hud').classList.remove('hidden'); updateTrust(); run(); }
+function begin() { titleAnim(false); $('#title').classList.add('hidden'); $('#textbox').classList.remove('hidden'); $('#hud').classList.remove('hidden'); updateTrust(); run(); }
 function toTitle() {
   auto = skip = false; syncBtns(); clearTimeout(tTimer);
   ['#ending','#modal','#textbox','#hud','#choices'].forEach(s => $(s).classList.add('hidden'));
   $('#chars').innerHTML = ''; Sound.music('calm'); Sound.rain(false); setRain(false);
-  $('#title').classList.remove('hidden'); refreshContinue();
+  $('#title').classList.remove('hidden'); $('#side').classList.add('hidden'); titleAnim(true); refreshContinue();
 }
 
 // ── Фон и персонажи ──
@@ -43,7 +77,7 @@ function setBg(k, instant) {
 }
 const POS = { left:'28%', center:'50%', right:'72%' };
 function showChar(who, expr, pos) {
-  const key = who === 'father' ? 'father' : 'sera_' + expr;
+  const key = who === 'father' ? 'father' : who + '_' + expr;
   const prev = st.chars[who];
   pos = pos || (prev && prev.pos) || 'center';
   st.chars[who] = { expr, pos };
@@ -57,7 +91,7 @@ function hideChar(who) {
 }
 function setSpeaker(name) {
   document.querySelectorAll('.char').forEach(el => {
-    const who = el.dataset.who; const active = !name || (name === 'Сера' && who === 'sera') || (name === 'Пастор' && who === 'father');
+    const who = el.dataset.who; const active = !name || (name === 'Сера' && who === 'sera') || (name === 'Пастор' && who === 'father') || (name === 'P' && who === 'hero');
     el.style.filter = active || Object.keys(st.chars).length < 2 ? '' : 'brightness(.6) drop-shadow(0 0 14px rgba(0,0,0,.6))';
   });
 }
@@ -90,7 +124,7 @@ function run() {
     const scene = STORY[st.scene]; const c = scene[st.i];
     if (!c) return;
     st.i++;
-    if (Array.isArray(c)) { say(c[0], c[1]); return; }
+    if (Array.isArray(c)) { say(c[0], c[1], c[2]); return; }
     if (c.chapter) { st.chapter = c.chapter; $('#chapter').textContent = c.chapter; }
     if (c.bg) setBg(c.bg);
     if (c.music) { st.music = c.music; Sound.music(c.music); }
@@ -98,6 +132,7 @@ function run() {
     if (c.show) showChar(c.who || (c.show === 'father' ? 'father' : 'sera'), c.show, c.pos);
     if (c.hide) hideChar(c.hide);
     if (c.fx && !skip) fx(c.fx);
+    if (c.react && !skip) react(c.react);
     if (typeof c.feel === 'number' && !c.choice) changeFeel(c.feel);
     if (c.set && !c.choice) Object.assign(st.flags, c.set);
     if (c.add && !c.choice) st.press += c.add.press || 0;
@@ -110,12 +145,16 @@ function run() {
 }
 function jump(l) { st.scene = l; st.i = 0; }
 
-function say(name, text) {
+function say(name, text, expr) {
   const nb = $('#namebox'), tx = $('#text');
   const disp = name === 'P' ? st.name : name;
   nb.textContent = disp; nb.className = name === 'P' ? 'gg' : name === 'Пастор' ? 'father' : '';
   tx.className = name ? '' : 'narr';
-  setSpeaker(name === 'P' ? null : name);
+  setSpeaker(name === 'P' && !st.chars.hero ? null : name);
+  const side = $('#side');
+  if (name === 'P' && !st.chars.hero) { const src = A.sprites['hero_' + (expr || 'neutral')]; const im = side.querySelector('img');
+    if (side.classList.contains('hidden') || im.getAttribute('src') !== src) { im.src = src; im.style.animation = 'none'; void im.offsetWidth; im.style.animation = ''; }
+    side.classList.remove('hidden'); } else side.classList.add('hidden');
   full = fmt(text); tIdx = 0; typing = true; waiting = false; $('#next').classList.remove('show');
   log.push({ n: disp, t: full }); if (log.length > 200) log.shift();
   clearTimeout(tTimer);
@@ -138,9 +177,12 @@ function choose(list) {
   inChoice = true; skip = false; syncBtns(); saveSlot('auto', true);
   const box = $('#choices'); box.innerHTML = ''; box.classList.remove('hidden');
   list.forEach(o => {
-    const b = document.createElement('button'); b.innerHTML = fmt(o.t) + (o.hint ? `<span class="hint">${o.hint}</span>` : '');
+    const b = document.createElement('button'); b.className = 'vbtn'; b.innerHTML = fmt(o.t) + (o.hint ? `<span class="hint">${o.hint}</span>` : ''); vineify(b);
+    b.onmouseenter = () => hoverLean(true); b.onmouseleave = () => hoverLean(false);
     b.onclick = e => {
-      e.stopPropagation(); box.classList.add('hidden'); inChoice = false;
+      e.stopPropagation(); box.classList.add('hidden'); inChoice = false; hoverLean(false);
+      const rk = o.react || (o.feel >= 10 ? 'pat' : o.feel >= 5 ? 'hop' : o.feel <= -12 ? 'shake' : o.feel < 0 ? 'shiver' : null);
+      if (rk) react(rk);
       log.push({ n: '→', t: fmt(o.t) });
       if (o.feel) changeFeel(o.feel);
       if (o.set) Object.assign(st.flags, o.set);
@@ -160,6 +202,41 @@ function finish(kind) {
     $('#ending').classList.remove('hidden');
   }, 900);
 }
+
+// ── Интерактив Серы ──
+let reactT = null, leanOn = false;
+const seraEl = () => document.querySelector('.char[data-who="sera"]');
+function hoverLean(on) {
+  const el = seraEl(); if (!el || el.dataset.reacting) return;
+  if (on && !leanOn) { leanOn = true; el.dataset.prev = st.chars.sera.expr; el.src = A.sprites.sera_lean; el.classList.add('react-lean'); }
+  else if (!on && leanOn) { leanOn = false; el.classList.remove('react-lean'); el.src = A.sprites['sera_' + st.chars.sera.expr]; }
+}
+function hearts(n, dark) {
+  for (let k = 0; k < n; k++) setTimeout(() => { const h = document.createElement('span'); h.className = 'heart' + (dark ? ' dark' : ''); h.textContent = dark ? '✝' : '♡';
+    h.style.left = (38 + Math.random() * 24) + '%'; h.style.top = (25 + Math.random() * 25) + '%'; $('#fxl').appendChild(h); setTimeout(() => h.remove(), 1900); }, k * 160);
+}
+const REACT = { // спрайт, длительность, эффекты
+  pat:    { spr: 'pat',    ms: 2400, fx: () => { hearts(6); const g = $('#game'); g.classList.add('patted'); setTimeout(() => g.classList.remove('patted'), 2300); toast('Сера гладит тебя по голове ♡'); } },
+  tongue: { spr: 'tongue', ms: 1500, fx: () => hearts(2, true) },
+  hop:    { spr: 'neutral', ms: 1200, fx: () => hearts(3) },
+  shy:    { spr: 'shy',    ms: 1600, fx: () => hearts(2) },
+  shake:  { spr: 'cold',   ms: 1100 },
+  shiver: { spr: 'sad',    ms: 900 },
+};
+function react(kind) {
+  const el = seraEl(), R = REACT[kind]; if (!el || !R || !st.chars.sera) return;
+  leanOn = false; el.classList.remove('react-lean');
+  clearTimeout(reactT); el.className = el.className.replace(/\breact-\S+/g, '').trim();
+  void el.offsetWidth; el.dataset.reacting = 1;
+  el.src = A.sprites['sera_' + R.spr]; el.classList.add('react-' + (kind === 'shy' ? 'hop' : kind)); R.fx && R.fx();
+  reactT = setTimeout(() => { el.classList.remove('react-' + (kind === 'shy' ? 'hop' : kind)); delete el.dataset.reacting; if (st.chars.sera) el.src = A.sprites['sera_' + st.chars.sera.expr]; }, R.ms);
+}
+// клик по голове Серы — она реагирует
+const pokes = ['tongue', 'shy', 'pat', 'tongue', 'hop'];
+$('#chars').addEventListener('click', e => {
+  const el = e.target.closest('.char[data-who="sera"]'); if (!el) return;
+  const r = el.getBoundingClientRect(); if (e.clientY - r.top < r.height * .3) { e.stopPropagation(); react(pokes[Math.floor(Math.random() * pokes.length)]); }
+});
 
 // ── Сохранения ──
 function snapshot() { return JSON.stringify({ st: { ...st, i: Math.max(0, st.i - 1) }, date: new Date().toLocaleString('ru-RU') }); }
