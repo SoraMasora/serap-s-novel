@@ -70,7 +70,7 @@ function toTitle() {
 // ── Фон и персонажи ──
 let bgFront = $('#bg'), bgBack = $('#bg2');
 function setBg(k, instant) {
-  st.bg = k; const url = `url(${A.bg[k]})`;
+  st.bg = k; if (typeof applyRain === 'function') applyRain(); const url = `url(${A.bg[k]})`;
   if (instant) { bgFront.style.backgroundImage = url; bgFront.style.opacity = 1; bgBack.style.opacity = 0; return; }
   bgBack.style.backgroundImage = url; bgBack.style.opacity = 1; bgFront.style.opacity = 0;
   [bgFront, bgBack] = [bgBack, bgFront];
@@ -130,7 +130,8 @@ function resize() { cv.width = cv.clientWidth; cv.height = cv.clientHeight; } ad
 function setRain(on) { raining = on; st.rain = on; if (on && !drops.length) drops = Array.from({ length: 650 }, () => newDrop(true)); }
 function newDrop(any) { const z = Math.random(); return { x: Math.random() * 1.15 - .05, y: any ? Math.random() : -.1 - Math.random() * .2, z, l: 18 + z * 46, v: .55 + z * .9, a: .12 + z * .38 }; }
 const RAIN_SLANT = .12;
-const OUTDOOR = { street:1, roof:1, court:1, yard:1 }; // в помещениях капли не рисуем — остаётся только шум дождя за окном
+const OUTDOOR = { street:1, roof:1, court:1 }; // дождь (капли и звук) — только на открытых локациях
+function applyRain() { Sound.rain(!!(st.rain && OUTDOOR[st.bg])); }
 (function frame() {
   cx.clearRect(0, 0, cv.width, cv.height);
   if (raining && OUTDOOR[st.bg]) {
@@ -173,7 +174,7 @@ function run() {
     if (c.bg) { setBg(c.bg); document.querySelectorAll('#bg,#bg2').forEach(x => x.classList.remove('zoom')); }
     if (c.zoom) bgFront.classList.add('zoom');
     if (c.music) { st.music = c.music; Sound.music(c.music); }
-    if ('rain' in c) { setRain(c.rain); Sound.rain(c.rain); }
+    if ('rain' in c) { setRain(c.rain); applyRain(); }
     if (c.show) showChar(c.who || (c.show === 'father' ? 'father' : 'sera'), c.show, c.pos);
     if (c.hide) hideChar(c.hide);
     if (c.fx && !skip) fx(c.fx);
@@ -297,7 +298,7 @@ function loadSlot(n) {
   $('#chars').innerHTML = ''; const chars = st.chars; st.chars = {};
   if (st.bg) setBg(st.bg, true);
   Object.entries(chars).forEach(([w, c]) => showChar(w, c.expr, c.pos));
-  setRain(st.rain); Sound.rain(st.rain); if (st.music) Sound.music(st.music);
+  setRain(st.rain); applyRain(); if (st.music) Sound.music(st.music);
   $('#chapter').textContent = st.chapter || '';
   ['#ending','#choices','#title','#nameScreen'].forEach(s => $(s).classList.add('hidden')); inChoice = false;
   begin();
