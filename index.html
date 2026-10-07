@@ -18,10 +18,6 @@
   <div id="vignette" class="layer"></div>
 
   <div id="hud" class="hidden">
-    <div id="trust" title="Шкала доверия Серы">
-      <span class="cross">✝</span>
-      <div class="bar"><div class="fill"></div><div class="cracks"></div></div>
-    </div>
     <div id="chapter"></div>
   </div>
   <div id="toast"></div>
@@ -34,6 +30,7 @@
     <div id="controls">
       <button data-a="auto">Авто</button>
       <button data-a="skip">Пропуск</button>
+      <button data-a="notes">Заметки</button>
       <button data-a="log">Журнал</button>
       <button data-a="save">Сохр.</button>
       <button data-a="load">Загр.</button>
@@ -42,6 +39,16 @@
   </div>
 
   <div id="choices" class="hidden"></div>
+
+  <div id="pixwrap" class="layer hidden">
+    <canvas id="pix" width="320" height="180"></canvas>
+    <div id="pixHud"><div><div id="pixDay"></div><div id="pixTask"></div></div>
+      <div class="pixBtns"><button id="pixNotes">Заметки</button><button id="pixSave">Сохр.</button><button id="pixMenu">Меню</button></div></div>
+    <div id="pixPrompt"></div>
+    <div id="pixHelp">WASD / стрелки — идти · E или клик — войти · N — заметки</div>
+  </div>
+
+  <div id="card" class="layer hidden"><div class="cBig"></div><div class="cLine"></div><div class="cSmall"></div></div>
 
   <div id="title" class="screen">
     <div id="tAnim"><img class="tf on" data-f="t0" alt=""><img class="tf" data-f="t1" alt=""><img class="tf" data-f="t2" alt=""><img class="tf" data-f="tb" alt=""></div>
@@ -78,12 +85,17 @@
 <script src="assets/sprites1.js"></script>
 <script src="assets/sprites2.js"></script>
 <script src="assets/sprites3.js"></script>
+<script src="assets/sprites4.js"></script>
+<script src="assets/sprites5.js"></script>
+<script src="assets/sprites6.js"></script>
 <script src="assets/title.js"></script>
 <script src="assets/ui.js"></script>
 <script src="assets/bg1.js"></script>
 <script src="assets/bg2.js"></script>
+<script src="assets/bg3.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/story.js"></script>
+<script src="js/pixel.js"></script>
 <script src="js/engine.js"></script>
 </body>
 </html>

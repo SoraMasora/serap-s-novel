@@ -6,6 +6,16 @@ html,body{height:100%;background:#07060a;color:#eee;font-family:"Trebuchet MS","
 #bg2{opacity:0}
 #chars{pointer-events:none}
 .char{position:absolute;bottom:-4%;height:104%;left:50%;transform:translateX(-50%);transition:opacity .5s ease,left .6s ease,filter .4s;filter:drop-shadow(0 0 14px rgba(0,0,0,.6))}
+.char .shiftw,.char .idle{height:100%;position:relative;transform-origin:50% 100%}
+.char img.base{height:100%;display:block}
+.char img.blink{position:absolute;left:39.62%;top:12.6%;width:22.32%;height:7.56%;opacity:0;pointer-events:none}
+.char.blinking img.blink[data-ok]{opacity:1}
+.char .idle{animation:idle 6s ease-in-out infinite}
+@keyframes idle{0%,100%{transform:rotate(0) scale(1,1)}25%{transform:rotate(.3deg) scale(1.002,1.006)}50%{transform:rotate(0) scale(1,1.011) translateY(-.15%)}75%{transform:rotate(-.3deg) scale(1.002,1.006)}}
+.char .shiftL{animation:shiftL 2.6s ease-in-out}
+.char .shiftR{animation:shiftR 2.6s ease-in-out}
+@keyframes shiftL{0%,100%{transform:none}35%,65%{transform:translateX(-.8%) rotate(-.9deg)}}
+@keyframes shiftR{0%,100%{transform:none}35%,65%{transform:translateX(.8%) rotate(.9deg)}}
 .char.fade{opacity:0}
 .char.breath{animation:breath 4.5s ease-in-out infinite}
 @keyframes breath{0%,100%{transform:translateX(-50%) scaleY(1)}50%{transform:translateX(-50%) scaleY(1.008)}}
@@ -35,11 +45,7 @@ html,body{height:100%;background:#07060a;color:#eee;font-family:"Trebuchet MS","
 #choices button:hover{background:rgba(70,20,45,.92);border-color:#ff8fb8;transform:scale(1.02)}
 #choices .hint{font-size:.7em;color:#9a8aa6;display:block;font-style:italic}
 
-#hud{position:absolute;top:2%;left:2%;right:2%;display:flex;justify-content:space-between;align-items:center;pointer-events:none}
-#trust{display:flex;align-items:center;gap:.5em}
-#trust .cross{color:#ff8fb8;font-size:3vh;text-shadow:0 0 8px #ff4f8f}
-#trust .bar{width:18vh;height:1vh;background:rgba(255,255,255,.12);border:1px solid rgba(255,170,200,.4);position:relative;overflow:hidden;border-radius:2px}
-#trust .fill{height:100%;background:linear-gradient(90deg,#7a1f3d,#ff8fb8);transition:width .8s}
+#hud{position:absolute;top:2%;left:2%;right:2%;display:flex;justify-content:flex-end;align-items:center;pointer-events:none}
 #chapter{font-size:clamp(11px,1.8vh,18px);color:#cdbfd8;letter-spacing:.2em;text-shadow:0 0 6px #000}
 #toast{position:absolute;top:8%;left:50%;transform:translateX(-50%);padding:.5em 1.2em;background:rgba(10,6,14,.85);border:1px solid rgba(255,170,200,.4);color:#ffd2e2;font-size:clamp(12px,2vh,20px);border-radius:3px;opacity:0;transition:opacity .4s;pointer-events:none}
 #toast.show{opacity:1}
@@ -126,7 +132,7 @@ h1 sup{font-size:.45em;color:#ff8fb8}
 #side:not(.hidden) ~ #textbox #namebox{left:19%}
 
 /* Сера: интерактив */
-.char{pointer-events:auto;cursor:pointer;transform-origin:50% 100%}
+.char{pointer-events:none;transform-origin:50% 100%}
 .char.react-hop{animation:hop .55s ease 2}
 .char.react-lean{transform:translateX(-50%) scale(1.06) translateY(-1%);transition:transform .35s ease}
 .char.react-pat{animation:patIn .5s ease forwards,patRub .42s ease-in-out .5s 4}
@@ -157,3 +163,36 @@ h1 sup{font-size:.45em;color:#ff8fb8}
 /* медленный наезд камеры (взгляд в окно на фигуру у площадки) */
 #bg,#bg2{transition:opacity 1.2s ease,transform 9s ease-in-out}
 #bg.zoom,#bg2.zoom{transform:scale(1.35);transform-origin:67% 68%}
+
+#namebox.npc{color:#ffd9a0;border-color:rgba(255,210,150,.5)}
+/* заметки */
+.nsub{color:#9a8aa6;margin:-.6em 0 1em;font-size:.9em}
+ul.notes{list-style:none;text-align:left;max-width:60vw;margin:0 auto 1.4em;display:grid;gap:.6em}
+ul.notes li{padding:.6em .9em;background:rgba(255,170,200,.06);border-left:2px solid #c8244e;line-height:1.45;font-size:clamp(13px,2vh,19px)}
+ul.notes li:before{content:"✎ ";color:#ff8fb8}
+ul.notes li.empty{border-color:#555;color:#9a8aa6}ul.notes li.empty:before{content:""}
+/* карточка главы */
+#card{z-index:8;background:radial-gradient(ellipse at center,rgba(40,8,20,.92),#030205 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transition:opacity .6s;cursor:pointer}
+#card.in{opacity:1}#card.out{opacity:0}
+#card .cBig{font-family:"Grenze Gotisch",serif;font-size:clamp(34px,9vh,110px);color:#f3d6e2;text-shadow:0 0 18px #c8244e,0 0 40px rgba(200,36,78,.5);letter-spacing:.06em}
+#card .cLine{width:28vh;height:1px;background:linear-gradient(90deg,transparent,#c8244e,transparent);margin:1.6vh 0}
+#card .cSmall{font-family:"Cormorant SC",serif;font-size:clamp(16px,3.6vh,40px);color:#cdbfd8;letter-spacing:.25em}
+/* пиксельная прогулка */
+#pixwrap{z-index:6;background:#000}
+#pix{width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;display:block;cursor:pointer}
+#pixHud{position:absolute;top:2.5%;left:2.5%;right:2.5%;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none}
+#pixDay{font-family:"Cormorant SC",serif;font-size:clamp(16px,3.4vh,36px);color:#fff;text-shadow:0 2px 0 #000,0 0 10px #c8244e;letter-spacing:.08em}
+#pixTask{font-size:clamp(12px,2vh,20px);color:#ffd2e2;text-shadow:0 1px 0 #000;margin-top:.3em}
+.pixBtns{pointer-events:auto;display:flex;gap:.5em}
+.pixBtns button{font:inherit;font-size:clamp(11px,1.8vh,18px);background:rgba(10,6,14,.8);color:#ffd2e2;border:1px solid rgba(200,30,70,.6);padding:.35em .9em;cursor:pointer;image-rendering:pixelated;box-shadow:2px 2px 0 #000}
+.pixBtns button:hover{background:#3a0d1c}
+#pixPrompt{position:absolute;bottom:9%;left:50%;transform:translateX(-50%);padding:.5em 1.2em;background:rgba(8,5,12,.88);border:2px solid #c8244e;color:#fff;font-size:clamp(13px,2.3vh,24px);box-shadow:3px 3px 0 #000;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+#pixPrompt.show{opacity:1}#pixPrompt b{color:#ffe36b}#pixPrompt i{color:#9a8aa6}
+#pixHelp{position:absolute;bottom:2.5%;left:50%;transform:translateX(-50%);font-size:clamp(10px,1.6vh,16px);color:rgba(255,255,255,.55);text-shadow:0 1px 0 #000;pointer-events:none}
+#pixHud>div:first-child{background:rgba(6,4,10,.62);padding:.5em 1em;border-left:3px solid #c8244e;box-shadow:3px 3px 0 rgba(0,0,0,.6)}
+.psign{position:absolute;transform:translate(-50%,-100%);font-size:clamp(9px,1.5vh,15px);color:#fff;background:rgba(10,6,14,.78);border:1px solid rgba(200,30,70,.7);padding:.1em .5em;white-space:nowrap;pointer-events:none;text-shadow:0 1px 0 #000}
+.char[data-who=valya]{height:88%}
+.char[data-who=liza]{height:97%}
+.char[data-who=margo]{height:100%}
+.char[data-who=timur]{height:108%}
+.char[data-who=father]{height:108%}

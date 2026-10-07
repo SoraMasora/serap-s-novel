@@ -2,7 +2,7 @@
 (() => {
 const $ = s => document.querySelector(s);
 const A = window.ASSETS || { bg:{}, sprites:{} };
-const st = { scene:'start', i:0, feel:50, press:0, flags:{}, name:'Кирилл', bg:null, chars:{}, music:null, rain:false, chapter:'' };
+const st = { scene:'start', i:0, feel:50, press:0, flags:{}, notes:[], name:'Кирилл', bg:null, chars:{}, music:null, rain:false, chapter:'', mode:'', map:null };
 let typing = false, full = '', tIdx = 0, tTimer = null, waiting = false, auto = false, skip = false, inChoice = false;
 const log = [];
 const opts = Object.assign({ speed: 28, music: 0.6, autoDelay: 1800 }, JSON.parse(localStorage.getItem('serap_opts') || '{}'));
@@ -50,7 +50,7 @@ refreshContinue();
 
 $('#btnNew').onclick = () => { Sound.init(); titleAnim(false); $('#title').classList.add('hidden'); $('#nameScreen').classList.remove('hidden'); $('#nameInput').focus(); };
 $('#nameOk').onclick = () => {
-  const n = $('#nameInput').value.trim(); Object.assign(st, { scene:'start', i:0, feel:50, press:0, flags:{}, name: n || 'Кирилл', bg:null, chars:{}, music:null, rain:false });
+  const n = $('#nameInput').value.trim(); Object.assign(st, { scene:'start', i:0, feel:50, press:0, flags:{}, notes:[], name: n || 'Кирилл', bg:null, chars:{}, music:null, rain:false, chapter:'', mode:'', map:null });
   log.length = 0; $('#nameScreen').classList.add('hidden'); begin();
 };
 $('#nameInput').onkeydown = e => { if (e.key === 'Enter') $('#nameOk').click(); };
@@ -59,10 +59,10 @@ $('#btnSettings').onclick = settings;
 $('#btnEndings').onclick = endingsList;
 $('#endBack').onclick = toTitle;
 
-function begin() { titleAnim(false); $('#title').classList.add('hidden'); $('#textbox').classList.remove('hidden'); $('#hud').classList.remove('hidden'); updateTrust(); run(); }
+function begin(noRun) { titleAnim(false); $('#title').classList.add('hidden'); $('#hud').classList.remove('hidden'); if (st.mode === 'map') { openMap(); return; } $('#textbox').classList.remove('hidden'); if (!noRun) run(); }
 function toTitle() {
   auto = skip = false; syncBtns(); clearTimeout(tTimer);
-  ['#ending','#modal','#textbox','#hud','#choices'].forEach(s => $(s).classList.add('hidden'));
+  ['#ending','#modal','#textbox','#hud','#choices','#card'].forEach(s => $(s).classList.add('hidden')); PixelMap.close();
   $('#chars').innerHTML = ''; Sound.music('calm'); Sound.rain(false); setRain(false);
   $('#title').classList.remove('hidden'); $('#side').classList.add('hidden'); titleAnim(true); refreshContinue();
 }
@@ -75,23 +75,50 @@ function setBg(k, instant) {
   bgBack.style.backgroundImage = url; bgBack.style.opacity = 1; bgFront.style.opacity = 0;
   [bgFront, bgBack] = [bgBack, bgFront];
 }
-const POS = { left:'28%', center:'50%', right:'72%' };
+const POS = { left:'28%', center:'50%', right:'72%', fl:'18%', fr:'82%' };
+const SINGLE = { father:1, valya:1, timur:1, liza:1, margo:1 };
+const WHO = { 'Сера':'sera', 'Пастор':'father', 'P':'hero', 'Баба Валя':'valya', 'Тимур':'timur', 'Лиза':'liza', 'Маргарита Павловна':'margo' };
+const BLINK = { neutral:1, cold:1 }; // для этих эмоций есть кадр моргания
+const baseImg = el => el.querySelector('img.base');
+function setImg(el, key) { const im = baseImg(el); const src = A.sprites[key]; if (src && im.getAttribute('src') !== src) im.src = src; }
+function syncBlink(el, expr) { const b = el.querySelector('img.blink'); if (el.dataset.who === 'sera' && BLINK[expr] && A.sprites['blink_' + expr]) { b.src = A.sprites['blink_' + expr]; b.dataset.ok = 1; } else delete b.dataset.ok; }
 function showChar(who, expr, pos) {
-  const key = who === 'father' ? 'father' : who + '_' + expr;
+  const key = SINGLE[who] ? who : who + '_' + expr;
   const prev = st.chars[who];
   pos = pos || (prev && prev.pos) || 'center';
   st.chars[who] = { expr, pos };
   let el = document.querySelector(`.char[data-who="${who}"]:not([data-dying])`);
-  if (!el) { el = document.createElement('img'); el.className = 'char fade breath'; el.dataset.who = who; $('#chars').appendChild(el); el.src = A.sprites[key]; el.style.left = POS[pos]; requestAnimationFrame(() => requestAnimationFrame(() => el.classList.remove('fade'))); }
-  else { if (el.src !== A.sprites[key]) el.src = A.sprites[key]; el.style.left = POS[pos]; el.classList.remove('fade'); }
+  if (!el) {
+    el = document.createElement('div'); el.className = 'char fade'; el.dataset.who = who;
+    el.innerHTML = '<div class="shiftw"><div class="idle"><img class="base" alt=""><img class="blink" alt=""></div></div>';
+    el.querySelector('.idle').style.animationDelay = (-Math.random() * 6).toFixed(2) + 's';
+    $('#chars').appendChild(el); setImg(el, key); el.style.left = POS[pos];
+    requestAnimationFrame(() => requestAnimationFrame(() => el.classList.remove('fade')));
+  } else { if (!el.dataset.reacting) setImg(el, key); el.style.left = POS[pos]; el.classList.remove('fade'); }
+  syncBlink(el, expr);
 }
+// ── Анимация бездействия: моргание и смена веса ──
+function idleLoop() {
+  document.querySelectorAll('.char[data-who="sera"]:not([data-dying])').forEach(el => {
+    const b = el.querySelector('img.blink');
+    if (b.dataset.ok && !el.dataset.reacting && !leanOn && Math.random() < .42) {
+      el.classList.add('blinking'); setTimeout(() => el.classList.remove('blinking'), 130);
+      if (Math.random() < .25) setTimeout(() => { el.classList.add('blinking'); setTimeout(() => el.classList.remove('blinking'), 110); }, 260);
+    }
+  });
+  document.querySelectorAll('.char:not([data-dying])').forEach(el => {
+    if (!el.dataset.reacting && Math.random() < .12) { const w = el.querySelector('.shiftw'); w.classList.remove('shiftL', 'shiftR'); void w.offsetWidth; w.classList.add(Math.random() < .5 ? 'shiftL' : 'shiftR'); }
+  });
+  setTimeout(idleLoop, 1400 + Math.random() * 1600);
+}
+setTimeout(idleLoop, 1500);
 function hideChar(who) {
   const list = who === 'all' ? Object.keys(st.chars) : [who];
   list.forEach(w => { delete st.chars[w]; const el = document.querySelector(`.char[data-who="${w}"]:not([data-dying])`); if (el) { el.dataset.dying = 1; el.classList.add('fade'); setTimeout(() => el.remove(), 500); } });
 }
 function setSpeaker(name) {
   document.querySelectorAll('.char').forEach(el => {
-    const who = el.dataset.who; const active = !name || (name === 'Сера' && who === 'sera') || (name === 'Пастор' && who === 'father') || (name === 'P' && who === 'hero');
+    const who = el.dataset.who; const active = !name || WHO[name] === who;
     el.style.filter = active || Object.keys(st.chars).length < 2 ? '' : 'brightness(.6) drop-shadow(0 0 14px rgba(0,0,0,.6))';
   });
 }
@@ -109,11 +136,13 @@ function setRain(on) { raining = on; st.rain = on; if (on && !drops.length) drop
 })();
 function fx(kind) { const g = $('#game'); g.classList.remove(kind); void g.offsetWidth; g.classList.add(kind); setTimeout(() => g.classList.remove(kind), 700); }
 
-// ── Доверие ──
-function updateTrust() { $('#trust .fill').style.width = Math.max(0, Math.min(100, st.feel)) + '%'; }
-function changeFeel(d) {
-  st.feel = Math.max(0, Math.min(100, st.feel + d)); updateTrust();
-  if (d >= 5) toast('Сера запомнит это ♡'); else if (d <= -5) toast('По доверию пошла трещина…');
+// ── Доверие (скрытое) и заметки о Сере ──
+function changeFeel(d) { st.feel = Math.max(0, Math.min(100, st.feel + d)); }
+function addNote(t) { st.notes = st.notes || []; if (st.notes.includes(t)) return; st.notes.push(t); if (!skip) toast('✎ Новая заметка о Сере'); }
+const NOTES_TOTAL = (() => { const set = new Set(); Object.values(STORY).forEach(sc => sc.forEach(c => { if (c && c.note) set.add(c.note); })); return set.size; })();
+function showNotes() {
+  const n = st.notes || [];
+  openModal(`<h2>Заметки о Сере</h2><p class="nsub">${n.length} из ${NOTES_TOTAL}</p><ul class="notes">${n.length ? n.map(t => `<li>${t}</li>`).join('') : '<li class="empty">Пока я почти ничего о ней не знаю.</li>'}</ul><button id="mClose">Закрыть</button>`);
 }
 let toastT; function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 1800); }
 
@@ -125,6 +154,8 @@ function run() {
     if (!c) return;
     st.i++;
     if (Array.isArray(c)) { say(c[0], c[1], c[2]); return; }
+    if (c.card) { showCard(c.card); return; }
+    if (c.note) addNote(c.note);
     if (c.chapter) { st.chapter = c.chapter; $('#chapter').textContent = c.chapter; }
     if (c.bg) { setBg(c.bg); document.querySelectorAll('#bg,#bg2').forEach(x => x.classList.remove('zoom')); }
     if (c.zoom) bgFront.classList.add('zoom');
@@ -141,6 +172,8 @@ function run() {
     if (c.go) { jump(c.go); continue; }
     if (c.choice) { choose(c.choice); return; }
     if (c.ending) { jump(pickEnding(st)); continue; }
+    if (c.map) { st.map = Object.assign({ done: [], pos: null }, c.map); st.mode = 'map'; openMap(); return; }
+    if (c.tomap) { if (st.map.done.length >= st.map.visits) { const a = st.map.after; st.map = null; st.mode = ''; jump(a); continue; } st.mode = 'map'; openMap(); return; }
     if (c.final) { finish(c.final); return; }
   }
 }
@@ -149,7 +182,9 @@ function jump(l) { st.scene = l; st.i = 0; }
 function say(name, text, expr) {
   const nb = $('#namebox'), tx = $('#text');
   const disp = name === 'P' ? st.name : name;
-  nb.textContent = disp; nb.className = name === 'P' ? 'gg' : name === 'Пастор' ? 'father' : '';
+  nb.textContent = disp; nb.className = name === 'P' ? 'gg' : name === 'Пастор' ? 'father' : (WHO[name] && name !== 'Сера') ? 'npc' : '';
+  if (expr && name === 'Сера' && st.chars.sera) showChar('sera', expr);
+  if (expr && name === 'P' && st.chars.hero) showChar('hero', expr);
   tx.className = name ? '' : 'narr';
   setSpeaker(name === 'P' && !st.chars.hero ? null : name);
   const side = $('#side');
@@ -199,7 +234,7 @@ function finish(kind) {
   const got = JSON.parse(localStorage.getItem('serap_endings') || '{}'); got[kind] = true; localStorage.setItem('serap_endings', JSON.stringify(got));
   localStorage.removeItem('serap_save_auto');
   setTimeout(() => {
-    $('#endTitle').textContent = ENDINGS[kind].title; $('#endText').textContent = ENDINGS[kind].text + `\n\nДоверие Серы: ${st.feel}/100`;
+    $('#endTitle').textContent = ENDINGS[kind].title; $('#endText').textContent = ENDINGS[kind].text + `\n\nЗаметок о Сере собрано: ${(st.notes || []).length} из ${NOTES_TOTAL}`;
     $('#ending').classList.remove('hidden');
   }, 900);
 }
@@ -213,15 +248,15 @@ const CRY_MAP = { pat: 'wipe', hop: 'wipe', shy: 'wipe', tongue: 'frown', shake:
 function hoverLean(on) {
   const el = seraEl(); if (!el || el.dataset.reacting) return;
   const crying = isCrying();
-  if (on && !leanOn) { leanOn = true; el.src = A.sprites[crying ? 'sera_sadwipe' : 'sera_lean']; el.classList.add(crying ? 'react-wipeloop' : 'react-lean'); }
-  else if (!on && leanOn) { leanOn = false; el.classList.remove('react-lean', 'react-wipeloop'); el.src = A.sprites['sera_' + st.chars.sera.expr]; }
+  if (on && !leanOn) { leanOn = true; setImg(el, crying ? 'sera_sadwipe' : 'sera_lean'); el.classList.add(crying ? 'react-wipeloop' : 'react-lean'); }
+  else if (!on && leanOn) { leanOn = false; el.classList.remove('react-lean', 'react-wipeloop'); if (st.chars.sera) setImg(el, 'sera_' + st.chars.sera.expr); }
 }
 function hearts(n, dark) {
   for (let k = 0; k < n; k++) setTimeout(() => { const h = document.createElement('span'); h.className = 'heart' + (dark ? ' dark' : ''); h.textContent = dark ? '✝' : '♡';
     h.style.left = (38 + Math.random() * 24) + '%'; h.style.top = (25 + Math.random() * 25) + '%'; $('#fxl').appendChild(h); setTimeout(() => h.remove(), 1900); }, k * 160);
 }
 const REACT = { // спрайт, длительность, эффекты
-  pat:    { spr: 'pat',    ms: 2400, fx: () => { hearts(6); const g = $('#game'); g.classList.add('patted'); setTimeout(() => g.classList.remove('patted'), 2300); toast('Сера гладит тебя по голове ♡'); } },
+  pat:    { spr: 'pat',    ms: 2400, fx: () => { hearts(6); const g = $('#game'); g.classList.add('patted'); setTimeout(() => g.classList.remove('patted'), 2300); } },
   tongue: { spr: 'tongue', ms: 1500, fx: () => hearts(2, true) },
   hop:    { spr: 'neutral', ms: 1200, fx: () => hearts(3) },
   shy:    { spr: 'shy',    ms: 1600, fx: () => hearts(2) },
@@ -237,22 +272,15 @@ function react(kind) {
   leanOn = false; el.classList.remove('react-lean', 'react-wipeloop');
   clearTimeout(reactT); el.className = el.className.replace(/\breact-\S+/g, '').trim();
   void el.offsetWidth; el.dataset.reacting = 1;
-  el.src = A.sprites['sera_' + R.spr]; el.classList.add('react-' + (kind === 'shy' ? 'hop' : kind)); R.fx && R.fx();
-  reactT = setTimeout(() => { el.classList.remove('react-' + (kind === 'shy' ? 'hop' : kind)); delete el.dataset.reacting; if (st.chars.sera) el.src = A.sprites['sera_' + st.chars.sera.expr]; }, R.ms);
+  setImg(el, 'sera_' + R.spr); el.classList.add('react-' + (kind === 'shy' ? 'hop' : kind)); R.fx && R.fx();
+  reactT = setTimeout(() => { el.classList.remove('react-' + (kind === 'shy' ? 'hop' : kind)); delete el.dataset.reacting; if (st.chars.sera) setImg(el, 'sera_' + st.chars.sera.expr); }, R.ms);
 }
-// клик по голове Серы — она реагирует
-const pokes = ['tongue', 'shy', 'pat', 'tongue', 'hop'];
-$('#chars').addEventListener('click', e => {
-  const el = e.target.closest('.char[data-who="sera"]'); if (!el) return;
-  const r = el.getBoundingClientRect(); if (e.clientY - r.top < r.height * .3) { e.stopPropagation(); const list = isCrying() ? ['wipe', 'frown', 'down'] : pokes; react(list[Math.floor(Math.random() * list.length)]); }
-});
-
 // ── Сохранения ──
-function snapshot() { return JSON.stringify({ st: { ...st, i: Math.max(0, st.i - 1) }, date: new Date().toLocaleString('ru-RU') }); }
+function snapshot() { if (st.mode === 'map' && st.map && PixelMap.isOpen()) st.map.pos = PixelMap.pos(); return JSON.stringify({ st: { ...st, i: st.mode === 'map' ? st.i : Math.max(0, st.i - 1) }, date: new Date().toLocaleString('ru-RU') }); }
 function saveSlot(n, silent) { localStorage.setItem('serap_save_' + n, snapshot()); if (!silent) toast('Сохранено'); }
 function loadSlot(n) {
   const raw = localStorage.getItem('serap_save_' + n); if (!raw) return;
-  const d = JSON.parse(raw); Object.assign(st, d.st); closeModal();
+  const d = JSON.parse(raw); Object.assign(st, { notes: [], mode: '', map: null }, d.st); closeModal(); PixelMap.close(); $('#card').classList.add('hidden');
   $('#chars').innerHTML = ''; const chars = st.chars; st.chars = {};
   if (st.bg) setBg(st.bg, true);
   Object.entries(chars).forEach(([w, c]) => showChar(w, c.expr, c.pos));
@@ -303,18 +331,47 @@ $('#controls').onclick = e => {
   e.stopPropagation(); const a = e.target.dataset.a; if (!a) return;
   if (a === 'auto') { auto = !auto; skip = false; syncBtns(); if (auto && waiting) advance(); }
   if (a === 'skip') { skip = !skip; auto = false; syncBtns(); if (skip && (waiting || typing)) advance(); }
-  if (a === 'log') showLog(); if (a === 'save') slotsUI('save'); if (a === 'load') slotsUI('load'); if (a === 'menu') gameMenu();
+  if (a === 'notes') showNotes(); if (a === 'log') showLog(); if (a === 'save') slotsUI('save'); if (a === 'load') slotsUI('load'); if (a === 'menu') gameMenu();
 };
 $('#textbox').onclick = () => { if (skip) { skip = false; syncBtns(); } advance(); };
 $('#chars').parentElement.addEventListener('click', e => { if (e.target.closest('#textbox,#choices,.screen,#controls')) return; if (!$('#textbox').classList.contains('hidden')) advance(); });
 addEventListener('keydown', e => {
   if (!$('#modal').classList.contains('hidden')) { if (e.key === 'Escape') closeModal(); return; }
+  if (st.mode === 'map' && PixelMap.isOpen() && $('#title').classList.contains('hidden')) { if (e.key === 'Escape') gameMenu(); return; }
   if ($('#textbox').classList.contains('hidden') || !$('#title').classList.contains('hidden')) return;
   if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); advance(); }
   if (e.key === 'Control') { skip = true; syncBtns(); advance(); }
   if (e.key === 'Escape') gameMenu();
+  if (e.key.toLowerCase() === 'n' || e.key.toLowerCase() === 'т') showNotes();
   if (e.key.toLowerCase() === 'a') document.querySelector('[data-a=auto]').click();
 });
 addEventListener('keyup', e => { if (e.key === 'Control') { skip = false; syncBtns(); } });
 document.addEventListener('click', () => Sound.init(), { once: true });
+
+// ── Карточка главы ──
+let cardT = null;
+function showCard([big, small]) {
+  const c = $('#card'); c.querySelector('.cBig').textContent = big; c.querySelector('.cSmall').textContent = small || '';
+  $('#textbox').classList.add('hidden'); $('#side').classList.add('hidden'); c.classList.remove('hidden', 'out'); void c.offsetWidth; c.classList.add('in');
+  const done = () => { clearTimeout(cardT); c.onclick = null; c.classList.add('out'); setTimeout(() => { c.classList.add('hidden'); c.classList.remove('in', 'out'); $('#textbox').classList.remove('hidden'); run(); }, 600); };
+  c.onclick = done; cardT = setTimeout(done, skip ? 300 : 3000);
+}
+
+// ── Пиксельная прогулка ──
+function openMap() {
+  hideChar('all'); $('#textbox').classList.add('hidden'); $('#side').classList.add('hidden'); $('#choices').classList.add('hidden');
+  const m = st.map; const left = m.visits - m.done.length;
+  if (m.bg) setBg(m.bg); if (m.music) { st.music = m.music; Sound.music(m.music); }
+  setRain(false); Sound.rain(false);
+  $('#chapter').textContent = st.chapter || '';
+  PixelMap.open({ title: m.title, task: `${m.task || 'Куда пойти?'} · осталось: ${left}`, time: m.time, spots: m.spots, done: m.done, pos: m.pos }, id => {
+    m.pos = PixelMap.pos(); m.done.push(id); const n = (st.flags['v_' + id] || 0) + 1; st.flags['v_' + id] = n;
+    st.mode = ''; $('#textbox').classList.remove('hidden'); jump(STORY[id + '_' + n] ? id + '_' + n : id + '_3'); run();
+  });
+  saveSlot('auto', true);
+}
+window.__pix = { enter: id => PixelMap.enter(id), state: () => st };
+$('#pixNotes').onclick = e => { e.stopPropagation(); showNotes(); };
+$('#pixMenu').onclick = e => { e.stopPropagation(); gameMenu(); };
+$('#pixSave').onclick = e => { e.stopPropagation(); slotsUI('save'); };
 })();
