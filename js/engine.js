@@ -77,8 +77,9 @@ function setBg(k, instant) {
 }
 const POS = { left:'28%', center:'50%', right:'72%', fl:'18%', fr:'82%' };
 const SINGLE = { father:1, valya:1, timur:1, liza:1, margo:1 };
-const WHO = { 'Сера':'sera', 'Пастор':'father', 'P':'hero', 'Баба Валя':'valya', 'Тимур':'timur', 'Лиза':'liza', 'Маргарита Павловна':'margo' };
-const BLINK = { neutral:1, cold:1 }; // для этих эмоций есть кадр моргания
+const WHO = { '???':'sera', 'Сера':'sera', 'Пастор':'father', 'P':'hero', 'Баба Валя':'valya', 'Тимур':'timur', 'Лиза':'liza', 'Маргарита Павловна':'margo' };
+const BLINK = { neutral:1 }; // cold перерисован в v4 — старый кадр моргания к нему не подходит
+const THOUGHT = '~'; // внутренний голос героя // для этих эмоций есть кадр моргания
 const baseImg = el => el.querySelector('img.base');
 function setImg(el, key) { const im = baseImg(el); const src = A.sprites[key]; if (src && im.getAttribute('src') !== src) im.src = src; }
 function syncBlink(el, expr) { const b = el.querySelector('img.blink'); if (el.dataset.who === 'sera' && BLINK[expr] && A.sprites['blink_' + expr]) { b.src = A.sprites['blink_' + expr]; b.dataset.ok = 1; } else delete b.dataset.ok; }
@@ -178,6 +179,7 @@ function run() {
     if (c.show) showChar(c.who || (c.show === 'father' ? 'father' : 'sera'), c.show, c.pos);
     if (c.hide) hideChar(c.hide);
     if (c.fx && !skip) fx(c.fx);
+    if (c.sfx && !skip) Sound.sfx(c.sfx);
     if (c.react && !skip) react(c.react);
     if (typeof c.feel === 'number' && !c.choice) changeFeel(c.feel);
     if (c.set && !c.choice) Object.assign(st.flags, c.set);
@@ -195,18 +197,20 @@ function jump(l) { st.scene = l; st.i = 0; }
 
 function say(name, text, expr) {
   const nb = $('#namebox'), tx = $('#text');
-  const disp = name === 'P' ? st.name : name;
-  nb.textContent = disp; nb.className = name === 'P' ? 'gg' : name === 'Пастор' ? 'father' : (WHO[name] && name !== 'Сера') ? 'npc' : '';
-  if (expr && name === 'Сера' && st.chars.sera) showChar('sera', expr);
+  const thought = name === THOUGHT;
+  const disp = thought ? '' : name === 'P' ? st.name : name;
+  nb.textContent = disp; nb.className = name === 'P' ? 'gg' : name === 'Пастор' ? 'father' : name === '???' ? 'unk' : (WHO[name] && name !== 'Сера') ? 'npc' : '';
+  $('#textbox').dataset.kind = thought ? 'thought' : !name ? 'narr' : name === 'P' ? 'gg' : WHO[name] || 'npc';
+  if (expr && (name === 'Сера' || name === '???') && st.chars.sera) showChar('sera', expr);
   if (expr && name === 'P' && st.chars.hero) showChar('hero', expr);
-  tx.className = name ? '' : 'narr';
-  setSpeaker(name === 'P' && !st.chars.hero ? null : name);
+  tx.className = thought ? 'thought' : name ? '' : 'narr';
+  setSpeaker((name === 'P' && !st.chars.hero) || thought ? null : name);
   const side = $('#side');
   if (name === 'P' && !st.chars.hero) { const src = A.sprites['hero_' + (expr || 'neutral')]; const im = side.querySelector('img');
     if (side.classList.contains('hidden') || im.getAttribute('src') !== src) { im.src = src; im.style.animation = 'none'; void im.offsetWidth; im.style.animation = ''; }
     side.classList.remove('hidden'); } else side.classList.add('hidden');
   full = fmt(text); tIdx = 0; typing = true; waiting = false; $('#next').classList.remove('show');
-  log.push({ n: disp, t: full }); if (log.length > 200) log.shift();
+  log.push({ n: disp, t: full, th: thought }); if (log.length > 200) log.shift();
   clearTimeout(tTimer);
   if (skip || opts.speed === 0) { tx.textContent = full; endType(); return; }
   (function type() { tIdx++; tx.textContent = full.slice(0, tIdx); if (tIdx >= full.length) endType(); else tTimer = setTimeout(type, 1000 / Math.max(5, opts.speed) * 1.0); })();
@@ -331,7 +335,7 @@ function endingsList() {
   openModal(`<h2>Концовки</h2><ul class="endlist">${Object.entries(ENDINGS).map(([k, e]) => `<li>${got[k] ? '✝ ' + e.title : '??? — не открыта'}</li>`).join('')}</ul><button id="mClose">Закрыть</button>`);
 }
 function showLog() {
-  openModal(`<h2>Журнал</h2><div class="log">${log.map(l => `<div>${l.n ? `<b>${l.n}:</b> ` : ''}${l.t}</div>`).join('')}</div><button id="mClose">Закрыть</button>`);
+  openModal(`<h2>Журнал</h2><div class="log">${log.map(l => `<div${l.th ? ' class="th"' : ''}>${l.n ? `<b>${l.n}:</b> ` : ''}${l.t}</div>`).join('')}</div><button id="mClose">Закрыть</button>`);
   const lg = document.querySelector('.log'); lg.scrollTop = lg.scrollHeight;
 }
 function gameMenu() {
@@ -376,7 +380,7 @@ function openMap() {
   hideChar('all'); $('#textbox').classList.add('hidden'); $('#side').classList.add('hidden'); $('#choices').classList.add('hidden');
   const m = st.map; const left = m.visits - m.done.length;
   if (m.bg) setBg(m.bg); if (m.music) { st.music = m.music; Sound.music(m.music); }
-  setRain(false); Sound.rain(false);
+  setRain(false); Sound.rain(true); // в пиксельном режиме дождь рисует сам PixelMap
   $('#chapter').textContent = st.chapter || '';
   PixelMap.open({ title: m.title, task: `${m.task || 'Куда пойти?'} · осталось: ${left}`, time: m.time, spots: m.spots, done: m.done, pos: m.pos }, id => {
     m.pos = PixelMap.pos(); m.done.push(id); const n = (st.flags['v_' + id] || 0) + 1; st.flags['v_' + id] = n;

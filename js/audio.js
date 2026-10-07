@@ -93,7 +93,31 @@ const Sound = (() => {
       const s = rainSrc; rainSrc = null; setTimeout(() => s.stop(), 1600);
     }
   }
+
+  // ── Звуковые эффекты (процедурно) ──
+  let sfxGain = null;
+  function sfxOut() { if (!sfxGain) { sfxGain = ctx.createGain(); sfxGain.gain.value = 0.9; sfxGain.connect(master); } return sfxGain; }
+  function ping(t, fr, dur, v, type = 'sine') { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = type; o.frequency.value = fr;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); o.connect(g); g.connect(sfxOut()); o.start(t); o.stop(t + dur + 0.02); }
+  function nz(t, dur, v, freq, q = 1, type = 'bandpass') { const s = ctx.createBufferSource(); s.buffer = noiseBuf(dur + 0.05); const fl = ctx.createBiquadFilter(); fl.type = type; fl.frequency.value = freq; fl.Q.value = q;
+    const g = ctx.createGain(); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); s.connect(fl); fl.connect(g); g.connect(sfxOut()); s.start(t); s.stop(t + dur + 0.05); }
+  function thump(t, v = 0.6, f0 = 120, f1 = 45, dur = 0.22) { const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.05); o.connect(g); g.connect(sfxOut()); o.start(t); o.stop(t + dur + 0.1); }
+  const SFX = {
+    door: t => { ping(t, 2093, 1.2, 0.12); ping(t + 0.09, 2637, 1.0, 0.08); // колокольчик
+      const o = ctx.createOscillator(), g = ctx.createGain(), fl = ctx.createBiquadFilter(); o.type = 'sawtooth'; o.frequency.setValueAtTime(180, t + 0.15); o.frequency.linearRampToValueAtTime(260, t + 0.7);
+      fl.type = 'bandpass'; fl.frequency.value = 900; fl.Q.value = 6; g.gain.setValueAtTime(0, t + 0.15); g.gain.linearRampToValueAtTime(0.05, t + 0.3); g.gain.linearRampToValueAtTime(0, t + 0.75);
+      o.connect(fl); fl.connect(g); g.connect(sfxOut()); o.start(t + 0.15); o.stop(t + 0.8); thump(t + 0.8, 0.35, 90, 40); },
+    keys: t => { for (let i = 0; i < 9; i++) { const tt = t + i * 0.055 + Math.random() * 0.03; ping(tt, 3200 + Math.random() * 2600, 0.18, 0.05, 'triangle'); nz(tt, 0.04, 0.05, 7000, 2); } nz(t + 0.6, 0.08, 0.2, 1500, 3); thump(t + 0.62, 0.2, 400, 200, 0.05); },
+    steps: t => { for (let i = 0; i < 6; i++) { const tt = t + i * 0.42; nz(tt, 0.12, 0.35, 380 + (i % 2) * 60, 1.2); nz(tt + 0.01, 0.09, 0.08, 2500, 0.7); } },
+    step: t => { nz(t, 0.09, 0.18, 420, 1.2); nz(t, 0.06, 0.04, 2400, 0.7); },
+    bump: t => { thump(t, 0.8, 140, 40, 0.25); nz(t, 0.12, 0.3, 600, 0.8); },
+    drop: t => { [0, 0.13, 0.22, 0.4, 0.47].forEach((d, i) => { ping(t + d, 900 + i * 370, 0.25, 0.06, 'triangle'); ping(t + d, 2300 + i * 500, 0.12, 0.03); nz(t + d, 0.05, 0.12, 3000, 1.5); }); thump(t + 0.05, 0.35, 160, 70, 0.12); },
+    knock: t => { [0, 0.22, 0.44].forEach(d => { thump(t + d, 0.5, 220, 90, 0.08); nz(t + d, 0.05, 0.2, 900, 2); }); },
+    enter: t => { ping(t, 660, 0.25, 0.06, 'square'); ping(t + 0.08, 990, 0.3, 0.05, 'square'); },
+  };
+  function sfx(k) { if (!ctx) return; if (ctx.state === 'suspended') ctx.resume(); const f = SFX[k]; if (f) f(ctx.currentTime + 0.02); }
   function blip() { if (!ctx || mode === null && !rainSrc) return; }
   function setVol(k, v) { vol[k] = v; if (ctx) { if (k === 'music') musicGain.gain.value = v; } }
-  return { init, music, rain, setVol, vol, blip, get mode() { return mode; } };
+  return { init, music, rain, setVol, vol, blip, sfx, get mode() { return mode; } };
 })();
