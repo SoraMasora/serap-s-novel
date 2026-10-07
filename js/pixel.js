@@ -68,7 +68,7 @@ const NPC = {
     r:['..KKKKK.','.KKKKKKK','.KSSSSK.','.KSESES.','..SSSS..','.GHHHHG.','GGHHHHGG','GGHHHHGG','SGGGGGGL','.GGGGGG.','.JJJJJJ.','.JJ..JJ.','.JJ..JJ.','.BB..BB.','.WW..WW.'] },
   margo: { p:{ g:'#ececf0', b:'#d6d6dc', S:'#efdccf', E:'#333', o:'#efdccf', c:'#36353b', C:'#2a292e', d:'#2e2d33', B:'#1a1a1d' },
     r:['...gb...','..gggg..','.gggggg.','.gSSSSg.','.oEooEo.','..SSSS..','.ccddcc.','cccddccc','cccddccc','.ccddcc.','.cddddc.','..dddd..','..dddd..','..S..S..','..B..B..'] },
-  sera: { p:{ P:'#f2aac4', p:'#d8849f', b:'#1a1520', S:'#f6e6e0', E:'#c2203a', G:'#cfcfd4', g:'#a9a9b2', k:'#55555e', L:'#1d1c22', B:'#18171c', W:'#2e2d33' },
+  sera: { p:{ P:'#8a2236', p:'#64172a', b:'#f2f2f2', S:'#f6e6e0', E:'#c2203a', G:'#cfcfd4', g:'#a9a9b2', k:'#55555e', L:'#1d1c22', B:'#18171c', W:'#2e2d33' },
     r:['.b.PPPP.b..','bbPPPPPPbb.','.PPPPPPPP..','PPSSSSSSPP.','PPSESSESPP.','PP.SSSS.PP.','PPGGGGGGPP.','PGGGGGGGGP.','PGGGGGGGGP.','PSGGGGGGSP.','P.kkkkkk.P.','P.kkkkkk.P.','p..LL.LL.p.','p..LL.LL...','...LL.LL...','..BBB.BBB..','..WWW.WWW..'] },
 };
 function drawNpc(id, x, y, t) {

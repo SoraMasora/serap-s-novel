@@ -100,7 +100,7 @@ function setBg(k, instant) {
 const POS = { left:'25%', center:'50%', right:'75%', fl:'16%', fr:'84%' };
 const SINGLE = { father:1, valya:1, timur:1, liza:1, margo:1 };
 const WHO = { '???':'sera', 'Сера':'sera', 'Пастор':'father', 'P':'hero', 'Баба Валя':'valya', 'Тимур':'timur', 'Лиза':'liza', 'Маргарита Павловна':'margo' };
-const BLINK = { neutral:1 }; // cold перерисован в v4 — старый кадр моргания к нему не подходит
+const BLINK = { neutral:1, cold:1 };
 const THOUGHT = '~'; // внутренний голос героя // для этих эмоций есть кадр моргания
 const baseImg = el => el.querySelector('img.base');
 function setImg(el, key) { const im = baseImg(el); const src = A.sprites[key]; if (src && im.getAttribute('src') !== src) im.src = src; }

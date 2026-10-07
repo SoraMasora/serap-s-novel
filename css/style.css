@@ -8,7 +8,7 @@ html,body{height:100%;background:#07060a;color:#eee;font-family:"Trebuchet MS","
 .char{position:absolute;bottom:-4%;height:104%;left:50%;transform:translateX(-50%);transition:opacity .5s ease,left .6s ease,filter .4s;filter:drop-shadow(0 0 14px rgba(0,0,0,.6))}
 .char .shiftw,.char .idle{height:100%;position:relative;transform-origin:50% 100%}
 .char img.base{height:100%;display:block}
-.char img.blink{position:absolute;left:39.62%;top:12.6%;width:22.32%;height:7.56%;opacity:0;pointer-events:none}
+.char img.blink{position:absolute;left:39.62%;top:11.75%;width:16.74%;height:6.885%;opacity:0;pointer-events:none}
 .char.blinking img.blink[data-ok]{opacity:1}
 .char .idle{animation:idle 6s ease-in-out infinite}
 @keyframes idle{0%,100%{transform:rotate(0) scale(1,1)}25%{transform:rotate(.3deg) scale(1.002,1.006)}50%{transform:rotate(0) scale(1,1.011) translateY(-.15%)}75%{transform:rotate(-.3deg) scale(1.002,1.006)}}
