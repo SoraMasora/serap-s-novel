@@ -62,11 +62,11 @@ function drawHero(x, y) {
 
 // ═══ Мелкие NPC (пиксели) ═══
 const NPC = {
-  valya: { p:{ h:'#efe3c8', f:'#d0605a', g:'#c9c9c9', s:'#f1d9c7', c:'#7a5233', C:'#5c3d26', d:'#8a4a55', D:'#6b3440', w:'#e8e2d6', b:'#6b5a4a' },
+  valya: { p:{ h:'#c4c4ca', f:'#a9a9b0', g:'#8d7f78', s:'#f1d9c7', c:'#8e2b2e', C:'#6a1d22', d:'#55545a', D:'#403f45', w:'#e9e4da', b:'#5a3e2a' },
     r:['..hhfhh..','.hfhhhfh.','.hsssssh.','.hgsssgh.','..sssss..','.ccccccc.','ccCcccCcc','cccsscccc','.ccccccc.','.ddddddd.','dDddddDdd','.ddddddd.','..ww.ww..','..bb.bb..'] },
-  timur: { p:{ K:'#3a2a22', S:'#efd6c6', E:'#222', G:'#2f8a4e', g:'#226b3b', H:'#9a9aa2', J:'#3e4c66', B:'#5a4a40', W:'#ddd', L:'#7cff6a' },
+  timur: { p:{ K:'#16151b', S:'#efd6c6', E:'#222', G:'#2a3152', g:'#1f2540', H:'#323b60', J:'#17171c', B:'#17171c', W:'#0d0d10', L:'#efd6c6' },
     r:['..KKKKK.','.KKKKKKK','.KSSSSK.','.KSESES.','..SSSS..','.GHHHHG.','GGHHHHGG','GGHHHHGG','SGGGGGGL','.GGGGGG.','.JJJJJJ.','.JJ..JJ.','.JJ..JJ.','.BB..BB.','.WW..WW.'] },
-  margo: { p:{ g:'#cfcfd4', b:'#8a6a3a', S:'#efdccf', E:'#333', o:'#7a5a30', c:'#6b2a35', C:'#4e1d26', d:'#1b1a20', B:'#222' },
+  margo: { p:{ g:'#ececf0', b:'#d6d6dc', S:'#efdccf', E:'#333', o:'#efdccf', c:'#36353b', C:'#2a292e', d:'#2e2d33', B:'#1a1a1d' },
     r:['...gb...','..gggg..','.gggggg.','.gSSSSg.','.oEooEo.','..SSSS..','.ccddcc.','cccddccc','cccddccc','.ccddcc.','.cddddc.','..dddd..','..dddd..','..S..S..','..B..B..'] },
   sera: { p:{ P:'#f2aac4', p:'#d8849f', b:'#1a1520', S:'#f6e6e0', E:'#c2203a', G:'#cfcfd4', g:'#a9a9b2', k:'#55555e', L:'#1d1c22', B:'#18171c', W:'#2e2d33' },
     r:['.b.PPPP.b..','bbPPPPPPbb.','.PPPPPPPP..','PPSSSSSSPP.','PPSESSESPP.','PP.SSSS.PP.','PPGGGGGGPP.','PGGGGGGGGP.','PGGGGGGGGP.','PSGGGGGGSP.','P.kkkkkk.P.','P.kkkkkk.P.','p..LL.LL.p.','p..LL.LL...','...LL.LL...','..BBB.BBB..','..WWW.WWW..'] },
@@ -252,17 +252,21 @@ const SPOTS = {
   swing:   { x: 226, y: 124, label: 'Качели', decor: true },
 };
 const SIGNS = [['Подъезд №3', 97, 63], ['Кафе «Луна»', 329, 58], ['24 часа', 424, 52], ['Колледж искусств', 515, 66]];
-const avail = id => id === 'home' || (id === 'swing' ? cfg.time !== 'day' : cfg.spots.includes(id));
+const avail = id => id === 'home' || (id === 'swing' ? cfg.time !== 'day' && !cfg.follow : cfg.spots.includes(id));
 function near() { let best = null, bd = 18; Object.entries(SPOTS).forEach(([id, s]) => { if (!avail(id)) return; const d = Math.hypot(s.x - hero.x, (s.y - hero.y) * 1.4); if (d < bd) { bd = d; best = id; } }); return best; }
 const SWING_LINES = ['Сера сидит на качелях с альбомом и рисует котов. Увидела меня — показала язык. Увидимся вечером.', 'Сера раскачивается, глядя в небо. «Не мешай, я ловлю вдохновение», — говорит она, не оборачиваясь.'];
 function act(id) {
   if (!id) return;
-  if (id === 'home') return say('Рано возвращаться. Хочется ещё куда-нибудь заглянуть.');
+  if (id === 'home') return say(cfg.home || 'Рано возвращаться. Хочется ещё куда-нибудь заглянуть.');
   if (id === 'swing') return say(SWING_LINES[(cfg.title || '').length % 2]);
   if (cfg.done.includes(id)) return say('Сегодня я тут уже был.');
   window.Sound && Sound.sfx('enter'); stop(); onEnter && onEnter(id);
 }
 function say(t) { msgText = t; msgT = 3.2; }
+// ═══ Сера идёт следом за героем (cfg.follow) ═══
+const trail = []; let folT = 6, folI = 0;
+const FOLLOW_LINES = ['Сера: «Не беги так. У меня ноги короче, чем твоя совесть».', 'Сера: «Смотри, лужа в форме таракана. Это знак».', 'Сера: «Я тут каждую ночь хожу. С тобой почему-то не так страшно. Только не зазнавайся».', 'Сера: «Ты всегда так сутулишься? Выпрямись, затворник».', 'Сера: «Магазин там, если что. Направо. Вечно направо».'];
+function follower() { const k = Math.max(0, trail.length - 18); return trail[k] || { x: hero.x - 14, y: hero.y }; }
 
 // ═══ Логика ═══
 function blocked(x, y) { // препятствия: лавочка, баки, песочница, качели
@@ -282,6 +286,10 @@ function update(dt) {
     hero.stepT -= dt; if (hero.stepT <= 0) { hero.stepT = keys.Shift ? .2 : .27; window.Sound && Sound.sfx('step'); }
     hero.idleT = 0;
   } else { hero.idleT += dt; hero.t = 0; }
+  if (cfg.follow) {
+    const l = trail[trail.length - 1]; if (!l || Math.hypot(l.x - hero.x, l.y - hero.y) > 1.2) { trail.push({ x: hero.x, y: hero.y, m: 1 }); if (trail.length > 60) trail.shift(); }
+    folT -= dt; if (folT <= 0 && msgT <= 0) { folT = 9 + Math.random() * 5; say(FOLLOW_LINES[folI++ % FOLLOW_LINES.length]); }
+  }
   hero.x = Math.max(6, Math.min(WW - 6, hero.x)); hero.y = Math.max(Y_MIN, Math.min(Y_MAX + 4, hero.y));
   camX += ((Math.max(0, Math.min(WW - W, hero.x - W / 2))) - camX) * Math.min(1, dt * 5);
   updFx(dt);
@@ -293,10 +301,11 @@ function render(dt, t) {
   const n = near();
   // персонажи и герой, сортировка по глубине (y)
   const actors = [];
-  if (cfg.spots.includes('valya')) actors.push({ y: 113, d: () => drawNpc('valya', 60 - Math.round(camX), 100, t) });
-  if (cfg.spots.includes('store')) actors.push({ y: 112, d: () => drawNpc('timur', 446 - Math.round(camX), 97, t) });
-  if (cfg.spots.includes('college') && time === 'day') actors.push({ y: 112, d: () => drawNpc('margo', 534 - Math.round(camX), 97, t) });
-  if (time !== 'day') actors.push({ y: 121, d: () => drawNpc('sera', 220 - Math.round(camX), 104 + (Math.sin(t / 500) > 0 ? 0 : 1), t) });
+  if (!cfg.quiet && cfg.spots.includes('valya')) actors.push({ y: 113, d: () => drawNpc('valya', 60 - Math.round(camX), 100, t) });
+  if (!cfg.quiet && cfg.spots.includes('store')) actors.push({ y: 112, d: () => drawNpc('timur', 446 - Math.round(camX), 97, t) });
+  if (!cfg.quiet && cfg.spots.includes('college') && time === 'day') actors.push({ y: 112, d: () => drawNpc('margo', 534 - Math.round(camX), 97, t) });
+  if (cfg.follow) { const f = follower(), mv = hero.moving && trail.length > 18; actors.push({ y: f.y, d: () => drawNpc('sera', Math.round(f.x - 5 - camX), Math.round(f.y - 16 + (mv && Math.sin(t / 90) > 0 ? -1 : 0)), t) }); }
+  else if (time !== 'day') actors.push({ y: 121, d: () => drawNpc('sera', 220 - Math.round(camX), 104 + (Math.sin(t / 500) > 0 ? 0 : 1), t) });
   actors.push({ y: hero.y, d: () => drawHero(Math.round(hero.x - camX), Math.round(hero.y)) });
   actors.sort((a, b) => a.y - b.y).forEach(a => a.d());
   drawWorldFx(time, t);
@@ -344,6 +353,7 @@ function open(c, cb) {
   paintBg(c.time || 'day'); paintFg(c.time || 'day'); initFx();
   if (c.pos) { hero.x = c.pos.x; hero.y = c.pos.y; } else { hero.x = 97; hero.y = 116; hero.dir = 'down'; }
   hero.target = null; hero.autoEnter = null; for (const k in keys) keys[k] = false;
+  trail.length = 0; folT = 4; for (let i = 0; i < 20; i++) trail.push({ x: hero.x - 14 + i * .7, y: hero.y });
   camX = Math.max(0, Math.min(WW - W, hero.x - W / 2));
   document.getElementById('pixDay').textContent = c.title || ''; document.getElementById('pixTask').textContent = c.task || '';
   const wrap = document.getElementById('pixwrap');

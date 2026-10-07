@@ -14,7 +14,7 @@ document.documentElement.style.setProperty('--vine', `url(${A.ui.vine})`);
 $('#logoImg').src = A.ui.logo;
 document.querySelectorAll('#tAnim .tf').forEach(i => i.src = A.title[i.dataset.f]);
 // ветки цветов на кнопках
-function vineify(btn) { ['l','r'].forEach(s => { const v = document.createElement('span'); v.className = 'vine ' + s; btn.appendChild(v); }); }
+function vineify(btn) { ['l','r','t','b'].forEach(s => { const v = document.createElement('span'); v.className = 'vine ' + s; btn.appendChild(v); }); }
 document.querySelectorAll('.vbtn').forEach(vineify);
 // анимация титульного экрана: Сера перебирает пальцами + моргает
 const TF = {}; document.querySelectorAll('#tAnim .tf').forEach(i => TF[i.dataset.f] = i);
@@ -69,13 +69,35 @@ function toTitle() {
 
 // ── Фон и персонажи ──
 let bgFront = $('#bg'), bgBack = $('#bg2');
+function camTo(c) { // наезд камеры на точку фона: {x,y — % ; s — масштаб; ms}
+  [bgFront, bgBack].forEach(b => { b.style.transition = ''; b.style.transform = ''; b.style.transformOrigin = ''; });
+  if (!c) return; const ms = skip ? 1 : (c.ms || 1400);
+  bgFront.style.transition = `opacity 1.2s ease,transform ${ms}ms cubic-bezier(.45,0,.2,1)`; bgFront.style.transformOrigin = `${c.x}% ${c.y}%`;
+  void bgFront.offsetWidth; bgFront.style.transform = `scale(${c.s || 1.6})`;
+}
+// катсцена: кадры сменяют друг друга сами (клик — следующий кадр)
+function playCut(frames) {
+  const c = $('#cut'), L = [...c.querySelectorAll('.cimg')], cap = c.querySelector('.ccap'); let k = 0, cur = 0, tm = null;
+  $('#textbox').classList.add('hidden'); $('#side').classList.add('hidden'); c.classList.remove('hidden', 'out');
+  const next = () => {
+    clearTimeout(tm);
+    if (k >= frames.length) { c.onclick = null; c.classList.add('out'); setTimeout(() => { c.classList.add('hidden'); c.classList.remove('out'); L.forEach(x => x.classList.remove('on')); cap.textContent = ''; $('#textbox').classList.remove('hidden'); run(); }, skip ? 50 : 700); return; }
+    const f = frames[k++], el = L[cur]; cur ^= 1; L[cur].classList.remove('on');
+    el.style.backgroundImage = `url(${A.bg[f.img]})`; el.classList.remove('on'); void el.offsetWidth; el.classList.add('on');
+    cap.classList.remove('show'); void cap.offsetWidth; cap.textContent = f.text ? fmt(f.text) : ''; if (f.text) cap.classList.add('show');
+    if (f.text) log.push({ n: '', t: fmt(f.text) });
+    if (f.sfx && !skip) Sound.sfx(f.sfx);
+    tm = setTimeout(next, skip ? 200 : (f.ms || 2600));
+  };
+  c.onclick = e => { e.stopPropagation(); next(); }; next();
+}
 function setBg(k, instant) {
-  st.bg = k; if (typeof applyRain === 'function') applyRain(); const url = `url(${A.bg[k]})`;
+  camTo(null); st.bg = k; if (typeof applyRain === 'function') applyRain(); const url = `url(${A.bg[k]})`;
   if (instant) { bgFront.style.backgroundImage = url; bgFront.style.opacity = 1; bgBack.style.opacity = 0; return; }
   bgBack.style.backgroundImage = url; bgBack.style.opacity = 1; bgFront.style.opacity = 0;
   [bgFront, bgBack] = [bgBack, bgFront];
 }
-const POS = { left:'28%', center:'50%', right:'72%', fl:'18%', fr:'82%' };
+const POS = { left:'25%', center:'50%', right:'75%', fl:'16%', fr:'84%' };
 const SINGLE = { father:1, valya:1, timur:1, liza:1, margo:1 };
 const WHO = { '???':'sera', 'Сера':'sera', 'Пастор':'father', 'P':'hero', 'Баба Валя':'valya', 'Тимур':'timur', 'Лиза':'liza', 'Маргарита Павловна':'margo' };
 const BLINK = { neutral:1 }; // cold перерисован в v4 — старый кадр моргания к нему не подходит
@@ -174,6 +196,8 @@ function run() {
     if (c.chapter) { st.chapter = c.chapter; $('#chapter').textContent = c.chapter; }
     if (c.bg) { setBg(c.bg); document.querySelectorAll('#bg,#bg2').forEach(x => x.classList.remove('zoom')); }
     if (c.zoom) bgFront.classList.add('zoom');
+    if ('cam' in c) camTo(c.cam);
+    if (c.cut) { playCut(c.cut); return; }
     if (c.music) { st.music = c.music; Sound.music(c.music); }
     if ('rain' in c) { setRain(c.rain); applyRain(); }
     if (c.show) showChar(c.who || (c.show === 'father' ? 'father' : 'sera'), c.show, c.pos);
@@ -274,7 +298,7 @@ function hearts(n, dark) {
     h.style.left = (38 + Math.random() * 24) + '%'; h.style.top = (25 + Math.random() * 25) + '%'; $('#fxl').appendChild(h); setTimeout(() => h.remove(), 1900); }, k * 160);
 }
 const REACT = { // спрайт, длительность, эффекты
-  pat:    { spr: 'pat',    ms: 2400, fx: () => { hearts(6); const g = $('#game'); g.classList.add('patted'); setTimeout(() => g.classList.remove('patted'), 2300); } },
+  pat:    { spr: 'pat',    ms: 2700, frames: true, fx: () => hearts(6) },
   tongue: { spr: 'tongue', ms: 1500, fx: () => hearts(2, true) },
   hop:    { spr: 'neutral', ms: 1200, fx: () => hearts(3) },
   shy:    { spr: 'shy',    ms: 1600, fx: () => hearts(2) },
@@ -284,6 +308,16 @@ const REACT = { // спрайт, длительность, эффекты
   frown:  { spr: 'sadfrown', ms: 1600 },
   down:   { spr: 'saddown',  ms: 2000 },
 };
+// «погладить экран»: покадровая анимация ладони (pat → pat2/pat3 туда-сюда, ~4 кадра/с)
+let patT = null;
+function patAnim(el, ms) {
+  const seq = ['sera_pat2','sera_pat3']; let k = 0; const t0 = Date.now();
+  setTimeout(() => { if (!el.dataset.reacting) return; patT = setInterval(() => {
+    if (!el.dataset.reacting || Date.now() - t0 > ms - 450) { clearInterval(patT); if (el.dataset.reacting) setImg(el, 'sera_pat'); return; }
+    setImg(el, seq[k++ % 2]); }, 230); }, 380);
+}
+// заранее декодируем кадры, чтобы смена была мгновенной
+['sera_pat','sera_pat2','sera_pat3'].forEach(k => { if (A.sprites[k]) { const i = new Image(); i.src = A.sprites[k]; i.decode && i.decode().catch(() => {}); } });
 function react(kind) {
   if (isCrying() && CRY_MAP[kind]) kind = CRY_MAP[kind];
   const el = seraEl(), R = REACT[kind]; if (!el || !R || !st.chars.sera) return;
@@ -291,7 +325,8 @@ function react(kind) {
   clearTimeout(reactT); el.className = el.className.replace(/\breact-\S+/g, '').trim();
   void el.offsetWidth; el.dataset.reacting = 1;
   setImg(el, 'sera_' + R.spr); el.classList.add('react-' + (kind === 'shy' ? 'hop' : kind)); R.fx && R.fx();
-  reactT = setTimeout(() => { el.classList.remove('react-' + (kind === 'shy' ? 'hop' : kind)); delete el.dataset.reacting; if (st.chars.sera) setImg(el, 'sera_' + st.chars.sera.expr); }, R.ms);
+  clearInterval(patT); if (R.frames) patAnim(el, R.ms);
+  reactT = setTimeout(() => { clearInterval(patT); el.classList.remove('react-' + (kind === 'shy' ? 'hop' : kind)); delete el.dataset.reacting; if (st.chars.sera) setImg(el, 'sera_' + st.chars.sera.expr); }, R.ms);
 }
 // ── Сохранения ──
 function snapshot() { if (st.mode === 'map' && st.map && PixelMap.isOpen()) st.map.pos = PixelMap.pos(); return JSON.stringify({ st: { ...st, i: st.mode === 'map' ? st.i : Math.max(0, st.i - 1) }, date: new Date().toLocaleString('ru-RU') }); }
@@ -382,13 +417,14 @@ function openMap() {
   if (m.bg) setBg(m.bg); if (m.music) { st.music = m.music; Sound.music(m.music); }
   setRain(false); Sound.rain(true); // в пиксельном режиме дождь рисует сам PixelMap
   $('#chapter').textContent = st.chapter || '';
-  PixelMap.open({ title: m.title, task: `${m.task || 'Куда пойти?'} · осталось: ${left}`, time: m.time, spots: m.spots, done: m.done, pos: m.pos }, id => {
-    m.pos = PixelMap.pos(); m.done.push(id); const n = (st.flags['v_' + id] || 0) + 1; st.flags['v_' + id] = n;
+  PixelMap.open({ title: m.title, task: `${m.task || 'Куда пойти?'} · осталось: ${left}`, time: m.time, spots: m.spots, done: m.done, pos: m.pos, follow: m.follow, home: m.home, quiet: !!m.scenes }, id => {
+    m.pos = PixelMap.pos(); m.done.push(id);
+    if (m.scenes && m.scenes[id]) { st.mode = ''; $('#textbox').classList.remove('hidden'); jump(m.scenes[id]); run(); return; } const n = (st.flags['v_' + id] || 0) + 1; st.flags['v_' + id] = n;
     st.mode = ''; $('#textbox').classList.remove('hidden'); jump(STORY[id + '_' + n] ? id + '_' + n : id + '_3'); run();
   });
   saveSlot('auto', true);
 }
-window.__pix = { enter: id => PixelMap.enter(id), state: () => st };
+window.__pix = { enter: id => PixelMap.enter(id), state: () => st, react: k => react(k) };
 $('#pixNotes').onclick = e => { e.stopPropagation(); showNotes(); };
 $('#pixMenu').onclick = e => { e.stopPropagation(); gameMenu(); };
 $('#pixSave').onclick = e => { e.stopPropagation(); slotsUI('save'); };
