@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S^erap^S — визуальная новелла</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="game">
+  <div id="bg" class="layer"></div>
+  <div id="bg2" class="layer"></div>
+  <div id="chars" class="layer"></div>
+  <canvas id="fx" class="layer"></canvas>
+  <div id="vignette" class="layer"></div>
+
+  <div id="hud" class="hidden">
+    <div id="trust" title="Шкала доверия Серы">
+      <span class="cross">✝</span>
+      <div class="bar"><div class="fill"></div><div class="cracks"></div></div>
+    </div>
+    <div id="chapter"></div>
+  </div>
+  <div id="toast"></div>
+
+  <div id="textbox" class="hidden">
+    <div id="namebox"></div>
+    <div id="text"></div>
+    <div id="next">▼</div>
+    <div id="controls">
+      <button data-a="auto">Авто</button>
+      <button data-a="skip">Пропуск</button>
+      <button data-a="log">Журнал</button>
+      <button data-a="save">Сохр.</button>
+      <button data-a="load">Загр.</button>
+      <button data-a="menu">Меню</button>
+    </div>
+  </div>
+
+  <div id="choices" class="hidden"></div>
+
+  <div id="title" class="screen">
+    <div class="title-art"></div>
+    <div class="title-inner">
+      <h1>S<sup>^</sup>erap<sup>^</sup>S</h1>
+      <p class="sub">визуальная новелла</p>
+      <div class="menu">
+        <button id="btnNew">Новая игра</button>
+        <button id="btnContinue">Продолжить</button>
+        <button id="btnSettings">Настройки</button>
+        <button id="btnEndings">Концовки</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="nameScreen" class="screen hidden">
+    <div class="panel">
+      <h2>Как тебя зовут?</h2>
+      <input id="nameInput" maxlength="16" placeholder="Кирилл">
+      <button id="nameOk">Начать</button>
+    </div>
+  </div>
+
+  <div id="modal" class="screen hidden"><div class="panel" id="modalBody"></div></div>
+
+  <div id="ending" class="screen hidden">
+    <div class="panel">
+      <h2 id="endTitle"></h2>
+      <p id="endText"></p>
+      <button id="endBack">В главное меню</button>
+    </div>
+  </div>
+</div>
+<script src="assets/sprites.js"></script>
+<script src="assets/bg1.js"></script>
+<script src="assets/bg2.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/story.js"></script>
+<script src="js/engine.js"></script>
+</body>
+</html>
