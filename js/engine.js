@@ -130,9 +130,10 @@ function resize() { cv.width = cv.clientWidth; cv.height = cv.clientHeight; } ad
 function setRain(on) { raining = on; st.rain = on; if (on && !drops.length) drops = Array.from({ length: 650 }, () => newDrop(true)); }
 function newDrop(any) { const z = Math.random(); return { x: Math.random() * 1.15 - .05, y: any ? Math.random() : -.1 - Math.random() * .2, z, l: 18 + z * 46, v: .55 + z * .9, a: .12 + z * .38 }; }
 const RAIN_SLANT = .12;
+const OUTDOOR = { street:1, roof:1, court:1, yard:1 }; // в помещениях капли не рисуем — остаётся только шум дождя за окном
 (function frame() {
   cx.clearRect(0, 0, cv.width, cv.height);
-  if (raining) {
+  if (raining && OUTDOOR[st.bg]) {
     const W = cv.width, H = cv.height, k = H / 720;
     const mg = cx.createLinearGradient(0, H * .45, 0, H); mg.addColorStop(0, 'rgba(150,160,200,0)'); mg.addColorStop(1, 'rgba(150,160,200,.10)'); cx.fillStyle = mg; cx.fillRect(0, 0, W, H);
     cx.lineCap = 'round';
