@@ -81,13 +81,13 @@ function showChar(who, expr, pos) {
   const prev = st.chars[who];
   pos = pos || (prev && prev.pos) || 'center';
   st.chars[who] = { expr, pos };
-  let el = document.querySelector(`.char[data-who="${who}"]`);
+  let el = document.querySelector(`.char[data-who="${who}"]:not([data-dying])`);
   if (!el) { el = document.createElement('img'); el.className = 'char fade breath'; el.dataset.who = who; $('#chars').appendChild(el); el.src = A.sprites[key]; el.style.left = POS[pos]; requestAnimationFrame(() => requestAnimationFrame(() => el.classList.remove('fade'))); }
   else { if (el.src !== A.sprites[key]) el.src = A.sprites[key]; el.style.left = POS[pos]; el.classList.remove('fade'); }
 }
 function hideChar(who) {
   const list = who === 'all' ? Object.keys(st.chars) : [who];
-  list.forEach(w => { delete st.chars[w]; const el = document.querySelector(`.char[data-who="${w}"]`); if (el) { el.classList.add('fade'); setTimeout(() => el.remove(), 500); } });
+  list.forEach(w => { delete st.chars[w]; const el = document.querySelector(`.char[data-who="${w}"]:not([data-dying])`); if (el) { el.dataset.dying = 1; el.classList.add('fade'); setTimeout(() => el.remove(), 500); } });
 }
 function setSpeaker(name) {
   document.querySelectorAll('.char').forEach(el => {
@@ -126,7 +126,8 @@ function run() {
     st.i++;
     if (Array.isArray(c)) { say(c[0], c[1], c[2]); return; }
     if (c.chapter) { st.chapter = c.chapter; $('#chapter').textContent = c.chapter; }
-    if (c.bg) setBg(c.bg);
+    if (c.bg) { setBg(c.bg); document.querySelectorAll('#bg,#bg2').forEach(x => x.classList.remove('zoom')); }
+    if (c.zoom) bgFront.classList.add('zoom');
     if (c.music) { st.music = c.music; Sound.music(c.music); }
     if ('rain' in c) { setRain(c.rain); Sound.rain(c.rain); }
     if (c.show) showChar(c.who || (c.show === 'father' ? 'father' : 'sera'), c.show, c.pos);
@@ -205,11 +206,15 @@ function finish(kind) {
 
 // ── Интерактив Серы ──
 let reactT = null, leanOn = false;
-const seraEl = () => document.querySelector('.char[data-who="sera"]');
+const seraEl = () => document.querySelector('.char[data-who="sera"]:not([data-dying])');
+const isCrying = () => st.chars.sera && /^sad/.test(st.chars.sera.expr);
+// когда Сера плачет — никаких языков и поглаживаний: вытирает слёзы, хмурится, опускает голову
+const CRY_MAP = { pat: 'wipe', hop: 'wipe', shy: 'wipe', tongue: 'frown', shake: 'frown', shiver: 'down' };
 function hoverLean(on) {
   const el = seraEl(); if (!el || el.dataset.reacting) return;
-  if (on && !leanOn) { leanOn = true; el.dataset.prev = st.chars.sera.expr; el.src = A.sprites.sera_lean; el.classList.add('react-lean'); }
-  else if (!on && leanOn) { leanOn = false; el.classList.remove('react-lean'); el.src = A.sprites['sera_' + st.chars.sera.expr]; }
+  const crying = isCrying();
+  if (on && !leanOn) { leanOn = true; el.src = A.sprites[crying ? 'sera_sadwipe' : 'sera_lean']; el.classList.add(crying ? 'react-wipeloop' : 'react-lean'); }
+  else if (!on && leanOn) { leanOn = false; el.classList.remove('react-lean', 'react-wipeloop'); el.src = A.sprites['sera_' + st.chars.sera.expr]; }
 }
 function hearts(n, dark) {
   for (let k = 0; k < n; k++) setTimeout(() => { const h = document.createElement('span'); h.className = 'heart' + (dark ? ' dark' : ''); h.textContent = dark ? '✝' : '♡';
@@ -222,10 +227,14 @@ const REACT = { // спрайт, длительность, эффекты
   shy:    { spr: 'shy',    ms: 1600, fx: () => hearts(2) },
   shake:  { spr: 'cold',   ms: 1100 },
   shiver: { spr: 'sad',    ms: 900 },
+  wipe:   { spr: 'sadwipe',  ms: 2000 },
+  frown:  { spr: 'sadfrown', ms: 1600 },
+  down:   { spr: 'saddown',  ms: 2000 },
 };
 function react(kind) {
+  if (isCrying() && CRY_MAP[kind]) kind = CRY_MAP[kind];
   const el = seraEl(), R = REACT[kind]; if (!el || !R || !st.chars.sera) return;
-  leanOn = false; el.classList.remove('react-lean');
+  leanOn = false; el.classList.remove('react-lean', 'react-wipeloop');
   clearTimeout(reactT); el.className = el.className.replace(/\breact-\S+/g, '').trim();
   void el.offsetWidth; el.dataset.reacting = 1;
   el.src = A.sprites['sera_' + R.spr]; el.classList.add('react-' + (kind === 'shy' ? 'hop' : kind)); R.fx && R.fx();
@@ -235,7 +244,7 @@ function react(kind) {
 const pokes = ['tongue', 'shy', 'pat', 'tongue', 'hop'];
 $('#chars').addEventListener('click', e => {
   const el = e.target.closest('.char[data-who="sera"]'); if (!el) return;
-  const r = el.getBoundingClientRect(); if (e.clientY - r.top < r.height * .3) { e.stopPropagation(); react(pokes[Math.floor(Math.random() * pokes.length)]); }
+  const r = el.getBoundingClientRect(); if (e.clientY - r.top < r.height * .3) { e.stopPropagation(); const list = isCrying() ? ['wipe', 'frown', 'down'] : pokes; react(list[Math.floor(Math.random() * list.length)]); }
 });
 
 // ── Сохранения ──
