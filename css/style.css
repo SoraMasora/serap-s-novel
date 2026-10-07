@@ -8,7 +8,7 @@ html,body{height:100%;background:#07060a;color:#eee;font-family:"Trebuchet MS","
 .char{position:absolute;bottom:-4%;height:104%;left:50%;transform:translateX(-50%);transition:opacity .5s ease,left .6s ease,filter .4s;filter:drop-shadow(0 0 14px rgba(0,0,0,.6))}
 .char .shiftw,.char .idle{height:100%;position:relative;transform-origin:50% 100%}
 .char img.base{height:100%;display:block}
-.char img.blink{position:absolute;left:39.62%;top:11.75%;width:16.74%;height:6.885%;opacity:0;pointer-events:none}
+.char img.blink{position:absolute;left:37.946%;top:15.06%;width:21.786%;height:8.768%;opacity:0;pointer-events:none}
 .char.blinking img.blink[data-ok]{opacity:1}
 .char .idle{animation:idle 6s ease-in-out infinite}
 @keyframes idle{0%,100%{transform:rotate(0) scale(1,1)}25%{transform:rotate(.3deg) scale(1.002,1.006)}50%{transform:rotate(0) scale(1,1.011) translateY(-.15%)}75%{transform:rotate(-.3deg) scale(1.002,1.006)}}
@@ -267,6 +267,8 @@ ul.notes li.empty{border-color:#555;color:#9a8aa6}ul.notes li.empty:before{conte
 .char[data-who=margo]{height:184%}
 .char[data-who=timur]{height:182%}
 .char[data-who=father]{height:177%}
+/* v6: Сера — новые единые спрайты (кадр от макушки до колен, 1120×1494) */
+.char[data-who=sera]:not(.react-pat){height:130.4%;bottom:-32.3%}
 /* «погладить экран»: крупный план по пояс, кадры меняет движок */
 .char.react-pat{height:104%!important;bottom:-4%;animation:patNear .35s ease-out}
 @keyframes patNear{from{transform:translateX(-50%) scale(.9);opacity:.6}to{transform:translateX(-50%) scale(1);opacity:1}}

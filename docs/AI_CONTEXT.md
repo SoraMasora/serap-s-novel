@@ -117,3 +117,12 @@ GitHub MCP `push_files` с `arguments_file_path` (JSON `{owner, repo, branch, me
 ## 9. Идеи на будущее (не сделано)
 - Больше точек на карте (качели на рассвете — Сера рисует котов), 4-й день, сцена в «Луне» с Серой и Лизой.
 - Моргание для остальных эмоций, отдельный спрайт Серы под зонтом.
+
+## v6 (единый дизайн Серы, вывески, этикетки)
+- **Сера перерисована целиком**: 23 эмоции сгенерированы от одного мастер-кадра (`gen/g_neutral.jpg`, session-файл меняется между сессиями) через `images_generate` с промптом «Keep the exact same character design… Change ONLY the pose and facial expression: …». Кадр — от макушки до колен, 1120×1494 (генерация 896×1195 ×1.25 Lanczos).
+- Файлы: `assets/sera1.js … sera4.js` (все `sera_*` кроме pat + `blink_neutral`). Старые `sprites1/3/4/5/7.js` удалены. `sprites8.js` — pat/pat2/pat3 (старые, крупный план), `blink_cold` больше нет.
+- CSS: `.char[data-who=sera]:not(.react-pat){height:130.4%;bottom:-32.3%}` — голова там же, где была у старых спрайтов. Моргание: `.char img.blink{left:37.946%;top:15.06%;width:21.786%;height:8.768%}`.
+- Вырезка без ореола: `python3 tools/key3.py in.jpg out.png 1.25 [soft]` (мягкая альфа, цвет кромки берётся от соседних «чистых» пикселей, despill; `soft` — если у персонажа есть жёлто-зелёное, напр. шарф). Пакетно: `python3 tools/build_sera.py [имена]` → `new/`, упаковка: `python3 tools/pack_sera.py`.
+- Фон `store`: этикетки «Доширак» (лотки), «Ролтон» (стаканы), «Adrenaline» (банки). Делалось так: кроп ×3–6 → `images_generate` → обратная вклейка с регистрацией SIFT+гомография (`tools/patch_bg.py`).
+- Фон `cafe` (мы внутри «Луны»): за окном вместо «CAFÉ LUNA»/«RAMEN» теперь «АПТЕКА», «ШАУРМА», «ЦВЕТЫ».
+- Сборка единого файла: `python3 tools/build.py` → `/data/serap-s.html` (+ `game.html` для тестов).
