@@ -283,3 +283,16 @@ ul.notes li.empty{border-color:#555;color:#9a8aa6}ul.notes li.empty:before{conte
 #cut .ccap{position:absolute;left:18%;right:18%;bottom:7%;text-align:center;font-family:"Lora",Georgia,serif;font-style:italic;font-size:clamp(15px,2.8vh,30px);color:#f1e6ee;
   text-shadow:0 0 4px #000,0 0 14px #000,0 0 30px #000;opacity:0;transition:opacity .6s ease .25s}
 #cut .ccap.show{opacity:1}
+/* v8: покадровые эмоции Серы — лёгкое движение поверх смены кадров */
+.char.react-giggle{animation:giggleB .26s ease-in-out 5}
+@keyframes giggleB{50%{transform:translateX(-50%) translateY(-1.2%)}}
+.char.react-huff{animation:huffS .7s ease}
+@keyframes huffS{30%{transform:translateX(-50%) translateY(-1%) scale(1.01)}}
+.char.react-yawn{animation:yawnS 2s ease}
+@keyframes yawnS{40%{transform:translateX(-50%) scaleY(1.012) translateY(-.6%)}}
+.char.react-cover{animation:coverS 1.6s ease}
+@keyframes coverS{20%{transform:translateX(-50%) translateY(.8%)}}
+/* v8: подпись автора — маленькая и неброская */
+.madeby{font:italic 12px/1 "Lora",Georgia,serif;letter-spacing:.12em;color:#e9dce6;opacity:.32;pointer-events:none;user-select:none}
+#title .madeby{position:absolute;right:18px;bottom:14px;z-index:5}
+#ending .madeby{margin-top:14px;text-align:center;font-size:11px;opacity:.38}

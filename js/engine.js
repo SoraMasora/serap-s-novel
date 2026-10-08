@@ -114,7 +114,7 @@ const baseImg = el => el.querySelector('img.base');
 function setImg(el, key) { const im = baseImg(el); const src = A.sprites[key]; if (src && im.getAttribute('src') !== src) im.src = src; }
 function syncBlink(el, expr) { const b = el.querySelector('img.blink'); if (el.dataset.who === 'sera' && BLINK[expr] && A.sprites['blink_' + expr]) { b.src = A.sprites['blink_' + expr]; b.dataset.ok = 1; } else delete b.dataset.ok; }
 function showChar(who, expr, pos) {
-  const key = SINGLE[who] ? who : who + '_' + expr;
+  const key = SINGLE[who] ? (expr && A.sprites[who + '_' + expr] ? who + '_' + expr : who) : who + '_' + expr;
   const prev = st.chars[who];
   pos = pos || (prev && prev.pos) || 'center';
   st.chars[who] = { expr, pos };
@@ -235,6 +235,7 @@ function say(name, text, expr) {
   $('#textbox').dataset.kind = thought ? 'thought' : !name ? 'narr' : name === 'P' ? 'gg' : WHO[name] || 'npc';
   if (expr && (name === 'Сера' || name === '???') && st.chars.sera) showChar('sera', expr);
   if (expr && name === 'P' && st.chars.hero) showChar('hero', expr);
+  else if (name !== 'P' && WHO[name] && SINGLE[WHO[name]] && st.chars[WHO[name]]) showChar(WHO[name], expr || 'neutral');
   tx.className = thought ? 'thought' : name ? '' : 'narr';
   setSpeaker((name === 'P' && !st.chars.hero) || thought ? null : name);
   const side = $('#side');
@@ -316,25 +317,40 @@ const REACT = { // спрайт, длительность, эффекты
   frown:  { spr: 'sadfrown', ms: 1600 },
   down:   { spr: 'saddown',  ms: 2000 },
 };
-// «погладить экран»: покадровая анимация ладони (pat → pat2/pat3 туда-сюда, ~4 кадра/с)
+// «погладить экран»: ладонь гладит туда-сюда (pat2→pat3→pat4→pat3, ~6 кадров/с)
 let patT = null;
 function patAnim(el, ms) {
-  const seq = ['sera_pat2','sera_pat3']; let k = 0; const t0 = Date.now();
+  const seq = ['sera_pat2','sera_pat3','sera_pat4','sera_pat3']; let k = 0; const t0 = Date.now();
   setTimeout(() => { if (!el.dataset.reacting) return; patT = setInterval(() => {
-    if (!el.dataset.reacting || Date.now() - t0 > ms - 450) { clearInterval(patT); if (el.dataset.reacting) setImg(el, 'sera_pat'); return; }
-    setImg(el, seq[k++ % 2]); }, 230); }, 380);
+    if (!el.dataset.reacting || Date.now() - t0 > ms - 400) { clearInterval(patT); if (el.dataset.reacting) setImg(el, 'sera_pat'); return; }
+    setImg(el, seq[k++ % seq.length]); }, 170); }, 320);
+}
+// v8: покадровые эмоции Серы — [кадр, мс]; после последнего кадра возвращается текущая эмоция
+const ANIM = {
+  yawn:   [['yawn1', 380], ['yawn2', 950], ['yawn3', 650]],
+  cover:  [['cover1', 350], ['cover2', 1300]],
+  giggle: [['giggle1', 260], ['giggle2', 260], ['giggle1', 260], ['giggle2', 260], ['giggle1', 300]],
+  huff:   [['huff1', 700], ['huff2', 1000]],
+};
+for (const k in ANIM) REACT[k] = { seq: ANIM[k], ms: ANIM[k].reduce((a, f) => a + f[1], 0), fx: k === 'cover' ? () => hearts(2) : null };
+function seqAnim(el, seq) {
+  let k = 0;
+  (function nx() { if (!el.dataset.reacting || k >= seq.length) return; setImg(el, 'sera_' + seq[k][0]); patT = setTimeout(nx, seq[k++][1]); })();
 }
 // заранее декодируем кадры, чтобы смена была мгновенной
-['sera_pat','sera_pat2','sera_pat3'].forEach(k => { if (A.sprites[k]) { const i = new Image(); i.src = A.sprites[k]; i.decode && i.decode().catch(() => {}); } });
+['sera_pat','sera_pat2','sera_pat3','sera_pat4'].concat(...Object.values(ANIM).map(a => a.map(f => 'sera_' + f[0])))
+  .forEach(k => { if (A.sprites[k]) { const i = new Image(); i.src = A.sprites[k]; i.decode && i.decode().catch(() => {}); } });
 function react(kind) {
   if (isCrying() && CRY_MAP[kind]) kind = CRY_MAP[kind];
   const el = seraEl(), R = REACT[kind]; if (!el || !R || !st.chars.sera) return;
   leanOn = false; el.classList.remove('react-lean', 'react-wipeloop');
   clearTimeout(reactT); el.className = el.className.replace(/\breact-\S+/g, '').trim();
   void el.offsetWidth; el.dataset.reacting = 1;
-  setImg(el, 'sera_' + R.spr); el.classList.add('react-' + (kind === 'shy' ? 'hop' : kind)); R.fx && R.fx();
-  clearInterval(patT); if (R.frames) patAnim(el, R.ms);
-  reactT = setTimeout(() => { clearInterval(patT); el.classList.remove('react-' + (kind === 'shy' ? 'hop' : kind)); delete el.dataset.reacting; if (st.chars.sera) setImg(el, 'sera_' + st.chars.sera.expr); }, R.ms);
+  clearInterval(patT); clearTimeout(patT);
+  if (R.seq) seqAnim(el, R.seq); else setImg(el, 'sera_' + R.spr);
+  el.classList.add('react-' + (kind === 'shy' ? 'hop' : kind)); R.fx && R.fx();
+  if (R.frames) patAnim(el, R.ms);
+  reactT = setTimeout(() => { clearInterval(patT); clearTimeout(patT); el.classList.remove('react-' + (kind === 'shy' ? 'hop' : kind)); delete el.dataset.reacting; if (st.chars.sera) setImg(el, 'sera_' + st.chars.sera.expr); }, R.ms);
 }
 // ── Сохранения ──
 function snapshot() { if (st.mode === 'map' && st.map && PixelMap.isOpen()) st.map.pos = PixelMap.pos(); return JSON.stringify({ st: { ...st, i: st.mode === 'map' ? st.i : Math.max(0, st.i - 1) }, date: new Date().toLocaleString('ru-RU') }); }

@@ -1,5 +1,6 @@
 // Звук: треки по локациям (Молчат Дома, Радиотехника), процедурный индастриал «tense» и дождь, SFX на сэмплах Kenney (CC0).
 const Sound = (() => {
+  const TRK = 0.3; // v8: треки тише (30% от ползунка)
   let ctx, master, musicGain, rainGain, reverb, trackBus, timer = null, mode = null, step = 0, rainSrc = null;
   let vol = { music: 0.6, rain: 0.5 };
   function init() {
@@ -11,7 +12,7 @@ const Sound = (() => {
     const wet = ctx.createGain(); wet.gain.value = 0.45;
     musicGain.connect(master); musicGain.connect(reverb); reverb.connect(wet); wet.connect(master);
     rainGain = ctx.createGain(); rainGain.gain.value = 0; rainGain.connect(master);
-    trackBus = ctx.createGain(); trackBus.gain.value = vol.music; trackBus.connect(master);
+    trackBus = ctx.createGain(); trackBus.gain.value = vol.music * TRK; trackBus.connect(master);
     loadSamples();
     if (mode === null) { mode = 'calm'; update(); }
   }
@@ -81,7 +82,7 @@ const Sound = (() => {
   // ── Музыка: три трека по локациям (assets/music*.js), «tense» — процедурный индастриал ──
   const LOC = { street:'roofs', street_rain:'roofs', yard:'roofs', roof:'roofs', court:'roofs', map:'roofs',
     room:'sudno', heroroom:'sudno', stairs:'sudno', kitchen:'sudno', empty:'sudno', title:'sudno', cg_father:'sudno', bug1:'sudno', bug_art:'sudno',
-    store:'elektro', cafe:'elektro', college:'elektro', cg_shift:'elektro' };
+    store:'elektro', cafe:'elektro', college:'elektro', cg_shift:'elektro', cg_cafe:'elektro', cg_study:'sudno', cg_roof:'roofs', cg_swing:'roofs', end_good1:'roofs', end_good2:'roofs', end_good3:'roofs' };
   let loc = 'title', curTrack = null; const T = {};
   function trackEl(k) {
     if (T[k]) return T[k];
@@ -94,7 +95,7 @@ const Sound = (() => {
   }
   function fade(t, to, sec) {
     if (t.g) { const g = t.g.gain, n = ctx.currentTime; g.cancelScheduledValues(n); g.setValueAtTime(g.value, n); g.linearRampToValueAtTime(to, n + sec); }
-    else { clearInterval(t.iv); const from = t.a.volume, t0 = Date.now(); t.iv = setInterval(() => { const q = Math.min(1, (Date.now() - t0) / (sec * 1000)); t.a.volume = Math.max(0, Math.min(1, (from + (to - from) * q) * vol.music)); if (q >= 1) clearInterval(t.iv); }, 50); }
+    else { clearInterval(t.iv); const from = t.a.volume, t0 = Date.now(); t.iv = setInterval(() => { const q = Math.min(1, (Date.now() - t0) / (sec * 1000)); t.a.volume = Math.max(0, Math.min(1, (from + (to - from) * q) * vol.music * TRK)); if (q >= 1) clearInterval(t.iv); }, 50); }
   }
   function playTrack(k) {
     if (k === curTrack) { const t = k && T[k]; if (t && t.a.paused) t.a.play().catch(() => {}); return; }
@@ -168,6 +169,6 @@ const Sound = (() => {
   ['keys', 'steps', 'step', 'bump', 'drop', 'knock', 'creak', 'cloth', 'paper', 'latch', 'unlock'].forEach(k => { SFX[k] = t => { sample(k, t, k === 'steps' ? 0.8 : 1) || (FALLBACK[k] && FALLBACK[k](t)); }; });
   function sfx(k) { if (!ctx) return; if (ctx.state === 'suspended') ctx.resume(); const f = SFX[k]; if (f) f(ctx.currentTime + 0.02); }
   function blip() { if (!ctx || mode === null && !rainSrc) return; }
-  function setVol(k, v) { vol[k] = v; if (ctx) { if (k === 'music') { musicGain.gain.value = v; trackBus.gain.value = v; } } }
+  function setVol(k, v) { vol[k] = v; if (ctx) { if (k === 'music') { musicGain.gain.value = v; trackBus.gain.value = v * TRK; } } }
   return { init, music, rain, setVol, vol, blip, sfx, loc: setLoc, get mode() { return mode; }, get track() { return curTrack; }, get time() { const t = curTrack && T[curTrack]; return t ? +t.a.currentTime.toFixed(1) : -1; }, get samples() { return Object.keys(BUF); } };
 })();
