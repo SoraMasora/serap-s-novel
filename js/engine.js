@@ -77,13 +77,21 @@ function camTo(c) { // наезд камеры на точку фона: {x,y �
 }
 // катсцена: кадры сменяют друг друга сами (клик — следующий кадр)
 function playCut(frames) {
-  const c = $('#cut'), L = [...c.querySelectorAll('.cimg')], cap = c.querySelector('.ccap'); let k = 0, cur = 0, tm = null;
+  // Новый кадр плавно проявляется ПОВЕРХ старого (старый гаснет только после перехода),
+  // зум идёт один на всю катсцену на обёртке .cstage — кадры не «прыгают».
+  const c = $('#cut'), stage = c.querySelector('.cstage'), L = [...c.querySelectorAll('.cimg')], cap = c.querySelector('.ccap');
+  let k = 0, cur = 1, tm = null, offT = null;
   $('#textbox').classList.add('hidden'); $('#side').classList.add('hidden'); c.classList.remove('hidden', 'out');
+  const total = frames.reduce((s, f) => s + (f.ms || 2600), 0) + 1200;
+  stage.style.animation = 'none'; void stage.offsetWidth; stage.style.animation = skip ? 'none' : `cutzoom ${total}ms linear forwards`;
   const next = () => {
     clearTimeout(tm);
-    if (k >= frames.length) { c.onclick = null; c.classList.add('out'); setTimeout(() => { c.classList.add('hidden'); c.classList.remove('out'); L.forEach(x => x.classList.remove('on')); cap.textContent = ''; $('#textbox').classList.remove('hidden'); run(); }, skip ? 50 : 700); return; }
-    const f = frames[k++], el = L[cur]; cur ^= 1; L[cur].classList.remove('on');
-    el.style.backgroundImage = `url(${A.bg[f.img]})`; el.classList.remove('on'); void el.offsetWidth; el.classList.add('on');
+    if (k >= frames.length) { c.onclick = null; c.classList.add('out'); setTimeout(() => { c.classList.add('hidden'); c.classList.remove('out'); clearTimeout(offT); L.forEach(x => { x.classList.remove('on'); x.style.zIndex = ''; }); stage.style.animation = 'none'; cap.textContent = ''; $('#textbox').classList.remove('hidden'); run(); }, skip ? 50 : 700); return; }
+    const f = frames[k++], prev = L[cur]; cur ^= 1; const el = L[cur];
+    clearTimeout(offT);
+    el.style.backgroundImage = `url(${A.bg[f.img]})`; el.style.zIndex = 2; prev.style.zIndex = 1;
+    el.classList.remove('on'); void el.offsetWidth; el.classList.add('on');
+    if (prev.classList.contains('on')) offT = setTimeout(() => prev.classList.remove('on'), skip ? 0 : 900);
     cap.classList.remove('show'); void cap.offsetWidth; cap.textContent = f.text ? fmt(f.text) : ''; if (f.text) cap.classList.add('show');
     if (f.text) log.push({ n: '', t: fmt(f.text) });
     if (f.sfx && !skip) Sound.sfx(f.sfx);
