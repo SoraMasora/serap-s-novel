@@ -398,7 +398,7 @@ function follower() { const k = Math.max(0, trail.length - 18); return trail[k] 
 
 // ═══ Логика ═══
 function blocked(x, y) { // препятствия: лавочка, баки, песочница, качели
-  if (world === 'station') return [[296, 116, 306, 124]].some(([a, b, c, d]) => x > a && x < c && y > b && y < d);
+  if (world === 'station') return false;
   return [[52, 104, 82, 113], [234, 134, 270, 150], [170, 98, 196, 111], [196, 119, 212, 127], [211, 116, 241, 121]].some(([a, b, c, d]) => x > a && x < c && y > b && y < d);
 }
 function update(dt) {
