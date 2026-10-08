@@ -84,7 +84,8 @@ const Sound = (() => {
     room:'sudno', heroroom:'sudno', stairs:'sudno', kitchen:'sudno', empty:'sudno', title:'sudno', cg_father:'sudno', bug1:'sudno', bug_art:'sudno',
     store:'elektro', cafe:'elektro', college:'elektro', cg_shift:'elektro', cg_cafe:'elektro', cg_study:'sudno', cg_roof:'roofs', cg_swing:'roofs', end_good1:'roofs', end_good2:'roofs', end_good3:'roofs',
     platform:'roofs', underpass:'roofs', cg_platform:'roofs', cg_train1:'roofs', cg_train2:'roofs', cg_reconcile:'roofs', cg_angel:'roofs',
-    clinic:'sudno', cg_clinic:'sudno', cg_leaflet1:'sudno', cg_leaflet2:'sudno', cg_quarrel:'sudno', cg_panic:'sudno' };
+    clinic:'sudno', cg_clinic:'sudno', cg_leaflet1:'sudno', cg_leaflet2:'sudno', cg_quarrel:'sudno', cg_panic:'sudno',
+    cg_store_help:'elektro', cg_roof_quiet:'roofs', cg_guests:'sudno', cg_tea:'sudno', cg_sing:'roofs', cg_take:'roofs', cg_dumplings:'sudno', cg_canvas:'sudno' };
   let loc = 'title', curTrack = null; const T = {};
   function trackEl(k) {
     if (T[k]) return T[k];

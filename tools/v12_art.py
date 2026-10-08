@@ -49,3 +49,7 @@ if 'cg' in what:
     def fix(im): im.paste(bg.crop(SIGN),SIGN[:2]); return im
     put('assets/cg7.js',[('cg_platform',pl),('cg_train1',fix(match(L('053b2fe1'),pl))),('cg_train2',fix(match(L('79df70e0'),pl))),('cg_reconcile',fix(match(L('9ec41798'),pl)))])
     put('assets/cg8.js',[('cg_angel',L('153c9b66')),('cg_clinic',L('ce18f443'))])
+if 'cg9' in what or 'cg' in what:  # v12: CG-реакции на выборы
+    open('assets/cg9.js','w').write('window.ASSETS=window.ASSETS||{bg:{},sprites:{}};ASSETS.bg=ASSETS.bg||{};ASSETS.sprites=ASSETS.sprites||{};\n')
+    put('assets/cg9.js',[('cg_store_help',L('1d8fe53d')),('cg_roof_quiet',L('5d93ffaa')),('cg_guests',L('b3347669')),('cg_tea',L('937cb55e')),
+        ('cg_sing',L('96ffb00e')),('cg_take',L('bce50dcc')),('cg_dumplings',L('c0447906')),('cg_canvas',L('86404925'))])
