@@ -4,7 +4,10 @@ const $ = s => document.querySelector(s);
 const A = window.ASSETS || { bg:{}, sprites:{} };
 const st = { scene:'start', i:0, feel:50, press:0, flags:{}, notes:[], name:'Кирилл', bg:null, chars:{}, music:null, rain:false, chapter:'', mode:'', map:null };
 let typing = false, full = '', tIdx = 0, tTimer = null, waiting = false, auto = false, skip = false, inChoice = false;
-const log = [];
+const log = []; const LOGMAX = 2000;
+// v12: снимок состояния для отката из журнала (без заметок — они только дописываются, хранится их число)
+function snapLite(off = -1) { const o = JSON.parse(JSON.stringify({ ...st, notes: undefined, i: Math.max(0, st.i + off) })); o.nc = (st.notes || []).length; return o; }
+function logPush(e) { log.push(e); if (log.length > LOGMAX) log.shift(); }
 const opts = Object.assign({ speed: 28, music: 0.6, autoDelay: 1800 }, JSON.parse(localStorage.getItem('serap_opts') || '{}'));
 Sound.setVol('music', opts.music);
 
@@ -76,27 +79,29 @@ function camTo(c) { // наезд камеры на точку фона: {x,y �
   void bgFront.offsetWidth; bgFront.style.transform = `scale(${c.s || 1.6})`;
 }
 // катсцена: кадры сменяют друг друга сами (клик — следующий кадр)
+let cutKill = null;
 function playCut(frames) {
   // Новый кадр плавно проявляется ПОВЕРХ старого (старый гаснет только после перехода),
   // зум идёт один на всю катсцену на обёртке .cstage — кадры не «прыгают».
   const c = $('#cut'), stage = c.querySelector('.cstage'), L = [...c.querySelectorAll('.cimg')], cap = c.querySelector('.ccap');
-  let k = 0, cur = 1, tm = null, offT = null;
+  let k = 0, cur = 1, tm = null, offT = null, endT = null; const cutSnap = snapLite(-1);
   $('#textbox').classList.add('hidden'); $('#side').classList.add('hidden'); c.classList.remove('hidden', 'out');
   const total = frames.reduce((s, f) => s + (f.ms || 2600), 0) + 1200;
   stage.style.animation = 'none'; void stage.offsetWidth; stage.style.animation = skip ? 'none' : `cutzoom ${total}ms linear forwards`;
   const next = () => {
     clearTimeout(tm);
-    if (k >= frames.length) { c.onclick = null; c.classList.add('out'); setTimeout(() => { c.classList.add('hidden'); c.classList.remove('out'); clearTimeout(offT); L.forEach(x => { x.classList.remove('on'); x.style.zIndex = ''; }); stage.style.animation = 'none'; cap.textContent = ''; $('#textbox').classList.remove('hidden'); run(); }, skip ? 50 : 700); return; }
+    if (k > frames.length + 50) return; if (k >= frames.length) { c.onclick = null; c.classList.add('out'); endT = setTimeout(() => { cutKill = null; c.classList.add('hidden'); c.classList.remove('out'); clearTimeout(offT); L.forEach(x => { x.classList.remove('on'); x.style.zIndex = ''; }); stage.style.animation = 'none'; cap.textContent = ''; $('#textbox').classList.remove('hidden'); run(); }, skip ? 50 : 700); return; }
     const f = frames[k++], prev = L[cur]; cur ^= 1; const el = L[cur];
     clearTimeout(offT);
     el.style.backgroundImage = `url(${A.bg[f.img]})`; el.style.zIndex = 2; prev.style.zIndex = 1;
     el.classList.remove('on'); void el.offsetWidth; el.classList.add('on');
     if (prev.classList.contains('on')) offT = setTimeout(() => prev.classList.remove('on'), skip ? 0 : 900);
     cap.classList.remove('show'); void cap.offsetWidth; cap.textContent = f.text ? fmt(f.text) : ''; if (f.text) cap.classList.add('show');
-    if (f.text) log.push({ n: '', t: fmt(f.text) });
+    if (f.text) logPush({ n: '', t: fmt(f.text), s: cutSnap });
     if (f.sfx && !skip) Sound.sfx(f.sfx);
     tm = setTimeout(next, skip ? 200 : (f.ms || 2600));
   };
+  cutKill = () => { clearTimeout(tm); clearTimeout(offT); clearTimeout(endT); c.onclick = null; k = frames.length + 99; L.forEach(x => { x.classList.remove('on'); x.style.zIndex = ''; }); stage.style.animation = 'none'; cap.textContent = ''; c.classList.add('hidden'); c.classList.remove('out'); cutKill = null; };
   c.onclick = e => { e.stopPropagation(); next(); }; next();
 }
 function setBg(k, instant) {
@@ -283,7 +288,7 @@ function say(name, text, expr) {
     if (side.classList.contains('hidden') || im.getAttribute('src') !== src) { im.src = src; im.style.animation = 'none'; void im.offsetWidth; im.style.animation = ''; }
     side.classList.remove('hidden'); } else side.classList.add('hidden');
   full = fmt(text); tIdx = 0; typing = true; waiting = false; $('#next').classList.remove('show');
-  log.push({ n: disp, t: full, th: thought }); if (log.length > 200) log.shift();
+  logPush({ n: disp, t: full, th: thought, s: snapLite(-1) });
   clearTimeout(tTimer);
   if (skip || opts.speed === 0) { tx.textContent = full; endType(); return; }
   (function type() { tIdx++; tx.textContent = full.slice(0, tIdx); if (tIdx >= full.length) endType(); else tTimer = setTimeout(type, 1000 / Math.max(5, opts.speed) * 1.0); })();
@@ -301,7 +306,7 @@ function advance() {
 }
 
 function choose(list) {
-  inChoice = true; skip = false; syncBtns(); saveSlot('auto', true);
+  inChoice = true; skip = false; syncBtns(); saveSlot('auto', true); const chSnap = snapLite(-1);
   const box = $('#choices'); box.innerHTML = ''; box.classList.remove('hidden');
   list.forEach(o => {
     const b = document.createElement('button'); b.className = 'vbtn'; b.innerHTML = fmt(o.t) + (o.hint ? `<span class="hint">${o.hint}</span>` : ''); vineify(b);
@@ -310,7 +315,7 @@ function choose(list) {
       e.stopPropagation(); box.classList.add('hidden'); inChoice = false; hoverLean(false);
       const rk = o.react || (o.feel >= 10 ? 'shy' : o.feel >= 5 ? 'hop' : o.feel <= -12 ? 'shake' : o.feel < 0 ? 'shiver' : null);
       if (rk) react(rk);
-      log.push({ n: '→', t: fmt(o.t) });
+      logPush({ n: '→', t: fmt(o.t), s: chSnap, ch: 1 });
       if (o.feel) changeFeel(o.feel);
       if (o.set) Object.assign(st.flags, o.set);
       if (o.add) st.press += o.add.press || 0;
@@ -397,11 +402,18 @@ function react(kind) {
   reactT = setTimeout(() => { clearInterval(patT); clearTimeout(patT); el.classList.remove('react-' + (kind === 'shy' ? 'hop' : kind)); delete el.dataset.reacting; if (st.chars.sera) setImg(el, 'sera_' + st.chars.sera.expr); }, R.ms);
 }
 // ── Сохранения ──
-function snapshot() { if (st.mode === 'map' && st.map && PixelMap.isOpen()) st.map.pos = PixelMap.pos(); return JSON.stringify({ st: { ...st, i: st.mode === 'map' ? st.i : Math.max(0, st.i - 1) }, date: new Date().toLocaleString('ru-RU') }); }
-function saveSlot(n, silent) { localStorage.setItem('serap_save_' + n, snapshot()); if (!silent) toast('Сохранено'); }
+function snapshot(nlog = 0) { if (st.mode === 'map' && st.map && PixelMap.isOpen()) st.map.pos = PixelMap.pos(); return JSON.stringify({ st: { ...st, i: st.mode === 'map' ? st.i : Math.max(0, st.i - 1) }, date: new Date().toLocaleString('ru-RU'), log: nlog ? log.slice(-nlog) : undefined }); }
+function saveSlot(n, silent) {
+  // журнал (с точками отката) сохраняется вместе со слотом; при нехватке места — короче
+  for (const nl of n === 'auto' ? [500, 200, 50, 0] : [200, 60, 0]) { try { localStorage.setItem('serap_save_' + n, snapshot(nl)); break; } catch (e) { if (!nl) console.warn('save failed', e); } }
+  if (!silent) toast('Сохранено'); }
 function loadSlot(n) {
   const raw = localStorage.getItem('serap_save_' + n); if (!raw) return;
-  const d = JSON.parse(raw); Object.assign(st, { notes: [], mode: '', map: null }, d.st); closeModal(); PixelMap.close(); $('#card').classList.add('hidden');
+  const d = JSON.parse(raw); log.length = 0; if (d.log) d.log.forEach(e => log.push(e)); restoreState(d.st);
+}
+function restoreState(s) {
+  auto = skip = false; syncBtns(); clearTimeout(tTimer); typing = waiting = false; if (cutKill) cutKill();
+  Object.assign(st, { notes: [], mode: '', map: null }, s); delete st.nc; closeModal(); PixelMap.close(); $('#card').classList.add('hidden'); $('#cut').classList.add('hidden'); $('#side').classList.add('hidden');
   $('#chars').innerHTML = ''; const chars = st.chars; st.chars = {};
   if (st.bg) setBg(st.bg, true);
   Object.entries(chars).forEach(([w, c]) => showChar(w, c.expr, c.pos));
@@ -438,8 +450,29 @@ function endingsList() {
   openModal(`<h2>Концовки</h2><ul class="endlist">${Object.entries(ENDINGS).map(([k, e]) => `<li>${got[k] ? '✝ ' + e.title : '??? — не открыта'}</li>`).join('')}</ul><button id="mClose">Закрыть</button>`);
 }
 function showLog() {
-  openModal(`<h2>Журнал</h2><div class="log">${log.map(l => `<div${l.th ? ' class="th"' : ''}>${l.n ? `<b>${l.n}:</b> ` : ''}${l.t}</div>`).join('')}</div><button id="mClose">Закрыть</button>`);
+  let ch = null, h = '';
+  log.forEach((l, k) => {
+    const c = l.s && l.s.chapter; if (c && c !== ch) { ch = c; h += `<h3 class="lch">${c}</h3>`; }
+    const cls = [l.th ? 'th' : '', l.ch ? 'chs' : '', l.s ? 'rb' : ''].filter(Boolean).join(' ');
+    h += `<div${cls ? ` class="${cls}"` : ''}${l.s ? ` data-k="${k}" title="Вернуться к этому моменту"` : ''}>${l.n ? `<b>${l.n}:</b> ` : ''}${l.t}${l.s ? '<i class="rbi">↺</i>' : ''}</div>`;
+  });
+  openModal(`<h2>Журнал</h2><p class="nsub">Нажми на реплику или выбор, чтобы вернуться к этому моменту и перепройти его</p><div class="log">${h || '<div>Пока пусто.</div>'}</div><button id="mClose">Закрыть</button>`);
   const lg = document.querySelector('.log'); lg.scrollTop = lg.scrollHeight;
+  lg.querySelectorAll('[data-k]').forEach(d => d.onclick = () => confirmRollback(+d.dataset.k));
+}
+function confirmRollback(k) {
+  const l = log[k]; if (!l || !l.s) return;
+  openModal(`<h2>Вернуться?</h2><p class="rbq">${l.n ? `<b>${l.n}:</b> ` : ''}${l.t}</p><p class="nsub">Игра продолжится с этого места. Всё, что было после, можно будет пройти заново — в том числе выбрать другой вариант.</p><div class="menu"><button id="rbYes">Вернуться сюда</button><button id="rbNo">Назад к журналу</button></div>`);
+  $('#rbYes').onclick = () => rollback(k); $('#rbNo').onclick = showLog;
+}
+function rollback(k) {
+  const l = log[k]; if (!l || !l.s) return;
+  if (breathOn) { toast('Сначала закончи дыхание'); return; }
+  const notes = (st.notes || []).slice(0, l.s.nc || 0);
+  log.length = k; // эта реплика снова попадёт в журнал, когда будет показана
+  ['#ending','#choices','#title','#nameScreen'].forEach(s => $(s).classList.add('hidden')); inChoice = false;
+  restoreState(Object.assign({}, l.s, { notes }));
+  toast('↺ Возврат в прошлое');
 }
 function gameMenu() {
   openModal(`<h2>Меню</h2><div class="menu"><button id="mResume">Продолжить</button><button id="mSet">Настройки</button><button id="mTitle">В главное меню</button></div>`);

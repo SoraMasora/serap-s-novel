@@ -324,3 +324,11 @@ ul.notes li.empty{border-color:#555;color:#9a8aa6}ul.notes li.empty:before{conte
 #breath .bbar i{display:block;height:100%;width:0;background:#c23a58}
 #breath .bhint{font-family:"Lora",Georgia,serif;font-size:clamp(11px,1.8vh,18px);color:#cdbfd0;text-align:center;opacity:.8;line-height:1.5}
 #breath.done .bhint,#breath.done .bbar{opacity:0;transition:opacity .4s}
+/* v12: откат из журнала */
+.log div.rb{cursor:pointer;border-radius:6px;padding:.15em .5em;margin:.35em 0;transition:background .15s;position:relative}
+.log div.rb:hover{background:rgba(255,120,170,.12)}
+.log div.chs{color:#ffd3e2}
+.log .rbi{font-style:normal;opacity:0;margin-left:.6em;color:#ff8fb6;transition:opacity .15s}
+.log div.rb:hover .rbi{opacity:.9}
+.log h3.lch{font-family:"Grenze Gotisch",Georgia,serif;font-weight:600;color:#ff9fc2;margin:1.2em 0 .3em;font-size:clamp(14px,2.4vh,22px);letter-spacing:.04em;border-bottom:1px solid rgba(255,140,180,.25)}
+.rbq{font-style:italic;max-width:60ch;margin:1em auto;line-height:1.5}
