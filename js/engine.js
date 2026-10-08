@@ -106,8 +106,8 @@ function setBg(k, instant) {
   [bgFront, bgBack] = [bgBack, bgFront];
 }
 const POS = { left:'25%', center:'50%', right:'75%', fl:'16%', fr:'84%' };
-const SINGLE = { father:1, valya:1, timur:1, liza:1, margo:1 };
-const WHO = { '???':'sera', 'Сера':'sera', 'Пастор':'father', 'P':'hero', 'Баба Валя':'valya', 'Тимур':'timur', 'Лиза':'liza', 'Маргарита Павловна':'margo' };
+const SINGLE = { father:1, valya:1, timur:1, liza:1, margo:1, matvey:1 };
+const WHO = { '???':'sera', 'Сера':'sera', 'Пастор':'father', 'P':'hero', 'Баба Валя':'valya', 'Тимур':'timur', 'Лиза':'liza', 'Маргарита Павловна':'margo', 'Матвей':'matvey', 'Парень в пальто':'matvey' };
 const BLINK = { neutral:1, cold:1 };
 const THOUGHT = '~'; // внутренний голос героя // для этих эмоций есть кадр моргания
 const baseImg = el => el.querySelector('img.base');
@@ -161,7 +161,7 @@ function resize() { cv.width = cv.clientWidth; cv.height = cv.clientHeight; } ad
 function setRain(on) { raining = on; st.rain = on; if (on && !drops.length) drops = Array.from({ length: 650 }, () => newDrop(true)); }
 function newDrop(any) { const z = Math.random(); return { x: Math.random() * 1.15 - .05, y: any ? Math.random() : -.1 - Math.random() * .2, z, l: 18 + z * 46, v: .55 + z * .9, a: .12 + z * .38 }; }
 const RAIN_SLANT = .12;
-const OUTDOOR = { street:1, roof:1, court:1 }; // дождь (капли и звук) — только на открытых локациях
+const OUTDOOR = { street:1, roof:1, court:1, platform:1 }; // дождь (капли и звук) — только на открытых локациях
 function applyRain() { Sound.rain(!!(st.rain && OUTDOOR[st.bg])); }
 (function frame() {
   cx.clearRect(0, 0, cv.width, cv.height);
@@ -224,6 +224,7 @@ function run() {
     if (c.add && !c.choice) st.press += c.add.press || 0;
     if (c.when) { if (c.when(st)) { jump(c.go); continue; } else continue; }
     if (c.go) { jump(c.go); continue; }
+    if (c.breath) { breath(c.breath); return; }
     if (c.choice) { choose(c.choice); return; }
     if (c.ending) { jump(pickEnding(st)); continue; }
     if (c.map) { st.map = Object.assign({ done: [], pos: null }, c.map); st.mode = 'map'; openMap(); return; }
@@ -232,6 +233,39 @@ function run() {
   }
 }
 function jump(l) { st.scene = l; st.i = 0; }
+
+// v10: мини-игра «Дыши со мной» — зажимай (пробел / мышь), пока круг растёт (вдох), отпускай, пока сжимается (выдох)
+let breathOn = false;
+function breath(o) {
+  const n = o.n || 3, IN = 3000, OUT = 3400, CY = IN + OUT, tot = n * CY;
+  $('#textbox').classList.add('hidden'); $('#side').classList.add('hidden');
+  let el = $('#breath'); if (!el) { el = document.createElement('div'); el.id = 'breath'; el.className = 'layer';
+    el.innerHTML = '<div class="btitle"></div><div class="bring"><div class="bcirc"></div><div class="bcore"></div></div><div class="btxt"></div><div class="bbar"><i></i></div><div class="bhint">Зажми <b>пробел</b> или кнопку мыши, пока круг растёт, — вдох.<br>Отпусти, когда он сжимается, — выдох.</div>';
+    $('#game').appendChild(el); }
+  el.querySelector('.btitle').textContent = o.title || 'Дыши со мной';
+  el.classList.remove('hidden', 'done'); breathOn = true; let held = false, good = 0, all = 0, t0 = null, raf = 0, beat = 0;
+  const dn = e => { if (e.type === 'keydown' && e.code !== 'Space' && e.key !== ' ') return; e.preventDefault(); e.stopPropagation(); held = true; };
+  const up = e => { if (e.type === 'keyup' && e.code !== 'Space' && e.key !== ' ') return; e.preventDefault(); e.stopPropagation(); held = false; };
+  const stopClick = e => { e.stopPropagation(); };
+  addEventListener('keydown', dn, true); addEventListener('keyup', up, true); el.addEventListener('pointerdown', dn); addEventListener('pointerup', up, true); el.addEventListener('click', stopClick);
+  const circ = el.querySelector('.bcirc'), txt = el.querySelector('.btxt'), bar = el.querySelector('.bbar i');
+  Sound.sfx('heart');
+  function fr(now) {
+    if (t0 == null) t0 = now; const t = now - t0, ph = t % CY, inh = ph < IN, k = inh ? ph / IN : 1 - (ph - IN) / OUT;
+    const e = .5 - Math.cos(Math.PI * k) / 2; circ.style.transform = `scale(${(.42 + .58 * e).toFixed(3)})`;
+    all++; if (held === inh) good++; const q = good / all;
+    el.classList.toggle('sync', held === inh); txt.textContent = (inh ? 'Вдох' : 'Выдох') + '…  ' + (Math.floor(t / CY) + 1) + ' / ' + n;
+    bar.style.width = (100 * Math.min(1, t / tot)).toFixed(1) + '%';
+    if (t - beat > 2600 && q < .55) { beat = t; Sound.sfx('heart'); }
+    if (t < tot && !skip) { raf = requestAnimationFrame(fr); return; }
+    removeEventListener('keydown', dn, true); removeEventListener('keyup', up, true); el.removeEventListener('pointerdown', dn); removeEventListener('pointerup', up, true); el.removeEventListener('click', stopClick);
+    const score = skip ? 1 : good / Math.max(1, all); st.flags[o.flag || 'breathOk'] = score >= .6; st.flags.breathScore = Math.round(score * 100);
+    if (score >= .6 && o.feel) changeFeel(o.feel);
+    el.classList.add('done'); txt.textContent = score >= .6 ? (o.ok || 'Ровно. Вместе.') : (o.bad || 'Сбилось… но я всё равно рядом.');
+    setTimeout(() => { el.classList.add('hidden'); breathOn = false; $('#textbox').classList.remove('hidden'); if (o.go) jump(score >= .6 ? o.go : (o.fail || o.go)); run(); }, 1500);
+  }
+  raf = requestAnimationFrame(fr);
+}
 
 function say(name, text, expr) {
   const nb = $('#namebox'), tx = $('#text');
@@ -337,6 +371,10 @@ const ANIM = {
   cover:  [['cover1', 350], ['cover2', 1300]],
   giggle: [['giggle1', 260], ['giggle2', 260], ['giggle1', 260], ['giggle2', 260], ['giggle1', 300]],
   huff:   [['huff1', 700], ['huff2', 1000]],
+  // v10: теребит цепочку на чокере, кричит сквозь слёзы, показывает «V»
+  chain:  [['chain1', 520], ['chain2', 760], ['chain1', 520], ['chain2', 900]],
+  shout:  [['shout1', 420], ['shout2', 700], ['shout1', 520], ['shout2', 800]],
+  vsign:  [['vsign1', 650], ['vsign2', 1000]],
 };
 for (const k in ANIM) REACT[k] = { seq: ANIM[k], ms: ANIM[k].reduce((a, f) => a + f[1], 0), fx: k === 'cover' ? () => hearts(2) : null };
 function seqAnim(el, seq) {
@@ -447,8 +485,14 @@ function openMap() {
   if (m.bg) setBg(m.bg); Sound.loc('map'); if (m.music) { st.music = m.music; Sound.music(m.music); }
   setRain(false); Sound.rain(true); // в пиксельном режиме дождь рисует сам PixelMap
   $('#chapter').textContent = st.chapter || '';
-  PixelMap.open({ title: m.title, task: `${m.task || 'Куда пойти?'} · осталось: ${left}`, time: m.time, spots: m.spots, done: m.done, pos: m.pos, follow: m.follow, home: m.home, quiet: !!m.scenes }, id => {
-    m.pos = PixelMap.pos(); m.done.push(id);
+  const task = m.items ? `${m.task} · ${(m.got || []).length}/${m.items.length}` : m.timer != null ? m.task : `${m.task || 'Куда пойти?'} · осталось: ${left}`;
+  PixelMap.open({ title: m.title, task, time: m.time, spots: m.spots, done: m.done, pos: m.pos, follow: m.follow, home: m.home, quiet: !!m.scenes && !m.npcsOn,
+    world: m.world, start: m.start, items: m.items, got: m.got || (m.got = []), itemLines: m.itemLines, itemLabel: m.itemLabel, itemsDone: m.itemsDone, info: m.info, extra: m.extra, npcs: m.npcs,
+    lines: m.lines, seraBench: m.seraBench, noSera: m.noSera, timer: m.timer, tleft: m.tleft,
+    onItem: n => { $('#pixTask').textContent = `${m.task} · ${n}/${m.items.length}`; saveSlot('auto', true); }, onTick: t => { m.tleft = t; } }, id => {
+    m.pos = PixelMap.pos();
+    if (id === '__items' || id === '__late') { const a = id === '__late' ? (m.late || m.after) : m.after; st.map = null; st.mode = ''; $('#textbox').classList.remove('hidden'); jump(a); run(); return; }
+    m.done.push(id);
     if (m.scenes && m.scenes[id]) { st.mode = ''; $('#textbox').classList.remove('hidden'); jump(m.scenes[id]); run(); return; } const n = (st.flags['v_' + id] || 0) + 1; st.flags['v_' + id] = n;
     st.mode = ''; $('#textbox').classList.remove('hidden'); jump(STORY[id + '_' + n] ? id + '_' + n : id + '_3'); run();
   });

@@ -300,3 +300,27 @@ ul.notes li.empty{border-color:#555;color:#9a8aa6}ul.notes li.empty:before{conte
 .char:not([data-who=sera]) .idle{animation:none}
 .char:not([data-who=sera]){transition:opacity .5s ease,filter .4s}
 #side img{height:150%;top:2%}
+/* ═══ v10 ═══ */
+.char[data-who=matvey]{height:130.4%;bottom:-32.3%}
+.char.react-shout{animation:shoutS .42s ease 4}
+@keyframes shoutS{30%{transform:translateX(-50%) translateY(-.6%) scale(1.012)}60%{transform:translateX(-50.4%)}}
+.char.react-chain{animation:chainS 2.7s ease-in-out}
+@keyframes chainS{50%{transform:translateX(-50%) translateY(.4%)}}
+.char.react-vsign{animation:vsignS .5s ease}
+@keyframes vsignS{40%{transform:translateX(-50%) translateY(-1.4%)}}
+#pixTask.hurry{color:#ff6b6b;animation:hurry .8s ease-in-out infinite}
+@keyframes hurry{50%{opacity:.55}}
+/* мини-игра «Дыши со мной» */
+#breath{z-index:7;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.2vh;background:radial-gradient(ellipse at center,rgba(20,10,30,.55),rgba(3,2,8,.88) 70%);cursor:pointer;user-select:none;transition:opacity .6s}
+#breath.hidden{display:none}
+#breath .btitle{font-family:"Cormorant SC",Georgia,serif;font-size:clamp(20px,4vh,44px);color:#f1e6ee;letter-spacing:.08em;text-shadow:0 0 12px #000}
+#breath .bring{position:relative;width:34vh;height:34vh;display:flex;align-items:center;justify-content:center}
+#breath .bring::before{content:'';position:absolute;inset:0;border-radius:50%;border:2px dashed rgba(240,200,220,.35)}
+#breath .bcirc{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,rgba(194,58,88,.55),rgba(120,30,70,.18) 70%,transparent 72%);box-shadow:0 0 40px rgba(194,58,88,.5);transform:scale(.42);transition:background .3s,box-shadow .3s}
+#breath.sync .bcirc{background:radial-gradient(circle,rgba(255,170,200,.7),rgba(194,58,88,.25) 70%,transparent 72%);box-shadow:0 0 60px rgba(255,160,200,.65)}
+#breath .bcore{width:8%;height:8%;border-radius:50%;background:#f1e6ee;box-shadow:0 0 12px #fff}
+#breath .btxt{font-family:"Lora",Georgia,serif;font-style:italic;font-size:clamp(16px,3vh,32px);color:#ffd2e2;text-shadow:0 0 8px #000;min-height:1.4em}
+#breath .bbar{width:30vh;height:3px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden}
+#breath .bbar i{display:block;height:100%;width:0;background:#c23a58}
+#breath .bhint{font-family:"Lora",Georgia,serif;font-size:clamp(11px,1.8vh,18px);color:#cdbfd0;text-align:center;opacity:.8;line-height:1.5}
+#breath.done .bhint,#breath.done .bbar{opacity:0;transition:opacity .4s}

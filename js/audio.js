@@ -82,7 +82,9 @@ const Sound = (() => {
   // ── Музыка: три трека по локациям (assets/music*.js), «tense» — процедурный индастриал ──
   const LOC = { street:'roofs', street_rain:'roofs', yard:'roofs', roof:'roofs', court:'roofs', map:'roofs',
     room:'sudno', heroroom:'sudno', stairs:'sudno', kitchen:'sudno', empty:'sudno', title:'sudno', cg_father:'sudno', bug1:'sudno', bug_art:'sudno',
-    store:'elektro', cafe:'elektro', college:'elektro', cg_shift:'elektro', cg_cafe:'elektro', cg_study:'sudno', cg_roof:'roofs', cg_swing:'roofs', end_good1:'roofs', end_good2:'roofs', end_good3:'roofs' };
+    store:'elektro', cafe:'elektro', college:'elektro', cg_shift:'elektro', cg_cafe:'elektro', cg_study:'sudno', cg_roof:'roofs', cg_swing:'roofs', end_good1:'roofs', end_good2:'roofs', end_good3:'roofs',
+    platform:'roofs', underpass:'roofs', cg_platform:'roofs', cg_train1:'roofs', cg_train2:'roofs', cg_reconcile:'roofs', cg_angel:'roofs',
+    clinic:'sudno', cg_clinic:'sudno', cg_leaflet1:'sudno', cg_leaflet2:'sudno', cg_quarrel:'sudno', cg_panic:'sudno' };
   let loc = 'title', curTrack = null; const T = {};
   function trackEl(k) {
     if (T[k]) return T[k];
@@ -166,6 +168,18 @@ const Sound = (() => {
     enter: t => { ping(t, 660, 0.25, 0.06, 'square'); ping(t + 0.08, 990, 0.3, 0.05, 'square'); },
     bell: t => bell(t),
   };
+  // v10: поезд, гудок, хлопок двери, сердцебиение, рвётся бумага, вибрация телефона
+  function swell(t, dur, v, freq, type = 'lowpass', q = 0.7) { const s = ctx.createBufferSource(); s.buffer = noiseBuf(dur + 0.1); const fl = ctx.createBiquadFilter(); fl.type = type; fl.frequency.value = freq; fl.Q.value = q;
+    const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + dur * 0.45); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); s.connect(fl); fl.connect(g); g.connect(sfxOut()); s.start(t); s.stop(t + dur + 0.1); }
+  function horn(t, dur = 1.1, v = 0.07) { [311, 370].forEach(f => { const o = ctx.createOscillator(), fl = ctx.createBiquadFilter(), g = ctx.createGain(); o.type = 'sawtooth'; o.frequency.value = f; fl.type = 'lowpass'; fl.frequency.value = 1400;
+    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(v, t + 0.06); g.gain.setValueAtTime(v, t + dur - 0.15); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); o.connect(fl); fl.connect(g); g.connect(sfxOut()); o.start(t); o.stop(t + dur + 0.05); }); }
+  SFX.train = t => { swell(t, 6.5, 0.5, 260); swell(t + 0.4, 5.5, 0.12, 1800, 'bandpass', 0.6); for (let i = 0; i < 16; i++) { const tt = t + 1 + i * 0.3 + (i % 2) * 0.09; thump(tt, 0.18 + 0.12 * Math.sin(i / 15 * Math.PI), 160, 70, 0.07); } horn(t + 0.3); };
+  SFX.horn = t => horn(t, 1.3, 0.08);
+  SFX.slam = t => { thump(t, 1, 110, 35, 0.35); nz(t, 0.25, 0.5, 900, 0.8); sample('door', t - 0.02, 0.5); thump(t + 0.12, 0.3, 300, 120, 0.06); };
+  SFX.heart = t => { [0, 0.24, 0.85, 1.09, 1.7, 1.94].forEach((d, i) => thump(t + d, i % 2 ? 0.35 : 0.55, 70, 38, 0.14)); };
+  SFX.tear = t => { for (let i = 0; i < 7; i++) nz(t + i * 0.035 + Math.random() * 0.02, 0.06, 0.25, 2500 + Math.random() * 2500, 0.8, 'highpass'); sample('paper', t + 0.2, 0.5); };
+  SFX.phone = t => { [0, 0.5].forEach(d => { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'square'; o.frequency.value = 120; g.gain.setValueAtTime(0.0001, t + d); g.gain.linearRampToValueAtTime(0.04, t + d + 0.02); g.gain.setValueAtTime(0.04, t + d + 0.32); g.gain.exponentialRampToValueAtTime(0.0001, t + d + 0.36);
+    const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 400; o.connect(fl); fl.connect(g); g.connect(sfxOut()); o.start(t + d); o.stop(t + d + 0.4); }); };
   ['keys', 'steps', 'step', 'bump', 'drop', 'knock', 'creak', 'cloth', 'paper', 'latch', 'unlock'].forEach(k => { SFX[k] = t => { sample(k, t, k === 'steps' ? 0.8 : 1) || (FALLBACK[k] && FALLBACK[k](t)); }; });
   function sfx(k) { if (!ctx) return; if (ctx.state === 'suspended') ctx.resume(); const f = SFX[k]; if (f) f(ctx.currentTime + 0.02); }
   function blip() { if (!ctx || mode === null && !rainSrc) return; }
