@@ -63,7 +63,7 @@ function begin(noRun) { titleAnim(false); $('#title').classList.add('hidden'); $
 function toTitle() {
   auto = skip = false; syncBtns(); clearTimeout(tTimer);
   ['#ending','#modal','#textbox','#hud','#choices','#card'].forEach(s => $(s).classList.add('hidden')); PixelMap.close();
-  $('#chars').innerHTML = ''; Sound.music('calm'); Sound.rain(false); setRain(false);
+  $('#chars').innerHTML = ''; Sound.loc('title'); Sound.music('calm'); Sound.rain(false); setRain(false);
   $('#title').classList.remove('hidden'); $('#side').classList.add('hidden'); titleAnim(true); refreshContinue();
 }
 
@@ -100,7 +100,7 @@ function playCut(frames) {
   c.onclick = e => { e.stopPropagation(); next(); }; next();
 }
 function setBg(k, instant) {
-  camTo(null); st.bg = k; if (typeof applyRain === 'function') applyRain(); const url = `url(${A.bg[k]})`;
+  camTo(null); st.bg = k; if (typeof applyRain === 'function') applyRain(); Sound.loc(k); const url = `url(${A.bg[k]})`;
   if (instant) { bgFront.style.backgroundImage = url; bgFront.style.opacity = 1; bgBack.style.opacity = 0; return; }
   bgBack.style.backgroundImage = url; bgBack.style.opacity = 1; bgFront.style.opacity = 0;
   [bgFront, bgBack] = [bgBack, bgFront];
@@ -422,7 +422,7 @@ function showCard([big, small]) {
 function openMap() {
   hideChar('all'); $('#textbox').classList.add('hidden'); $('#side').classList.add('hidden'); $('#choices').classList.add('hidden');
   const m = st.map; const left = m.visits - m.done.length;
-  if (m.bg) setBg(m.bg); if (m.music) { st.music = m.music; Sound.music(m.music); }
+  if (m.bg) setBg(m.bg); Sound.loc('map'); if (m.music) { st.music = m.music; Sound.music(m.music); }
   setRain(false); Sound.rain(true); // в пиксельном режиме дождь рисует сам PixelMap
   $('#chapter').textContent = st.chapter || '';
   PixelMap.open({ title: m.title, task: `${m.task || 'Куда пойти?'} · осталось: ${left}`, time: m.time, spots: m.spots, done: m.done, pos: m.pos, follow: m.follow, home: m.home, quiet: !!m.scenes }, id => {

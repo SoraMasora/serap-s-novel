@@ -1,6 +1,6 @@
-// Процедурная музыка на WebAudio: меланхоличное фортепиано, индастриал, дождь.
+// Звук: треки по локациям (Молчат Дома, Радиотехника), процедурный индастриал «tense» и дождь, SFX на сэмплах Kenney (CC0).
 const Sound = (() => {
-  let ctx, master, musicGain, rainGain, reverb, timer = null, mode = null, step = 0, rainSrc = null;
+  let ctx, master, musicGain, rainGain, reverb, trackBus, timer = null, mode = null, step = 0, rainSrc = null;
   let vol = { music: 0.6, rain: 0.5 };
   function init() {
     if (ctx) return;
@@ -11,6 +11,9 @@ const Sound = (() => {
     const wet = ctx.createGain(); wet.gain.value = 0.45;
     musicGain.connect(master); musicGain.connect(reverb); reverb.connect(wet); wet.connect(master);
     rainGain = ctx.createGain(); rainGain.gain.value = 0; rainGain.connect(master);
+    trackBus = ctx.createGain(); trackBus.gain.value = vol.music; trackBus.connect(master);
+    loadSamples();
+    if (mode === null) { mode = 'calm'; update(); }
   }
   function impulse(sec) {
     const len = ctx.sampleRate * sec, b = ctx.createBuffer(2, len, ctx.sampleRate);
@@ -60,6 +63,7 @@ const Sound = (() => {
   };
   function tick() {
     const t = ctx.currentTime + 0.05;
+    if (mode !== 'tense') { timer = null; return; }
     if (mode === 'tense') {
       const b = 60 / 100 / 2; // восьмые
       if (step % 4 === 0) kick(t); if (step % 8 === 4) hit(t, 0.35, 1200);
@@ -74,12 +78,46 @@ const Sound = (() => {
     if (s8 % 2 === 0 && Math.random() < 0.55) piano(th.mel[(step / 2 + bar) % th.mel.length | 0], t, 3, 0.11);
     step++; timer = setTimeout(tick, beat / 2 * 1000);
   }
+  // ── Музыка: три трека по локациям (assets/music*.js), «tense» — процедурный индастриал ──
+  const LOC = { street:'roofs', street_rain:'roofs', yard:'roofs', roof:'roofs', court:'roofs', map:'roofs',
+    room:'sudno', heroroom:'sudno', stairs:'sudno', kitchen:'sudno', empty:'sudno', title:'sudno', cg_father:'sudno', bug1:'sudno', bug_art:'sudno',
+    store:'elektro', cafe:'elektro', college:'elektro', cg_shift:'elektro' };
+  let loc = 'title', curTrack = null; const T = {};
+  function trackEl(k) {
+    if (T[k]) return T[k];
+    const b64 = window.ASSETS && ASSETS.music && ASSETS.music[k]; if (!b64) return null;
+    const bin = atob(b64), u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+    const a = new Audio(URL.createObjectURL(new Blob([u8], { type: 'audio/mpeg' }))); a.loop = true; a.preload = 'auto';
+    const t = { a, g: null };
+    try { const src = ctx.createMediaElementSource(a); t.g = ctx.createGain(); t.g.gain.value = 0; src.connect(t.g); t.g.connect(trackBus); } catch (e) { a.volume = 0; }
+    return (T[k] = t);
+  }
+  function fade(t, to, sec) {
+    if (t.g) { const g = t.g.gain, n = ctx.currentTime; g.cancelScheduledValues(n); g.setValueAtTime(g.value, n); g.linearRampToValueAtTime(to, n + sec); }
+    else { clearInterval(t.iv); const from = t.a.volume, t0 = Date.now(); t.iv = setInterval(() => { const q = Math.min(1, (Date.now() - t0) / (sec * 1000)); t.a.volume = Math.max(0, Math.min(1, (from + (to - from) * q) * vol.music)); if (q >= 1) clearInterval(t.iv); }, 50); }
+  }
+  function playTrack(k) {
+    if (k === curTrack) { const t = k && T[k]; if (t && t.a.paused) t.a.play().catch(() => {}); return; }
+    const old = curTrack && T[curTrack]; curTrack = k;
+    if (old) { fade(old, 0, 1.6); clearTimeout(old.stopT); old.stopT = setTimeout(() => { if (curTrack !== Object.keys(T).find(x => T[x] === old)) old.a.pause(); }, 1700); }
+    const t = k && trackEl(k); if (!t) return;
+    clearTimeout(t.stopT); t.a.play().catch(() => {}); fade(t, 1, old ? 2.2 : 1.2);
+  }
+  function update() {
+    if (!ctx) return;
+    if (mode === 'tense') { playTrack(null); if (!timer) { step = 0; tick(); } return; }
+    clearTimeout(timer); timer = null;
+    playTrack(mode ? (LOC[loc] || 'sudno') : null);
+  }
   function music(m) {
     init(); if (ctx.state === 'suspended') ctx.resume();
-    if (m === mode) return; clearTimeout(timer); mode = m; step = 0;
-    if (!m || m === 'none') { mode = null; return; }
-    tick();
+    if (!m || m === 'none') m = null;
+    if (m === mode && (m !== null)) { update(); return; }
+    mode = m; update();
   }
+  function setLoc(k) { if (!k) return; loc = k; if (ctx) update(); }
+  // браузер мог заблокировать автозапуск — возобновляем при следующем клике
+  document.addEventListener('click', () => { if (ctx && curTrack && T[curTrack] && T[curTrack].a.paused) T[curTrack].a.play().catch(() => {}); });
   function rain(on) {
     init();
     if (on && !rainSrc) {
@@ -103,21 +141,33 @@ const Sound = (() => {
     const g = ctx.createGain(); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); s.connect(fl); fl.connect(g); g.connect(sfxOut()); s.start(t); s.stop(t + dur + 0.05); }
   function thump(t, v = 0.6, f0 = 120, f1 = 45, dur = 0.22) { const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur);
     g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.05); o.connect(g); g.connect(sfxOut()); o.start(t); o.stop(t + dur + 0.1); }
-  const SFX = {
-    door: t => { ping(t, 2093, 1.2, 0.12); ping(t + 0.09, 2637, 1.0, 0.08); // колокольчик
-      const o = ctx.createOscillator(), g = ctx.createGain(), fl = ctx.createBiquadFilter(); o.type = 'sawtooth'; o.frequency.setValueAtTime(180, t + 0.15); o.frequency.linearRampToValueAtTime(260, t + 0.7);
-      fl.type = 'bandpass'; fl.frequency.value = 900; fl.Q.value = 6; g.gain.setValueAtTime(0, t + 0.15); g.gain.linearRampToValueAtTime(0.05, t + 0.3); g.gain.linearRampToValueAtTime(0, t + 0.75);
-      o.connect(fl); fl.connect(g); g.connect(sfxOut()); o.start(t + 0.15); o.stop(t + 0.8); thump(t + 0.8, 0.35, 90, 40); },
-    keys: t => { for (let i = 0; i < 9; i++) { const tt = t + i * 0.055 + Math.random() * 0.03; ping(tt, 3200 + Math.random() * 2600, 0.18, 0.05, 'triangle'); nz(tt, 0.04, 0.05, 7000, 2); } nz(t + 0.6, 0.08, 0.2, 1500, 3); thump(t + 0.62, 0.2, 400, 200, 0.05); },
-    steps: t => { for (let i = 0; i < 6; i++) { const tt = t + i * 0.42; nz(tt, 0.12, 0.35, 380 + (i % 2) * 60, 1.2); nz(tt + 0.01, 0.09, 0.08, 2500, 0.7); } },
-    step: t => { nz(t, 0.09, 0.18, 420, 1.2); nz(t, 0.06, 0.04, 2400, 0.7); },
-    bump: t => { thump(t, 0.8, 140, 40, 0.25); nz(t, 0.12, 0.3, 600, 0.8); },
-    drop: t => { [0, 0.13, 0.22, 0.4, 0.47].forEach((d, i) => { ping(t + d, 900 + i * 370, 0.25, 0.06, 'triangle'); ping(t + d, 2300 + i * 500, 0.12, 0.03); nz(t + d, 0.05, 0.12, 3000, 1.5); }); thump(t + 0.05, 0.35, 160, 70, 0.12); },
-    knock: t => { [0, 0.22, 0.44].forEach(d => { thump(t + d, 0.5, 220, 90, 0.08); nz(t + d, 0.05, 0.2, 900, 2); }); },
-    enter: t => { ping(t, 660, 0.25, 0.06, 'square'); ping(t + 0.08, 990, 0.3, 0.05, 'square'); },
+  // Сэмплы: Kenney RPG Audio + Impact Sounds (CC0), assets/sfx.js
+  const BUF = {};
+  function loadSamples() {
+    const S = (window.ASSETS && ASSETS.sfx) || {};
+    Object.keys(S).forEach(k => { const bin = atob(S[k]), u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+      ctx.decodeAudioData(u8.buffer, b => { BUF[k] = b; }, () => {}); });
+  }
+  function sample(k, t, v = 1, rate = 1) { const b = BUF[k]; if (!b) return false; const s = ctx.createBufferSource(), g = ctx.createGain(); s.buffer = b; s.playbackRate.value = rate; g.gain.value = v; s.connect(g); g.connect(sfxOut()); s.start(t); return true; }
+  const bell = t => { ping(t, 2093, 1.2, 0.10); ping(t + 0.09, 2637, 1.0, 0.07); ping(t + 0.2, 2093, 0.8, 0.04); };
+  const SHOP = { store:1, cafe:1, cg_shift:1 };
+  const FALLBACK = {
+    door: t => { thump(t + 0.8, 0.35, 90, 40); },
+    keys: t => { for (let i = 0; i < 9; i++) { const tt = t + i * 0.055 + Math.random() * 0.03; ping(tt, 3200 + Math.random() * 2600, 0.18, 0.05, 'triangle'); } },
+    steps: t => { for (let i = 0; i < 6; i++) nz(t + i * 0.42, 0.12, 0.35, 380 + (i % 2) * 60, 1.2); },
+    step: t => { nz(t, 0.09, 0.18, 420, 1.2); },
+    bump: t => { thump(t, 0.8, 140, 40, 0.25); },
+    drop: t => { [0, 0.13, 0.22, 0.4].forEach((d, i) => ping(t + d, 900 + i * 370, 0.25, 0.06, 'triangle')); },
+    knock: t => { [0, 0.22, 0.44].forEach(d => thump(t + d, 0.5, 220, 90, 0.08)); },
   };
+  const SFX = {
+    door: t => { if (SHOP[loc]) bell(t); sample('door', t + (SHOP[loc] ? 0.05 : 0), 0.9) || FALLBACK.door(t); },
+    enter: t => { ping(t, 660, 0.25, 0.06, 'square'); ping(t + 0.08, 990, 0.3, 0.05, 'square'); },
+    bell: t => bell(t),
+  };
+  ['keys', 'steps', 'step', 'bump', 'drop', 'knock', 'creak', 'cloth', 'paper', 'latch', 'unlock'].forEach(k => { SFX[k] = t => { sample(k, t, k === 'steps' ? 0.8 : 1) || (FALLBACK[k] && FALLBACK[k](t)); }; });
   function sfx(k) { if (!ctx) return; if (ctx.state === 'suspended') ctx.resume(); const f = SFX[k]; if (f) f(ctx.currentTime + 0.02); }
   function blip() { if (!ctx || mode === null && !rainSrc) return; }
-  function setVol(k, v) { vol[k] = v; if (ctx) { if (k === 'music') musicGain.gain.value = v; } }
-  return { init, music, rain, setVol, vol, blip, sfx, get mode() { return mode; } };
+  function setVol(k, v) { vol[k] = v; if (ctx) { if (k === 'music') { musicGain.gain.value = v; trackBus.gain.value = v; } } }
+  return { init, music, rain, setVol, vol, blip, sfx, loc: setLoc, get mode() { return mode; }, get track() { return curTrack; }, get time() { const t = curTrack && T[curTrack]; return t ? +t.a.currentTime.toFixed(1) : -1; }, get samples() { return Object.keys(BUF); } };
 })();
