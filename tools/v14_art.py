@@ -24,5 +24,5 @@ put('assets/bg1.js',[('store',st),('roof',L('e24ad84e'))])
 put('assets/bg3.js',[('court',L('4bb8df48'))])
 put('assets/cg2.js',[('cg_shift',fix(L('1fc6931f'),SHIFT))])
 put('assets/cg3.js',[('cg_study',L('c778cad6'))])
-put('assets/cg9.js',[('cg_roof_quiet',L('92e24c45')),('cg_guests',L('fe7060ae')),('cg_tea',L('afd66bd4'))])  # v14.2: на-модельные Сера и герой в стиле cg_platform
+put('assets/cg9.js',[('cg_roof_quiet',L('92e24c45')),('cg_guests',L('e7612b13')),('cg_tea',L('afd66bd4'))])  # v14.2: на-модельные Сера и герой в стиле cg_platform
 put('assets/cg10.js',[('cg_shoulders',sign(L('ce43e73f'))),('cg_walkhome',L('4ea25c57'))])
