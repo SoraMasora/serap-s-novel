@@ -204,3 +204,12 @@ GitHub MCP `push_files` с `arguments_file_path` (JSON `{owner, repo, branch, me
 - Новые концовки (story.js, после end_bad_t; CG в assets/cg10.js): end_expo «Подпись „С.“» (истинная), end_letters «Письма из Твери», end_home «Блудная дочь», end_gone «Без следа». pickEnding: expo (feel≥85, defended, therapy, expoYes, sang||newWings) → good → home (press≥4 || feel<25) → bad → letters (c3fled) → neutral. ENDINGS — 7 записей (меню строится автоматически).
 - Реплики Серы: `tools/v13_dialog.py` — точечные замены (в основном глава 1 + несколько реплик глав 2/4), живая разговорная речь. Скрипт идемпотентен.
 - Ассеты: `tools/v13_art.py` (табличка «ПЛАТФОРМА 47 км» на cg_hit подставляется из фона по маске, бордовые волосы не трогаются).
+
+## v14 (правки по скриншотам)
+- Надписи на лапше: `tools/v14_labels.py` — овалы «РОЛЛТОН», лотки «ДОШИРАК» дорисованы шрифтом поверх псевдотекста (списки координат STORE для фона store и SHIFT для cg_shift). Генератор сам писать не умеет — только так.
+- cg_shift: Тимур новой модели (npcs/timur_new.png = спрайт timur из npc1.js).
+- cg_study — в комнате Серы (фон room), герой по мастеру 50bd2180. cg_roof_quiet — стоят порознь, не за руки, мокрая крыша, дождь.
+- Мокрые фоны: court (bg3.js), roof (bg1.js). Солнечный street остался только для весенних концовок.
+- cg_shoulders перерисован в стиле игры (табличка из фона). Новый cg_walkhome (cg10.js): герой идёт из магазина с пакетом, крутит прядь пальцем, Сера впереди — в c1_store_end.
+- Диалог c1_door (мицеллярка) возвращён к оригиналу (из v13_dialog.py эти замены удалены).
+- Ассеты: `tools/v14_art.py`. Проверка сценария: `node tools/chk.cjs`.
