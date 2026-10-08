@@ -163,10 +163,10 @@ function setSpeaker(name) {
 const cv = $('#fx'), cx = cv.getContext('2d'); let drops = [], raining = false;
 function resize() { cv.width = cv.clientWidth; cv.height = cv.clientHeight; } addEventListener('resize', resize); resize();
 // дождь рисуется на слое ПОД персонажами: на весь экран, но не поверх них
-function setRain(on) { raining = on; st.rain = on; if (on && !drops.length) drops = Array.from({ length: 650 }, () => newDrop(true)); }
+function setRain(on) { raining = on; st.rain = on; document.getElementById('game').classList.toggle('gloom', !!on); /* v13: мрачная палитра, пока идёт дождь */ if (on && !drops.length) drops = Array.from({ length: 650 }, () => newDrop(true)); }
 function newDrop(any) { const z = Math.random(); return { x: Math.random() * 1.15 - .05, y: any ? Math.random() : -.1 - Math.random() * .2, z, l: 18 + z * 46, v: .55 + z * .9, a: .12 + z * .38 }; }
 const RAIN_SLANT = .12;
-const OUTDOOR = { street:1, roof:1, court:1, platform:1 }; // дождь (капли и звук) — только на открытых локациях
+const OUTDOOR = { street:1, roof:1, court:1, platform:1, yard:1, street_rain:1 }; // дождь (капли и звук) — только на открытых локациях
 function applyRain() { Sound.rain(!!(st.rain && OUTDOOR[st.bg])); }
 (function frame() {
   cx.clearRect(0, 0, cv.width, cv.height);

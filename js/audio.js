@@ -80,7 +80,7 @@ const Sound = (() => {
     step++; timer = setTimeout(tick, beat / 2 * 1000);
   }
   // ── Музыка: три трека по локациям (assets/music*.js), «tense» — процедурный индастриал ──
-  const LOC = { street:'roofs', street_rain:'roofs', yard:'roofs', roof:'roofs', court:'roofs', map:'roofs',
+  const LOC = { yard_father:'roofs', cg_shoulders:'roofs', cg_hit:'roofs', end_gone:'roofs', end_home:'roofs', end_expo:'sudno', end_letters:'sudno', street:'roofs', street_rain:'roofs', yard:'roofs', roof:'roofs', court:'roofs', map:'roofs',
     room:'sudno', heroroom:'sudno', stairs:'sudno', kitchen:'sudno', empty:'sudno', title:'sudno', cg_father:'sudno', bug1:'sudno', bug_art:'sudno',
     store:'elektro', cafe:'elektro', college:'elektro', cg_shift:'elektro', cg_cafe:'elektro', cg_study:'sudno', cg_roof:'roofs', cg_swing:'roofs', end_good1:'roofs', end_good2:'roofs', end_good3:'roofs',
     platform:'roofs', underpass:'roofs', cg_platform:'roofs', cg_train1:'roofs', cg_train2:'roofs', cg_reconcile:'roofs', cg_angel:'roofs',
