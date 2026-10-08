@@ -137,7 +137,7 @@ function idleLoop() {
       if (Math.random() < .25) setTimeout(() => { el.classList.add('blinking'); setTimeout(() => el.classList.remove('blinking'), 110); }, 260);
     }
   });
-  document.querySelectorAll('.char:not([data-dying])').forEach(el => {
+  document.querySelectorAll('.char[data-who="sera"]:not([data-dying])').forEach(el => {
     if (!el.dataset.reacting && Math.random() < .12) { const w = el.querySelector('.shiftw'); w.classList.remove('shiftL', 'shiftR'); void w.offsetWidth; w.classList.add(Math.random() < .5 ? 'shiftL' : 'shiftR'); }
   });
   setTimeout(idleLoop, 1400 + Math.random() * 1600);
@@ -193,14 +193,20 @@ let toastT; function toast(t) { const el = $('#toast'); el.textContent = t; el.c
 
 // ── Исполнение сценария ──
 const fmt = t => t.replace(/\{P\}/g, st.name);
+// v9: «тон» маршрута — от него зависят реплики и отношение персонажей.
+// warm — дело идёт к хорошей концовке, mid — к нейтральной, cold — к плохой.
+function tier(s = st) { if (s.feel < 40 || s.press >= 3) return 'cold'; if (s.feel >= 65 && s.press < 2) return 'warm'; return 'mid'; }
+// реплика/эмоция/заметка может быть объектом {warm, mid, cold}; null — строку пропустить
+const TV = v => (v && typeof v === 'object' && !Array.isArray(v) && ('mid' in v || 'warm' in v || 'cold' in v)) ? (tier() in v ? v[tier()] : v.mid) : v;
 function run() {
   while (true) {
     const scene = STORY[st.scene]; const c = scene[st.i];
     if (!c) return;
     st.i++;
-    if (Array.isArray(c)) { say(c[0], c[1], c[2]); return; }
+    if (Array.isArray(c)) { const t = TV(c[1]); if (t == null) continue; say(c[0], t, TV(c[2])); return; }
+    if (c.tier) { const g = TV(c.tier); if (g) { jump(g); continue; } }
     if (c.card) { showCard(c.card); return; }
-    if (c.note) addNote(c.note);
+    if (c.note) { const n = TV(c.note); if (n) addNote(n); }
     if (c.chapter) { st.chapter = c.chapter; $('#chapter').textContent = c.chapter; }
     if (c.bg) { setBg(c.bg); document.querySelectorAll('#bg,#bg2').forEach(x => x.classList.remove('zoom')); }
     if (c.zoom) bgFront.classList.add('zoom');
@@ -268,7 +274,7 @@ function choose(list) {
     b.onmouseenter = () => hoverLean(true); b.onmouseleave = () => hoverLean(false);
     b.onclick = e => {
       e.stopPropagation(); box.classList.add('hidden'); inChoice = false; hoverLean(false);
-      const rk = o.react || (o.feel >= 10 ? 'pat' : o.feel >= 5 ? 'hop' : o.feel <= -12 ? 'shake' : o.feel < 0 ? 'shiver' : null);
+      const rk = o.react || (o.feel >= 10 ? 'shy' : o.feel >= 5 ? 'hop' : o.feel <= -12 ? 'shake' : o.feel < 0 ? 'shiver' : null);
       if (rk) react(rk);
       log.push({ n: '→', t: fmt(o.t) });
       if (o.feel) changeFeel(o.feel);

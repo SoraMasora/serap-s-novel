@@ -7,7 +7,7 @@ const p=await b.newPage({viewport:{width:1280,height:720}});const errs=[];p.on('
 await p.goto('file:///data/serap/game.html');await p.waitForTimeout(2500);
 fs.mkdirSync('/data/serap/shots/scene',{recursive:true});
 if(tag==='title'){await p.screenshot({path:'/data/serap/shots/scene/title.png'});await b.close();return;}
-await p.evaluate(([scene,bg,chars])=>localStorage.setItem('serap_save_1',JSON.stringify({st:{scene,i:0,feel:90,press:0,flags:{defended:true,therapy:true},notes:[],name:'Кирилл',bg,chars:JSON.parse(chars),music:'calm',rain:false,chapter:'',mode:'',map:null},date:'t'})),[scene,bg,chars]);
+await p.evaluate(([scene,bg,chars,feel])=>localStorage.setItem('serap_save_1',JSON.stringify({st:{scene,i:0,feel,press:0,flags:{defended:true,therapy:true},notes:[],name:'Кирилл',bg,chars:JSON.parse(chars),music:'calm',rain:false,chapter:'',mode:'',map:null},date:'t'})),[scene,bg,chars,+(process.env.FEEL||90)]);
 await p.click('#btnLoadT');await p.waitForTimeout(400);await p.click('[data-slot="1"]');await p.waitForTimeout(1500);
 let n=0;
 for(let i=0;i<+clicks;i++){

@@ -296,3 +296,7 @@ ul.notes li.empty{border-color:#555;color:#9a8aa6}ul.notes li.empty:before{conte
 .madeby{font:italic 12px/1 "Lora",Georgia,serif;letter-spacing:.12em;color:#e9dce6;opacity:.32;pointer-events:none;user-select:none}
 #title .madeby{position:absolute;right:18px;bottom:14px;z-index:5}
 #ending .madeby{margin-top:14px;text-align:center;font-size:11px;opacity:.38}
+/* v9: второстепенные персонажи почти «фон»: без покачивания, только смена кадров эмоций */
+.char:not([data-who=sera]) .idle{animation:none}
+.char:not([data-who=sera]){transition:opacity .5s ease,filter .4s}
+#side img{height:150%;top:2%}
