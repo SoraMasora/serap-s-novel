@@ -13,6 +13,7 @@ let pairs={},log=[],shot=0,steps=0,mapEntered=0;
 const vis=async s=>p.evaluate(s=>{const e=document.querySelector(s);return !!e&&!e.classList.contains('hidden')},s);
 for(let i=0;i<2400;i++){
   if(await vis('#ending')){log.push('=== ENDING ===');break;}
+  if(await vis('#breath')&&!(await p.evaluate(()=>document.querySelector('#breath').classList.contains('done')))){log.push('BREATH ok');await p.evaluate(()=>document.querySelector('[data-a=skip]').click());await p.waitForTimeout(200);await p.evaluate(()=>{const b=document.querySelector('[data-a=skip]');if(b.classList.contains('on'))b.click()});await p.waitForTimeout(1800);continue;}
   if(await vis('#pixwrap')){
     const st=await p.evaluate(()=>{const s=window.__pix.state();return {spots:s.map.spots,done:s.map.done,visits:s.map.visits,title:s.map.title,scenes:s.map.scenes?Object.keys(s.map.scenes):null,items:!!s.map.items,world:s.map.world||'yard'}});
     log.push('MAP: '+JSON.stringify(st));
