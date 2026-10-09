@@ -47,3 +47,5 @@ docs/concept.md   — концепт-документ
 
 ## Godot-версия
 Порт на Godot 4.7.2 — папка `godot/`. С чего начать: [START_HERE.md](START_HERE.md).
+
+**Мобильная версия** (ветка `godot-mobile`): Android APK (`--export-debug "Android"`, артефакт CI `android-debug-apk`), веб-PWA с сенсорным управлением; iOS-пресет — UNVERIFIED. Подробности — START_HERE.md, ADR-0005.

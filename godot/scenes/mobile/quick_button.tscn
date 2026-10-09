@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[node name="QuickButton" type="Button"]
+custom_minimum_size = Vector2(100, 80)
+focus_mode = 0
+theme_type_variation = &"TouchButton"
+text = "Меню"

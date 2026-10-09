@@ -117,6 +117,11 @@ func set_side_padding(on: bool) -> void:
 	name_box.offset_right = name_box.offset_left + nw
 
 
+## Сенсорный режим: мелкая строка кнопок скрыта, её заменяет TouchQuickMenu в Main
+func set_touch_mode(on: bool) -> void:
+	controls.visible = not on
+
+
 func set_toggle(action: String, on: bool) -> void:
 	var b := controls.get_node_or_null(NodePath(action.capitalize())) as Button
 	if b:

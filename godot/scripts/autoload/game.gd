@@ -11,7 +11,7 @@ var config: GameConfig
 var db: StoryDB
 ## group → {key → res-путь}
 var manifest: Dictionary = {}
-var settings := {"speed": 28.0, "music": 0.6, "auto_delay": 1800.0}
+var settings := {"speed": 28.0, "music": 0.6, "auto_delay": 1800.0, "touch": 0.0}
 var _tex_cache: Dictionary = {}
 
 
@@ -22,6 +22,8 @@ func _ready() -> void:
 		"speed": config.default_text_speed,
 		"music": config.default_music_volume,
 		"auto_delay": config.default_auto_delay_ms,
+		# 0 — авто (телефон/планшет), 1 — всегда сенсорное управление, 2 — никогда (Mobile.TOUCH_*)
+		"touch": 0.0,
 	}
 	_load_manifest()
 	_load_settings()

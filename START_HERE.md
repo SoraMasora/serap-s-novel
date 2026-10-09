@@ -18,11 +18,21 @@ mkdir -p build/web && godot --headless --path . --export-release "Web" build/web
 Редактор: `godot -e --path godot` (после шагов 1–2). Игра: `godot --path godot`.
 Детерминированный прогон: `godot --headless --audio-driver Dummy --path godot -- --autoplay=42` → `AUTOPLAY {digest, ending…}`.
 
+## Мобильная версия (ветка `godot-mobile`, v0.19.0)
+```bash
+JAVA_HOME=<jdk17> ANDROID_SDK_ROOT=<sdk с build-tools> bash tools/godot/android_setup.sh                          # один раз: JDK/SDK/debug-keystore в настройки редактора
+cd godot && mkdir -p build/android && touch build/.gdignore && godot --headless --path . --export-debug "Android" build/android/serap-debug.apk
+(cd godot/build/web && python3 -m http.server 8765 &); NODE_PATH=<node_modules> node tools/godot/mobile_smoke.cjs shots/mobile   # смоук: телефон 844×390, касания
+godot --path godot -- --touch --jump=d1                                                                           # десктоп: сенсорный режим + сразу на карту d1
+```
+Сенсорный слой — `scenes/mobile/*.tscn` + автозагрузка `Mobile`; параметры — `data/mobile_config.tres`, тема — `ui/theme_mobile.tres` (ADR-0005).
+
 ## Карта репозитория
 | Путь | Что |
 |---|---|
 | `godot/project.godot` | проект, автозагрузки Game/SaveSystem/Audio, действия ввода |
 | `godot/scenes/` | `.tscn`: main, ui/*, pixel/*, audio |
+| `godot/scenes/mobile/` | сенсорный слой: джойстик+кнопки карты, быстрое меню, сенсорная кнопка |
 | `godot/scripts/core/` | StoryDB, StoryRunner (порт `run()` из js/engine.js), AutoPlayer |
 | `godot/scripts/{ui,pixel,audio,autoload,resources}/` | подача, пиксельная карта, звук, сейвы/настройки, классы ресурсов |
 | `godot/data/` | `story.json` (234 сцены, генерируется), `*.tres` (настройки), `pixel_bake.json`, `assets_manifest.json` |
@@ -36,7 +46,8 @@ mkdir -p build/web && godot --headless --path . --export-release "Web" build/web
 - Весь сюжет (234 сцены, 6 правил концовок, 48 заметок) идёт из `story.json`, сгенерированного из `js/story*.js`.
 - Подача: реплики-субтитры как в css v13, портреты/реакции, сердечки, выборы с лозами, катсцены, карточки глав, дыхание, дождь, меню, журнал с откатом, заметки, 3 слота + автосейв, концовки, настройки.
 - Пиксельная карта прогулок (запечённые слои js/pixel.js, герой, Сера, NPC, мини-карта).
-- Паритет: 200 сидов совпали с JS-эталоном по digest/концовке/статам. GUT 28/28.
+- Паритет: 200 сидов совпали с JS-эталоном по digest/концовке/статам.
+- Мобильная версия: Android APK (arm64, альбомная, immersive), веб-PWA, касания, быстрое меню, виртуальный джойстик, безопасные зоны, «назад» Android, автосейв при сворачивании. GUT 44/44.
 
 ## Notion
 Project Board: https://app.notion.com/p/32a8d6006e1c49df9efc9fc5a4b38f02 (Tasks, Research Questions, Decisions, Measurements, Skills).

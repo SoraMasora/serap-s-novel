@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="MobileConfig" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/mobile_config.gd" id="1"]
+[ext_resource type="Theme" path="res://ui/theme_mobile.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+touch_theme = ExtResource("2")

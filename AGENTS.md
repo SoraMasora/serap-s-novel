@@ -14,12 +14,16 @@
 - Тесты: `cd godot && GODOT_DISABLE_LEAK_CHECKS=1 godot --headless -d --audio-driver Dummy --path . -s res://addons/gut/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit`
 - Перф (CPU): `cd godot && godot --headless --audio-driver Dummy --path . res://tests/perf/perf_pixel_map.tscn -- --frames=600`
 - Веб: `cd godot && mkdir -p build/web && godot --headless --path . --export-release "Web" build/web/index.html`; смоук: `(cd godot/build/web && python3 -m http.server 8765 &); NODE_PATH=<node_modules> node tools/godot/web_smoke.cjs shots/godot` (env `STEPS`, `PERF`)
+- Android: `bash tools/godot/android_setup.sh` (env JAVA_HOME, ANDROID_SDK_ROOT) → `cd godot && touch build/.gdignore && godot --headless --path . --export-debug "Android" build/android/serap-debug.apk`
+- Мобильный смоук: `NODE_PATH=<node_modules> node tools/godot/mobile_smoke.cjs shots/mobile` (env `VW`/`VH`/`STEPS` в долях экрана, kind `tap`/`hold:ms`/`drag:dx,dy,ms`)
+- Флаги запуска: `-- --touch` / `--no-touch` (сенсорный режим), `--jump=<label>` (dev: сразу в сцену), `--autoplay=<seed>`
 
 ## Правила
 - Сцены — `.tscn`, настройки — `.tres`/JSON, повторяющиеся объекты — инстансы PackedScene.
 - Сюжет меняется только в `js/story*.js` → перегенерировать story.json и эталон паритета → тесты.
 - Изменение ядра (`scripts/core/`) требует зелёного `test_parity_js.gd`.
 - Вёрстка сверяется с `css/style.css` (последние переопределения побеждают) и скриншотами оригинала.
+- Мобильное: всё сенсорное — сцены `scenes/mobile/*.tscn`, параметры — `data/mobile_config.tres`; элементы у краёв экрана — в группе `safe_area`; касания не ломают мышь/клавиатуру (оба режима в тестах).
 - Docs обновляются в том же коммите, что и код. Коммиты: `type(scope): summary` + Why/What/Verify/Docs/Revert.
 - Статусы: PASS только после реального запуска; иначе UNVERIFIED + команда + ожидаемый вывод.
 - Ошибки не глушить; новые проблемы — в `docs/KNOWN_ISSUES.md` и `state.json`.

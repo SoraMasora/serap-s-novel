@@ -15,6 +15,10 @@
 | Esc · N · A | `vn_menu` · `vn_notes` · `vn_auto` |
 | дыхание: удержание Space / ЛКМ | `breath_hold` |
 | карта: WASD/стрелки, Shift, E/Enter/Space | `map_*`, `map_run`, `map_interact` |
+| касание по экрану (телефон) | `vn_advance` (как клик) |
+| быстрое меню (телефон): Авто/Пропуск/Журнал/Заметки/Сохр./Загр./Меню | `vn_auto`, skip-переключатель, журнал, `vn_notes`, слоты, `vn_menu` |
+| карта (телефон): джойстик · «Бег» (удержание) · «E» | `map_*` · `map_run` · `map_interact` |
+| Android «назад» | закрыть модалку / меню; на титуле — выход (`back_on_title_quits`) |
 
 ## Ассеты
 - Картинки/музыка: base64 из `assets/*.js` → файлы `godot/assets/**` (`export_data.cjs --assets`), без перекодирования.
@@ -47,5 +51,8 @@
 | Титул, имя, карточка главы, магазин, выбор с наведением | `web_smoke.cjs` (Chromium/SwiftShader), ERRORS none | PASS (host) |
 | Пиксельная карта: движение, точки, мини-карта | smoke (11 карт через map_enter) + perf-зонд | PASS логика / UNVERIFIED визуально в браузере |
 | Дыхание (ручной ввод) | smoke через breath_result | UNVERIFIED |
+| Сенсорный режим, safe area, «назад», джойстик, быстрое меню, 2400×1080 → карта 16:9 | `test_mobile.gd`, `test_touch_controls.gd`, `test_mobile_main.gd` (16) | PASS |
+| Телефон (эмуляция): титул, имя с экранной клавиатурой, касания, быстрое меню, джойстик на карте | `mobile_smoke.cjs` 844×390 isMobile/hasTouch, ERRORS none | PASS (host) |
+| Реальный Android / iPhone | — | UNVERIFIED (KI-009, KI-010) |
 | Звук (кроссфейд, SFX) | только Dummy-драйвер | UNVERIFIED на слух |
 | Реакции/анимации | визуально по кадрам | ASSUMED близко (п.1) |

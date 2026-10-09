@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3]
+[gd_scene load_steps=19 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/main.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/ui/rain_fx.gd" id="2"]
@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/name_screen.tscn" id="9"]
 [ext_resource type="PackedScene" path="res://scenes/ui/modal.tscn" id="10"]
 [ext_resource type="PackedScene" path="res://scenes/ui/ending_screen.tscn" id="11"]
+[ext_resource type="PackedScene" path="res://scenes/mobile/touch_quick_menu.tscn" id="12"]
 
 [sub_resource type="Gradient" id="vig_g"]
 offsets = PackedFloat32Array(0.55, 1)
@@ -166,7 +167,7 @@ grow_vertical = 2
 modulate = Color(1, 1, 1, 0)
 mouse_filter = 2
 
-[node name="Hud" type="Control" parent="."]
+[node name="Hud" type="Control" parent="." groups=["safe_area"]]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -272,6 +273,9 @@ theme_override_colors/font_color = Color(1, 0.824, 0.886, 1)
 theme_override_font_sizes/font_size = 17
 theme_override_styles/normal = SubResource("toast_sb")
 horizontal_alignment = 1
+
+[node name="TouchQuickMenu" parent="." instance=ExtResource("12")]
+layout_mode = 0
 
 [node name="TitleScreen" parent="." instance=ExtResource("8")]
 layout_mode = 1

@@ -10,3 +10,8 @@
 | KI-006 | P3 | Концовка «expo» не достигается 200 случайными сидами — проверена только логика правила | `node tools/godot/js_reference.cjs 200` | Нужен целевой сценарий-тест. |
 | KI-007 | P2 | CI (`.github/workflows/godot.yml`) ни разу не запускался на GitHub | — | UNVERIFIED. |
 | KI-008 | P3 | Нет MCP-сервера Godot в среде агента; редактор не открывался в GUI (только headless) | — | Сцены — валидные .tscn (импорт без ошибок), открытие мышью UNVERIFIED. |
+| KI-009 | P1 | Мобильная версия не запускалась на реальном телефоне (только эмуляция Chromium isMobile/hasTouch 844×390 и сборка APK) | `adb install -r godot/build/android/serap-debug.apk` | UNVERIFIED: ожидается запуск в альбомной ориентации, касания, джойстик на карте, «назад» → меню. |
+| KI-010 | P2 | Пресет iOS не экспортировался (нужен macOS + Xcode, Team ID) | `godot --export-debug "iOS"` на macOS | UNVERIFIED. |
+| KI-011 | P2 | Нет release-keystore: APK подписан debug-ключом, для Google Play нужен свой ключ и AAB (Gradle-сборка) | `--export-release "Android"` | Открыто: ключ не хранить в git, задать в export_credentials/секретах CI. |
+| KI-012 | P3 | Веб: «На весь экран» на iPhone Safari не работает (Fullscreen API нет на iOS); кнопка там скрыта, PWA «На экран Домой» — запасной путь | Safari iOS | UNVERIFIED на устройстве. |
+| KI-013 | P3 | APK 58,6 МБ (ресурсы 30,6 МБ + движок) | `ls -la godot/build/android/` | Открыто: сжатие музыки (см. KI-002). |

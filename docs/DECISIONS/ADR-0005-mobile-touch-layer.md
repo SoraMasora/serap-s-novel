@@ -1,0 +1,7 @@
+# ADR-0005: мобильная версия — stretch expand, сенсорный слой сценами, нативный VirtualJoystick, APK без Gradle
+**Решение:** `window/stretch/aspect="expand"` (UI на весь экран телефона), пиксельная карта — в `AspectRatioContainer` 16:9; сенсорный слой — отдельные `.tscn` в `scenes/mobile/` и автозагрузка `Mobile`, параметры в `data/mobile_config.tres`, крупная тема `ui/theme_mobile.tres`; джойстик карты — встроенный узел Godot 4.7 `VirtualJoystick` (R-008); Android — экспорт APK из готового шаблона `android_debug/release.apk` без Gradle; веб — PWA + экранная клавиатура.
+**Контекст:** телефоны 19.5:9–20:9, вырезы экрана, нет клавиатуры/мыши, кнопка «назад», сворачивание приложения. Требования промпта: сцены .tscn, настройки в .tres, без runtime-сборки.
+**Альтернативы:** `keep` с чёрными полосами (теряется до 20 % экрана); свой джойстик на GDScript (конфликтует с именем нативного класса `VirtualJoystick` в 4.7, больше кода); Gradle-сборка (нужен Android build template в репо, тяжелее CI) — понадобится для AAB/Google Play (KI-011).
+**Последствия:** касания маппятся на существующие действия InputMap — ядро и паритет не меняются (digest 9a1c118c тот же); тема-перекрытие без `default_font_size` (R-009); APK 58,6 МБ.
+**Проверка:** GUT 44/44; `mobile_smoke.cjs` ERRORS none; `--export-debug "Android"` → APK, `aapt2 dump badging`, `apksigner verify`. На устройстве — UNVERIFIED (KI-009).
+**Откат:** `git revert` коммита `feat(godot-mobile)`; или вернуть `aspect="keep"` и убрать автозагрузку `Mobile`.

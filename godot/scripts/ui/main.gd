@@ -56,6 +56,7 @@ var _toast_tw: Tween
 @onready var name_screen: NameScreen = $NameScreen
 @onready var modal: Modal = $Modal
 @onready var ending: EndingScreen = $EndingScreen
+@onready var quick: TouchQuickMenu = $TouchQuickMenu
 
 
 func _ready() -> void:
@@ -68,9 +69,11 @@ func _ready() -> void:
 	breath.exhale_ms = cfg.breath_exhale_ms
 	breath.ok_ratio = cfg.breath_ok_ratio
 	_connect_signals()
+	_apply_touch(Mobile.touch)
 	if _cli_autoplay():
 		return
 	to_title()
+	_cli_jump()
 
 
 func _connect_signals() -> void:
@@ -96,6 +99,10 @@ func _connect_signals() -> void:
 	modal.menu_action.connect(_on_menu)
 	modal.rollback_confirmed.connect(rollback)
 	ending.back.connect(to_title)
+	quick.action.connect(_on_control)
+	Mobile.touch_mode_changed.connect(_apply_touch)
+	Mobile.back_requested.connect(on_back)
+	Mobile.app_paused.connect(_on_app_paused)
 
 
 ## Безголовый автоплей для CI/отладки: godot --headless --path godot -- --autoplay=SEED
@@ -107,6 +114,16 @@ func _cli_autoplay() -> bool:
 			get_tree().quit(0 if r.ending != "" else 1)
 			return true
 	return false
+
+
+## Отладка/смоук: godot --path godot -- --jump=d1
+## — новая игра сразу с метки сценария (d1 — первая карта прогулки)
+func _cli_jump() -> void:
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--jump="):
+			runner.new_game(cfg.default_name)
+			runner.jump(a.get_slice("=", 1))
+			begin()
 
 
 # ── Экраны ──
@@ -693,6 +710,8 @@ func _on_setting(k: String, v: float) -> void:
 func _sync_btns() -> void:
 	textbox.set_toggle("auto", auto)
 	textbox.set_toggle("skip", skip)
+	quick.set_toggle("auto", auto)
+	quick.set_toggle("skip", skip)
 
 
 func show_toast(t: String) -> void:
@@ -735,3 +754,44 @@ func _unhandled_input(event: InputEvent) -> void:
 		modal.open_notes(runner.st.notes, Game.db.notes_total)
 	elif event.is_action_pressed("vn_auto"):
 		_on_control("auto")
+
+
+# ── Мобильная версия ──
+## Сенсорный режим: тема для пальцев, быстрое меню вместо мелкой строки кнопок
+func _apply_touch(on: bool) -> void:
+	theme = Mobile.cfg.touch_theme if on else null
+	textbox.set_touch_mode(on)
+	_sync_btns()
+
+
+func _process(_delta: float) -> void:
+	quick.visible = (
+		Mobile.touch
+		and playing
+		and textbox.visible
+		and not title.visible
+		and not modal.is_open()
+		and not name_screen.visible
+		and not ending.visible
+		and not cut.visible
+		and not card.visible
+	)
+
+
+## Кнопка «Назад» Android (и Esc на телефоне с клавиатурой): закрыть окно → меню → титул → выход
+func on_back() -> void:
+	if modal.is_open():
+		modal.close()
+	elif title.visible:
+		if Mobile.cfg.back_on_title_quits:
+			get_tree().quit()
+	elif name_screen.visible or ending.visible:
+		to_title()
+	elif playing:
+		modal.open_menu()
+
+
+## Приложение ушло в фон: телефон может выгрузить его — сохраняем прогресс
+func _on_app_paused() -> void:
+	if Mobile.cfg.autosave_on_pause and playing and not title.visible:
+		autosave()

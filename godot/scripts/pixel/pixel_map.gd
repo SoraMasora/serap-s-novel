@@ -12,21 +12,24 @@ const CONFIG_PATH := "res://data/pixel_config.tres"
 var pc: PixelConfig
 var _base_task := ""
 var _msg := ""
+var _prefix := "E · "
 
-@onready var view: SubViewportContainer = $View
-@onready var pworld: PixelWorld = $View/Viewport/World
-@onready var signs: Control = $Signs
+@onready var view: SubViewportContainer = $Frame/View
+@onready var pworld: PixelWorld = $Frame/View/Viewport/World
+@onready var signs: Control = $Frame/Signs
 @onready var day_label: Label = $Hud/Info/Day
 @onready var task_label: Label = $Hud/Info/Task
 @onready var prompt: Label = $Prompt
 @onready var help: Label = $Help
 @onready var mini: MiniMap = $Mini
+@onready var touch: PixelTouchControls = $Touch
 
 
 func _ready() -> void:
 	pc = load(CONFIG_PATH)
 	visible = false
-	help.text = pc.help_text
+	_sync_touch(Mobile.touch)
+	Mobile.touch_mode_changed.connect(_sync_touch)
 	pworld.entered.connect(_on_entered)
 	pworld.said.connect(func(t: String) -> void: _msg = t)
 	pworld.sfx_requested.connect(func(k: String) -> void: Audio.sfx(k))
@@ -63,12 +66,24 @@ func open(m: Dictionary) -> void:
 		var l: Label = SIGN.instantiate()
 		l.text = s[0]
 		l.set_meta("wx", float(s[1]))
-		l.position.y = float(s[2]) / pc.screen.y * size.y
+		l.set_meta("wy", float(s[2]))
 		signs.add_child(l)
 	mini.setup(pworld)
 
 
+func _sync_touch(on: bool) -> void:
+	help.text = Mobile.cfg.map_help_touch if on else pc.help_text
+	if on:
+		help.add_theme_font_size_override("font_size", Mobile.cfg.map_help_font_size)
+		prompt.add_theme_font_size_override("font_size", Mobile.cfg.map_prompt_font_size)
+	else:
+		help.remove_theme_font_size_override("font_size")
+		prompt.remove_theme_font_size_override("font_size")
+	_prefix = Mobile.cfg.map_prompt_prefix_touch if on else "E · "
+
+
 func close() -> void:
+	touch.release_all()
 	pworld.stop()
 	visible = false
 
@@ -96,10 +111,11 @@ func _on_tick(s: int) -> void:
 func _process(_delta: float) -> void:
 	if not visible:
 		return
-	var k := size.x / pc.screen.x
+	var k := view.size.x / pc.screen.x
 	for l: Label in signs.get_children():
 		var x: float = l.get_meta("wx") - pworld.cam_x
 		l.position.x = x * k - l.size.x / 2.0
+		l.position.y = float(l.get_meta("wy")) / pc.screen.y * view.size.y
 		l.visible = x > -30 and x < pc.screen.x + 30
 	if pworld.msg_t > 0:
 		prompt.text = _msg
@@ -108,10 +124,12 @@ func _process(_delta: float) -> void:
 		var n := pworld.near()
 		if n != "":
 			if n.begins_with("it"):
-				prompt.text = "E · " + str(pworld.cfg.get("itemLabel", "Сорвать листовку"))
+				prompt.text = _prefix + str(pworld.cfg.get("itemLabel", "Сорвать листовку"))
 			else:
 				var done: bool = n != "home" and pworld.cfg.done.has(n)
-				prompt.text = "E · %s%s" % [pworld.spots()[n].label, " (уже был)" if done else ""]
+				prompt.text = (
+					"%s%s%s" % [_prefix, pworld.spots()[n].label, " (уже был)" if done else ""]
+				)
 			prompt.visible = true
 		else:
 			prompt.visible = false

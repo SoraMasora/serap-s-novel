@@ -19,6 +19,7 @@ var _cur := "t0"
 @onready var blink: TextureRect = $Frames/tb
 @onready var logo: TextureRect = $Logo/Img
 @onready var btn_continue: Button = $Bar/Continue
+@onready var btn_fullscreen: Button = $Fullscreen
 
 
 func _ready() -> void:
@@ -28,6 +29,9 @@ func _ready() -> void:
 	logo.texture = Game.tex("ui", "logo")
 	for b: Button in $Bar.get_children():
 		b.pressed.connect(func() -> void: action.emit(String(b.name).to_lower()))
+	# Веб-сборка на телефоне: браузер разворачивает игру только по нажатию игрока
+	btn_fullscreen.text = Mobile.cfg.web_fullscreen_label
+	btn_fullscreen.pressed.connect(Mobile.toggle_fullscreen)
 	var tw := create_tween().set_loops().set_trans(Tween.TRANS_SINE)
 	tw.tween_property(frames, "scale", Vector2(1.06, 1.06), 28.0)
 	tw.tween_property(frames, "scale", Vector2.ONE, 28.0)
@@ -38,6 +42,7 @@ func _ready() -> void:
 
 func refresh(can_continue: bool) -> void:
 	btn_continue.disabled = not can_continue
+	btn_fullscreen.visible = Mobile.can_web_fullscreen() and not Mobile.is_fullscreen()
 	frames.pivot_offset = Vector2(size.x * 0.5, size.y * 0.6)
 
 

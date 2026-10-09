@@ -1,23 +1,24 @@
-# Verification — latest (2026-10-09, commit d5d9034 + docs)
+# Verification — latest (2026-10-09, ветка `godot-mobile`, v0.19.0)
 
-Платформа: Linux (Amazon Linux 2023), Godot 4.7.2.stable.official.ed1daf0bf, headless; Chromium 153 (SwiftShader). GitHub Actions — не запускался.
+Платформа: Linux (Amazon Linux 2023), Godot 4.7.2.stable.official.ed1daf0bf, headless; Chromium 153 (SwiftShader); JDK 17.0.20.1, Android build-tools 35.0.0. GitHub Actions и реальные телефоны — не запускались.
 
 | # | Команда | Результат | Статус |
 |---|---|---|---|
-| 1 | `node tools/godot/export_data.cjs --assets` | `story.json: scenes 234 rules 6 notes 48` · `assets: 155 files, 18.5 MB` | PASS |
-| 2 | `node tools/godot/bake_web.cjs` | `pixel: ok` · `audio: ok 23` | PASS |
-| 3 | `bash tools/godot/fetch_deps.sh` | `GUT v9.7.1 ok` · `fonts ok` (sha256 сверены) | PASS |
-| 4 | `godot --headless --path . --import --quit` (2-й проход) | без ошибок/предупреждений (1-й проход на чистом клоне — KI-004) | PASS |
-| 5 | `bash tools/godot/check_scripts.sh` | `CHECK OK` | PASS |
-| 6 | `gdformat --check scripts tests && gdlint scripts tests` | `Success: no problems found` | PASS |
-| 7 | GUT (`-gdir=res://tests -ginclude_subdirs`) | Tests 28, Passing 28, Asserts 193, 23.6 s | PASS |
-| 8 | `godot --headless --path . -- --autoplay=42` | `ending home, steps 403, digest 9a1c118c…` | PASS |
-| 9 | `godot --headless --path . --quit-after 200` | запуск ок; при выходе KI-001 (ObjectDB leak аудио) | PASS с предупреждением |
-| 10 | `godot --headless --path . --export-release "Web" build/web/index.html` | 68 МБ (wasm 39.5, pck 30.6) | PASS |
-| 11 | `web_smoke.cjs`: титул → «Новая игра» → имя → глава → магазин → выбор → наведение | ERRORS none, boot 12.9 с; скриншоты сверены с `shots/t_store.png` | PASS (host) |
-| 12 | perf: `tests/perf/perf_pixel_map.tscn` | см. PERF_TARGETS M-001 | PASS |
+| 1 | `node tools/godot/export_data.cjs --assets` · `bake_web.cjs` · `fetch_deps.sh` | как на main (story.json 234 сцены, ассеты 155 файлов) | PASS |
+| 2 | `godot --headless --path . --import --quit` (2-й проход) | без ошибок | PASS |
+| 3 | `bash tools/godot/check_scripts.sh` | `CHECK OK` (включая Mobile) | PASS |
+| 4 | `gdformat --check scripts tests && gdlint scripts tests` | `42 files would be left unchanged` · `Success: no problems found` | PASS |
+| 5 | GUT (`-gdir=res://tests -ginclude_subdirs`) | Tests 44, Passing 44, Asserts 254 (+16 мобильных: test_mobile 5, test_touch_controls 5, test_mobile_main 6) | PASS |
+| 6 | `godot --headless --path . -- --autoplay=42` | `ending home, steps 403, digest 9a1c118c…` — совпадает с main (ядро не тронуто) | PASS |
+| 7 | perf `tests/perf/perf_pixel_map.tscn -- --frames=600` | avg 1.24 мс, p99 1.94 мс | PASS |
+| 8 | `godot --headless --path . --export-release "Web" build/web/index.html` | ок; `index.manifest.json`: display fullscreen, orientation landscape | PASS |
+| 9 | `mobile_smoke.cjs` (Pixel 7 UA, 844×390, isMobile/hasTouch): титул → имя (экранная клавиатура) → глава → касания → быстрое меню | ERRORS none, boot 12.8 с | PASS (host) |
+| 10 | `mobile_smoke.cjs` с `--jump=d1`: карта, drag джойстика, «E» | ERRORS none; герой идёт, карта 16:9, вывески на месте | PASS (host) |
+| 11 | `godot --headless --path . --export-debug "Android" build/android/serap-debug.apk` | 58,6 МБ; `aapt2 dump badging`: com.soramasora.seraps 19/0.19.0, arm64-v8a, targetSdk 36; `apksigner verify` ок | PASS (build) |
+| 12 | `python3 -c "yaml.safe_load(...godot.yml)"` | парсится (на main падал на строке 45 — исправлено) | PASS |
 
 ## Не проверялось
-- CI на GitHub Actions (`.github/workflows/godot.yml`) — UNVERIFIED; ожидается зелёный job `test` с теми же выводами.
-- Открытие сцен в редакторе с GUI и правка мышью — UNVERIFIED (`godot -e --path godot`, ожидается: сцены открываются без ошибок).
-- Звук на слух, ручной ввод дыхания, пиксельная карта в браузере, FPS на реальном GPU, десктоп-экспорт.
+- APK на реальном Android-телефоне (KI-009) — `adb install -r godot/build/android/serap-debug.apk`; ожидается: альбомная, касания листают текст, джойстик/«E»/«Бег» на карте, «назад» → меню, сворачивание → автосейв.
+- iOS-экспорт (KI-010) — нужен macOS + Xcode.
+- CI на GitHub Actions (KI-007) — ожидаются артефакты `web-build` и `android-debug-apk`.
+- Звук на слух, FPS на реальном GPU, редактор с GUI.

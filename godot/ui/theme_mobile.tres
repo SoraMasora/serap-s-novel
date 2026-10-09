@@ -1,0 +1,73 @@
+[gd_resource type="Theme" format=3]
+
+; Тема поверх ui/theme.tres в сенсорном режиме (Main.theme). Только размеры и стиль TouchButton.
+; Без default_font_size: Theme.has_font_size() с ним перехватывает все поиски размера (theme.cpp).
+; Поиск идёт «тема → все типы», поэтому каждая вариация, наследующая Label/Button, перечислена явно.
+
+[sub_resource type="StyleBoxFlat" id="sb_touch"]
+content_margin_left = 18.0
+content_margin_top = 8.0
+content_margin_right = 18.0
+content_margin_bottom = 8.0
+bg_color = Color(0.05, 0.02, 0.05, 0.62)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 0.55, 0.72, 0.5)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="sb_touch_on"]
+content_margin_left = 18.0
+content_margin_top = 8.0
+content_margin_right = 18.0
+content_margin_bottom = 8.0
+bg_color = Color(0.55, 0.06, 0.2, 0.75)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 0.6, 0.76, 0.9)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxEmpty" id="sb_none"]
+
+[resource]
+Button/font_sizes/font_size = 26
+CardBig/font_sizes/font_size = 64
+CardSmall/font_sizes/font_size = 28
+ChapterLabel/font_sizes/font_size = 22
+ChoiceVine/font_sizes/font_size = 24
+ControlButton/font_sizes/font_size = 12
+ControlDot/font_sizes/font_size = 12
+DialogueText/font_sizes/normal_font_size = 30
+DialogueText/font_sizes/italics_font_size = 30
+Hint/font_sizes/font_size = 18
+Label/font_sizes/font_size = 24
+LineEdit/font_sizes/font_size = 30
+LogoText/font_sizes/font_size = 84
+NameBox/font_sizes/font_size = 31
+PanelTitle/font_sizes/font_size = 34
+RichTextLabel/font_sizes/normal_font_size = 24
+RichTextLabel/font_sizes/italics_font_size = 24
+RichTextLabel/font_sizes/bold_font_size = 24
+VineButton/font_sizes/font_size = 28
+TouchButton/base_type = &"Button"
+TouchButton/colors/font_color = Color(1, 0.9, 0.94, 1)
+TouchButton/colors/font_pressed_color = Color(1, 1, 1, 1)
+TouchButton/colors/font_hover_color = Color(1, 0.9, 0.94, 1)
+TouchButton/colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+TouchButton/colors/font_focus_color = Color(1, 0.9, 0.94, 1)
+TouchButton/font_sizes/font_size = 24
+TouchButton/styles/normal = SubResource("sb_touch")
+TouchButton/styles/hover = SubResource("sb_touch")
+TouchButton/styles/pressed = SubResource("sb_touch_on")
+TouchButton/styles/hover_pressed = SubResource("sb_touch_on")
+TouchButton/styles/focus = SubResource("sb_none")
+TouchButton/styles/disabled = SubResource("sb_touch")

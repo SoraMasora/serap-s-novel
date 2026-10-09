@@ -192,3 +192,18 @@ theme_override_colors/font_color = Color(0.914, 0.863, 0.902, 0.35)
 theme_override_font_sizes/font_size = 12
 text = "Made By Sora"
 horizontal_alignment = 2
+
+[node name="Fullscreen" type="Button" parent="." groups=["safe_area"]]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -320.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = 104.0
+grow_horizontal = 0
+focus_mode = 0
+theme_type_variation = &"TouchButton"
+text = "На весь экран"

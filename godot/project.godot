@@ -12,11 +12,12 @@ config_version=5
 
 config/name="S^erap^S"
 config/description="Визуальная новелла S^erap^S — порт веб-версии на Godot 4"
-config/version="0.18.0"
+config/version="0.19.0"
 run/main_scene="res://scenes/main/main.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 boot_splash/bg_color=Color(0.027, 0.024, 0.039, 1)
 config/icon="res://icon.svg"
+config/quit_on_go_back=false
 
 [audio]
 
@@ -26,6 +27,7 @@ buses/default_bus_layout="res://audio/default_bus_layout.tres"
 
 Game="*res://scripts/autoload/game.gd"
 SaveSystem="*res://scripts/autoload/save_system.gd"
+Mobile="*res://scripts/autoload/mobile.gd"
 Audio="*res://scenes/audio/audio.tscn"
 
 [debug]
@@ -40,7 +42,8 @@ gdscript/warnings/unsafe_method_access=0
 window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/mode="canvas_items"
-window/stretch/aspect="keep"
+window/stretch/aspect="expand"
+window/handheld/orientation=4
 
 [editor_plugins]
 

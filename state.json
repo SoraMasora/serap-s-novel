@@ -1,17 +1,82 @@
 {
   "project": "serap-s-novel",
   "route": "B",
-  "phase": "port-complete-verification",
+  "phase": "mobile",
   "status": "green-with-known-issues",
-  "next_task": "KI-007: запустить .github/workflows/godot.yml на GitHub и починить, если упадёт; затем KI-003 замер FPS на реальном GPU",
-  "blocked_by": ["нет GPU в среде агента (KI-003)", "CI не запускался (KI-007)"],
+  "next_task": "KI-009: установить godot/build/android/serap-debug.apk (или артефакт CI android-debug-apk) на реальный Android-телефон и пройти титул → имя → глава → карта d1 (джойстик, E, Бег, назад); затем KI-007 CI на GitHub",
+  "blocked_by": [
+    "нет реального телефона в среде агента (KI-009)",
+    "нет macOS/Xcode для iOS (KI-010)",
+    "нет GPU в среде агента (KI-003)",
+    "CI не запускался (KI-007)"
+  ],
   "verification": [
-    {"cmd": "gdformat --check scripts tests && gdlint scripts tests", "result": "no problems", "status": "PASS", "date": "2026-10-09"},
-    {"cmd": "GUT -gdir=res://tests -ginclude_subdirs", "result": "28/28, 193 asserts", "status": "PASS", "date": "2026-10-09"},
-    {"cmd": "godot --headless --path godot -- --autoplay=42", "result": "home, steps 403, digest 9a1c118c", "status": "PASS", "date": "2026-10-09"},
-    {"cmd": "godot --export-release Web", "result": "68 MB", "status": "PASS", "date": "2026-10-09"},
-    {"cmd": "web_smoke.cjs", "result": "ERRORS none, boot 12.9 s", "status": "PASS (host)", "date": "2026-10-09"},
-    {"cmd": ".github/workflows/godot.yml", "result": "not run", "status": "UNVERIFIED", "date": "2026-10-09"}
+    {
+      "cmd": "gdformat --check scripts tests && gdlint scripts tests",
+      "result": "no problems",
+      "status": "PASS",
+      "date": "2026-10-09"
+    },
+    {
+      "cmd": "bash tools/godot/check_scripts.sh",
+      "result": "CHECK OK",
+      "status": "PASS",
+      "date": "2026-10-09"
+    },
+    {
+      "cmd": "GUT -gdir=res://tests -ginclude_subdirs",
+      "result": "44/44, 254 asserts",
+      "status": "PASS",
+      "date": "2026-10-09"
+    },
+    {
+      "cmd": "godot --headless --path godot -- --autoplay=42",
+      "result": "home, steps 403, digest 9a1c118c (как на main)",
+      "status": "PASS",
+      "date": "2026-10-09"
+    },
+    {
+      "cmd": "perf_pixel_map.tscn --frames=600",
+      "result": "avg 1.24 ms, p99 1.94 ms",
+      "status": "PASS",
+      "date": "2026-10-09"
+    },
+    {
+      "cmd": "godot --export-release Web",
+      "result": "ok, PWA manifest fullscreen/landscape",
+      "status": "PASS",
+      "date": "2026-10-09"
+    },
+    {
+      "cmd": "mobile_smoke.cjs 844x390 isMobile/hasTouch",
+      "result": "ERRORS none, boot 12.8 s; титул, имя, реплики, быстрое меню, карта d1 + джойстик",
+      "status": "PASS (host)",
+      "date": "2026-10-09"
+    },
+    {
+      "cmd": "godot --export-debug Android",
+      "result": "serap-debug.apk 58.6 MB, com.soramasora.seraps 19/0.19.0, arm64-v8a, targetSdk 36, apksigner ok",
+      "status": "PASS (build)",
+      "date": "2026-10-09"
+    },
+    {
+      "cmd": "APK на реальном устройстве",
+      "result": "not run",
+      "status": "UNVERIFIED",
+      "date": "2026-10-09"
+    },
+    {
+      "cmd": "godot --export-debug iOS",
+      "result": "not run (нужен macOS)",
+      "status": "UNVERIFIED",
+      "date": "2026-10-09"
+    },
+    {
+      "cmd": ".github/workflows/godot.yml",
+      "result": "not run; YAML теперь парсится (на main не парсился)",
+      "status": "UNVERIFIED",
+      "date": "2026-10-09"
+    }
   ],
   "pins": {
     "godot": "4.7.2-stable",
@@ -19,7 +84,10 @@
     "gdtoolkit": "4.5.0",
     "google_fonts_rev": "51303ca9e8ac9dcea7b12d307ba568fd0e6fcfca",
     "node": "24",
-    "playwright": "1.63.0"
+    "playwright": "1.63.0",
+    "jdk": "17 (Temurin 17.0.20.1+1)",
+    "android_build_tools": "35.0.0",
+    "android_target_sdk": "36 (из шаблона 4.7.2)"
   },
   "budgets": {
     "frame_ms_gpu": 16.7,
@@ -28,6 +96,22 @@
     "web_boot_s": 10,
     "web_size_mb": 50
   },
-  "todo": ["KI-001", "KI-002", "KI-003", "KI-004", "KI-005", "KI-006", "KI-007", "KI-008"],
-  "last_code_sha": "d5d9034"
+  "todo": [
+    "KI-001",
+    "KI-002",
+    "KI-003",
+    "KI-004",
+    "KI-005",
+    "KI-006",
+    "KI-007",
+    "KI-008",
+    "KI-009",
+    "KI-010",
+    "KI-011",
+    "KI-012",
+    "KI-013"
+  ],
+  "last_code_sha": "b944650 (main); ветка godot-mobile — см. git log",
+  "branch": "godot-mobile",
+  "version": "0.19.0"
 }
