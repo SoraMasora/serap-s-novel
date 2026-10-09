@@ -228,3 +228,8 @@ GitHub MCP `push_files` с `arguments_file_path` (JSON `{owner, repo, branch, me
 - cg_hit: табличка «ПЛАТФОРМА 47 км» вклеена из эталона (`sign()`); end_letters: «Роллтон» на стакане (`cuptext()`).
 - Скрипт `tools/v15_art.py` запускать ПОСЛЕ v14_art.py. cg_tea снова сцена с чаем (ab2180ec), кормление пельменем — cg_dumplings (afd66bd4).
 - Не трогали: store/cg_shift (надписи Доширак/Роллтон), cg_walkhome, cg_guests, платформа/поезда/крыши, bug*, end_bad*, фоны.
+
+## v16 (v15 ОТМЕНЁН пользователем: «старые сцены лучше, просто приведи их к этой стилистике»)
+- Исходники: `v16src/` — распаковка ассетов коммита ДО v15 (bg/cg, sprites, title). cg_tea ← 937cb55e (оригинальный чай), cg_dumplings ← afd66bd4 (кормление).
+- `tools/v16_style.py` — фильтр `artist()` (cel edgePreserving 55%, DoG-контур тушью, −12% насыщенности, сплит-тон, матовые чёрные, бумажное зерно). `tools/v16_apply.py` применяет его ко ВСЕМ фонам/CG, спрайтам (k=.85, RGBA premult) и титулу; ui не трогает. Запускать ПОСЛЕДНИМ (после v14_art/v14_labels), только на исходниках из v16src (не повторно на уже обработанных!).
+- Из-за роста размера часть ассетов переложена в `assets/x1-x4.js` (≤960 КБ), теги в index.html; `tools/chk.cjs` читает bg|cg|x.
