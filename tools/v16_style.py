@@ -7,7 +7,7 @@ def artist(img,k=1.0,seed=7,paper=True):
     a=np.asarray(img.convert('RGB')).astype(np.float32)/255.
     # 1) cel: убираем «ИИ-глянец» — плавные градиенты/микродетали, края сохраняются
     b=cv2.edgePreservingFilter((a*255).astype(np.uint8),flags=1,sigma_s=24,sigma_r=0.22).astype(np.float32)/255.
-    b=a*(1-.55*k)+b*.8*k
+    b=a*(1-.55*k)+b*.55*k  # v16.2: было .8 → сумма весов 1.21, пересвет/контраст
     # 2) контур: DoG по яркости → тёмные линии тушью, плюс сдвинутый «карандашный» дубль
     L=cv2.cvtColor((a*255).astype(np.uint8),cv2.COLOR_RGB2GRAY).astype(np.float32)/255.
     dog=cv2.GaussianBlur(L,(0,0),2.0)-cv2.GaussianBlur(L,(0,0),0.8)

@@ -6,9 +6,12 @@ import numpy as np
 from PIL import Image
 from setasset import set_asset
 from v16_style import artist
+from v14_labels import fix,STORE,SHIFT
+from PIL import ImageEnhance,ImageOps
+LAB={'store':('a01badb2',STORE),'cg_shift':('1fc6931f',SHIFT)}
 F='/data/.agent-service/files/'
 def fid(i): return Image.open(glob.glob(F+i+'*/*')[0]).convert('RGB').resize((1376,768),Image.LANCZOS)
-OVR={'cg_tea':'c53464dc','cg_dumplings':'1ea824cf','cg_guests':'8b5f8a41','cg_walkhome':'897fd415'}  # v16.1: новые чай(2 кружки), пельмени, гости по концепту, иду домой
+OVR={'cg_tea':'937cb55e','cg_dumplings':'afd66bd4'}
 pat=re.compile(r"ASSETS\.(\w+)\['([^']+)'\]='data:image")
 where={}
 for js in sorted(glob.glob('assets/*.js')):
@@ -23,7 +26,12 @@ BL=(425,225)
 for (kind,key),js in sorted(where.items()):
     if kind=='bg':
         src=fid(OVR[key]) if key in OVR else Image.open(f'v16src/bg_{key}.webp').convert('RGB')
-        im=artist(src); im.save(f'v16/{key}.jpg',quality=85); set_asset(js,'bg',key,im,80)
+        if key in LAB:  # v16.2: надписи рисуются ПОСЛЕ фильтра (иначе контур портит «Роллтон»/«Доширак»)
+            src=fid(LAB[key][0]); 
+            if key=='store': src=ImageEnhance.Color(ImageEnhance.Contrast(ImageOps.autocontrast(src,cutoff=1)).enhance(1.12)).enhance(1.15)
+            im=fix(artist(src),LAB[key][1])
+        else: im=artist(src)
+        im.save(f'v16/{key}.jpg',quality=85); set_asset(js,'bg',key,im,80)
     elif kind=='title':
         set_asset(js,'title',key,artist(Image.open(f'v16src/title_{key}.webp').convert('RGB')),80)
     elif kind=='sprites':
