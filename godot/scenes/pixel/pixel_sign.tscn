@@ -1,0 +1,10 @@
+[gd_scene format=3]
+
+[node name="PixelSign" type="Label"]
+mouse_filter = 2
+theme_type_variation = &"ChapterLabel"
+theme_override_colors/font_color = Color(1, 0.86, 0.6, 0.9)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.9)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 15
+text = "Вывеска"

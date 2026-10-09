@@ -1,0 +1,1806 @@
+{
+ "generator": "tools/godot/js_reference.cjs",
+ "rng": "park-miller 16807 mod 2^31-1; pick(n)=s%n",
+ "runs": [
+  {
+   "seed": 1,
+   "ending": "home",
+   "steps": 390,
+   "feel": 17,
+   "press": 9,
+   "notes": 19,
+   "digest": "0d64fbed75f025d4ab0f8da0a0d3bfbd657e05c23ba0b23d34745e5d8acad0d2"
+  },
+  {
+   "seed": 7920,
+   "ending": "home",
+   "steps": 422,
+   "feel": 6,
+   "press": 6,
+   "notes": 20,
+   "digest": "9ef4988674d22bf7b4f7b3906d30e7b5c3d5140dba7b0b8cf15b1d8e87a4719e"
+  },
+  {
+   "seed": 15839,
+   "ending": "gone",
+   "steps": 449,
+   "feel": 77,
+   "press": 2,
+   "notes": 27,
+   "digest": "72550145d9373fb6ef14b7b834a4666c316ab7bb05b908e285f6415ce64f67c2"
+  },
+  {
+   "seed": 23758,
+   "ending": "gone",
+   "steps": 484,
+   "feel": 100,
+   "press": 1,
+   "notes": 27,
+   "digest": "f89f3bb10c2caf602fa2ca1d9b3fecf08c2c554b07bcc9decc74d5d14210d805"
+  },
+  {
+   "seed": 31677,
+   "ending": "home",
+   "steps": 399,
+   "feel": 28,
+   "press": 6,
+   "notes": 19,
+   "digest": "ba64949970a9b4fe80b4cd088e92d4a68d367972e701b9c9059c89e3b1d7d5a4"
+  },
+  {
+   "seed": 39596,
+   "ending": "home",
+   "steps": 348,
+   "feel": 0,
+   "press": 6,
+   "notes": 14,
+   "digest": "2798ad1bf2dfc7ae0d3dbd3155bddd04621e877c46055170c545fa25060ee45a"
+  },
+  {
+   "seed": 47515,
+   "ending": "home",
+   "steps": 412,
+   "feel": 52,
+   "press": 6,
+   "notes": 19,
+   "digest": "c3f74c10b6ca3339056c0659266cd147c2448d9a0322d1b92a8e15b1931fb7ff"
+  },
+  {
+   "seed": 55434,
+   "ending": "neutral",
+   "steps": 488,
+   "feel": 96,
+   "press": 2,
+   "notes": 27,
+   "digest": "65620e1f4d430cba9d67ffc6082ba2228390150b76124469f5a595ad5a2991a6"
+  },
+  {
+   "seed": 63353,
+   "ending": "neutral",
+   "steps": 459,
+   "feel": 75,
+   "press": 3,
+   "notes": 28,
+   "digest": "d9f31595639fd9bc232bf83a0093cdf66eca081092cfc23968bdc6e0629247c0"
+  },
+  {
+   "seed": 71272,
+   "ending": "home",
+   "steps": 383,
+   "feel": 32,
+   "press": 5,
+   "notes": 20,
+   "digest": "a6c8cb323a2ecc9ac8fc5216f7f539cda7c7df45b8e634bb08af2d9ed24a2bb3"
+  },
+  {
+   "seed": 79191,
+   "ending": "good",
+   "steps": 446,
+   "feel": 100,
+   "press": 3,
+   "notes": 21,
+   "digest": "01baa989a375920e2176a7bbd6fbcac2c036a22633064c8481d225246d084d92"
+  },
+  {
+   "seed": 87110,
+   "ending": "home",
+   "steps": 400,
+   "feel": 28,
+   "press": 6,
+   "notes": 19,
+   "digest": "0e111f2859f3845570d9136b185c9fb446940f3452e4ab2f057df0e2537e6e92"
+  },
+  {
+   "seed": 95029,
+   "ending": "neutral",
+   "steps": 475,
+   "feel": 100,
+   "press": 2,
+   "notes": 27,
+   "digest": "ce86d3865d1ba63d9b77db25857abc2d0908d6ccaa23e22d7d1459cedea2abc3"
+  },
+  {
+   "seed": 102948,
+   "ending": "home",
+   "steps": 373,
+   "feel": 14,
+   "press": 7,
+   "notes": 15,
+   "digest": "9818a461033a03b7156e7d4dfab2992ab996525526dace784d52856ea6c94ed7"
+  },
+  {
+   "seed": 110867,
+   "ending": "home",
+   "steps": 360,
+   "feel": 0,
+   "press": 8,
+   "notes": 16,
+   "digest": "ab8c993f80ccd8de397f2b116bf933e48613d969e93698f5eb730191f8f1b4d7"
+  },
+  {
+   "seed": 118786,
+   "ending": "good",
+   "steps": 475,
+   "feel": 100,
+   "press": 3,
+   "notes": 29,
+   "digest": "f9cc372495f69520f303cde6aee7a71c6cf997162edad5cb56c23b5c81b5aba6"
+  },
+  {
+   "seed": 126705,
+   "ending": "home",
+   "steps": 399,
+   "feel": 41,
+   "press": 5,
+   "notes": 20,
+   "digest": "98021baf558cca8c1a8ce7b5251a67c5773ebfd4a30fbb51d902a163712a0ef6"
+  },
+  {
+   "seed": 134624,
+   "ending": "home",
+   "steps": 423,
+   "feel": 15,
+   "press": 5,
+   "notes": 20,
+   "digest": "9288ea0cab7f4f2795edd37f70d80176cef1b7488b874428329b4c86251abad0"
+  },
+  {
+   "seed": 142543,
+   "ending": "home",
+   "steps": 408,
+   "feel": 16,
+   "press": 6,
+   "notes": 22,
+   "digest": "8da97061d140323ed55ad54f26f98b25f05279e66aa0af9a551dfc07875b2812"
+  },
+  {
+   "seed": 150462,
+   "ending": "home",
+   "steps": 385,
+   "feel": 20,
+   "press": 5,
+   "notes": 15,
+   "digest": "05d9fd48d8e41a54c625fa81e287d02d76b1cd2779d1ae7b194700be3660e451"
+  },
+  {
+   "seed": 158381,
+   "ending": "home",
+   "steps": 445,
+   "feel": 60,
+   "press": 6,
+   "notes": 21,
+   "digest": "1f86c9d9662eea67bedbdd9e94dc246e7ff8db73b3a15e998dd0fb5dc84931d0"
+  },
+  {
+   "seed": 166300,
+   "ending": "bad",
+   "steps": 445,
+   "feel": 81,
+   "press": 3,
+   "notes": 25,
+   "digest": "b19b1bf83ebd0f32568de7af34e82aada797ae88aef45c8c29be31f3f1bd6639"
+  },
+  {
+   "seed": 174219,
+   "ending": "home",
+   "steps": 399,
+   "feel": 5,
+   "press": 7,
+   "notes": 19,
+   "digest": "a7cb22070ed90ee322d2e161953500112154eacd121762c0f5c8c8821ae3de63"
+  },
+  {
+   "seed": 182138,
+   "ending": "home",
+   "steps": 419,
+   "feel": 54,
+   "press": 6,
+   "notes": 20,
+   "digest": "58b7e0402c9223a6df8542bf8f0cba0b42aa6cf711708585e65aec525c022074"
+  },
+  {
+   "seed": 190057,
+   "ending": "home",
+   "steps": 423,
+   "feel": 24,
+   "press": 6,
+   "notes": 19,
+   "digest": "f670db677d22cd2f6cd4c444750f71416865b4e0349b9c86482ff734728c5946"
+  },
+  {
+   "seed": 197976,
+   "ending": "home",
+   "steps": 368,
+   "feel": 0,
+   "press": 8,
+   "notes": 18,
+   "digest": "d0c1063f460bab7d66b566eebcf9d28dcce343b465969476b989ac8ca56e8064"
+  },
+  {
+   "seed": 205895,
+   "ending": "bad",
+   "steps": 461,
+   "feel": 75,
+   "press": 3,
+   "notes": 27,
+   "digest": "d03bdf8604cdbe93a4729fb1b7811d841022b1077add8e1dc966818366adafb7"
+  },
+  {
+   "seed": 213814,
+   "ending": "home",
+   "steps": 434,
+   "feel": 60,
+   "press": 6,
+   "notes": 23,
+   "digest": "af8c8e3d90b54d70c4d08452b08a0a15acd9b197cb8f5df36e727d090dc58173"
+  },
+  {
+   "seed": 221733,
+   "ending": "home",
+   "steps": 377,
+   "feel": 32,
+   "press": 6,
+   "notes": 19,
+   "digest": "f291403c01b9d0be233531cead94cbf594672efeae70980139dbda45fd832895"
+  },
+  {
+   "seed": 229652,
+   "ending": "home",
+   "steps": 405,
+   "feel": 18,
+   "press": 6,
+   "notes": 21,
+   "digest": "8d4f5a439b3334737cce958cda600eb0f03e981618afce920c54bdb18781f8f6"
+  },
+  {
+   "seed": 237571,
+   "ending": "good",
+   "steps": 470,
+   "feel": 97,
+   "press": 4,
+   "notes": 28,
+   "digest": "3c5ee0507e6e9cc08c7ed7488e75fb8b4ef84b80177b4a9adf0e4a45fa97c177"
+  },
+  {
+   "seed": 245490,
+   "ending": "home",
+   "steps": 468,
+   "feel": 66,
+   "press": 5,
+   "notes": 28,
+   "digest": "9fcd9d6ef6b4eb0f9af4c17b3f8413f742174128a705bd7f16616bcf3ad701d5"
+  },
+  {
+   "seed": 253409,
+   "ending": "home",
+   "steps": 365,
+   "feel": 11,
+   "press": 8,
+   "notes": 15,
+   "digest": "28a81ba51c9a674e40862c713e4bd4f63c37ed106501485bccf3b88da894687f"
+  },
+  {
+   "seed": 261328,
+   "ending": "home",
+   "steps": 389,
+   "feel": 39,
+   "press": 4,
+   "notes": 16,
+   "digest": "b671519fd371c1b64729e0436348384e278b1ba53c81165f1a6e8ed23c136f50"
+  },
+  {
+   "seed": 269247,
+   "ending": "bad",
+   "steps": 482,
+   "feel": 50,
+   "press": 3,
+   "notes": 25,
+   "digest": "efda36012dfd7c72fc9ff63ac8a63becc996cf53ba2424eaae0394706983382c"
+  },
+  {
+   "seed": 277166,
+   "ending": "home",
+   "steps": 427,
+   "feel": 56,
+   "press": 7,
+   "notes": 23,
+   "digest": "b6b54b7436ba6f4ba29e7b22f42138735a79d2c0362666497ba04b4a11013f08"
+  },
+  {
+   "seed": 285085,
+   "ending": "home",
+   "steps": 405,
+   "feel": 22,
+   "press": 5,
+   "notes": 20,
+   "digest": "32d95fc99e56a6e52faabeadb78e61851e58875f026f0627514cc245ba42ef9b"
+  },
+  {
+   "seed": 293004,
+   "ending": "home",
+   "steps": 364,
+   "feel": 17,
+   "press": 6,
+   "notes": 16,
+   "digest": "6c3b72e0f8ab7558680416cc134076dda712fef3ea34211a1abf907d389ca51a"
+  },
+  {
+   "seed": 300923,
+   "ending": "gone",
+   "steps": 438,
+   "feel": 86,
+   "press": 2,
+   "notes": 25,
+   "digest": "08f08ab00c2d2cd8fa0ee0980c153f48b0d5ef9af301cd10745e87c26e000e40"
+  },
+  {
+   "seed": 308842,
+   "ending": "home",
+   "steps": 428,
+   "feel": 29,
+   "press": 5,
+   "notes": 20,
+   "digest": "6a982184d7312de38b0d553bd08c7383efe4c99e34b668b50109d821ef415682"
+  },
+  {
+   "seed": 316761,
+   "ending": "home",
+   "steps": 429,
+   "feel": 32,
+   "press": 7,
+   "notes": 21,
+   "digest": "b8b9e436e6bffc68a514e71f71ce52053e6abf4e0cb19b7c4188d0162c5c699c"
+  },
+  {
+   "seed": 324680,
+   "ending": "home",
+   "steps": 403,
+   "feel": 79,
+   "press": 4,
+   "notes": 21,
+   "digest": "5b69a78770739a6ece8627711aa3fbed640563cc882119561821122286fdad62"
+  },
+  {
+   "seed": 332599,
+   "ending": "home",
+   "steps": 343,
+   "feel": 6,
+   "press": 5,
+   "notes": 16,
+   "digest": "8f74a4498ba5c62f22769cd7c0c772e25dee0dd3d9014031b0d4f9f1ab4fefec"
+  },
+  {
+   "seed": 340518,
+   "ending": "neutral",
+   "steps": 482,
+   "feel": 88,
+   "press": 3,
+   "notes": 27,
+   "digest": "5fc96fe53e8a4d31d8e128493eabd3c468af40af494b624d74ee38d383875c0e"
+  },
+  {
+   "seed": 348437,
+   "ending": "home",
+   "steps": 455,
+   "feel": 80,
+   "press": 4,
+   "notes": 22,
+   "digest": "23a3413587a31e9062a03073ed2ccf8eefcaaf8f05588c492d5156f2615cc14e"
+  },
+  {
+   "seed": 356356,
+   "ending": "home",
+   "steps": 414,
+   "feel": 0,
+   "press": 11,
+   "notes": 20,
+   "digest": "361a8b25b1c7e5d2602fd754da004cdf2c08e397584e73c85ebd1df9ae04025c"
+  },
+  {
+   "seed": 364275,
+   "ending": "home",
+   "steps": 395,
+   "feel": 56,
+   "press": 6,
+   "notes": 19,
+   "digest": "0d50b987cfdeb835c4657dc48d381c5e8b8df31a20fbe2dab73b9261787dd839"
+  },
+  {
+   "seed": 372194,
+   "ending": "home",
+   "steps": 398,
+   "feel": 24,
+   "press": 7,
+   "notes": 19,
+   "digest": "47d312910bb516fe8d1b8951d55fbf2da99a57546e274d1b22000973e7cbb0cc"
+  },
+  {
+   "seed": 380113,
+   "ending": "home",
+   "steps": 440,
+   "feel": 51,
+   "press": 5,
+   "notes": 22,
+   "digest": "061df18d94539641d894f1b5c944a3d6b29eaa488ffdde11a4f5585b0dcef5e1"
+  },
+  {
+   "seed": 388032,
+   "ending": "gone",
+   "steps": 449,
+   "feel": 87,
+   "press": 2,
+   "notes": 27,
+   "digest": "98bda354d1245c2a1fef80ce40eca9ba91812117649783c611aa7f82d78ebd00"
+  },
+  {
+   "seed": 395951,
+   "ending": "home",
+   "steps": 408,
+   "feel": 29,
+   "press": 8,
+   "notes": 16,
+   "digest": "5b7b2e7fbd3aed84fa53a27049753085baffac96735ab0a476ff77882e42b7c8"
+  },
+  {
+   "seed": 403870,
+   "ending": "good",
+   "steps": 449,
+   "feel": 81,
+   "press": 5,
+   "notes": 23,
+   "digest": "d4d2f44e240d0bf8a9700931c38a79874959305adeb105e0690ec8fa489c77dc"
+  },
+  {
+   "seed": 411789,
+   "ending": "home",
+   "steps": 399,
+   "feel": 22,
+   "press": 4,
+   "notes": 19,
+   "digest": "3f2a00cb15e51bd5a76afe8f7af21184dc401eef53af6e663499362c15b0cd49"
+  },
+  {
+   "seed": 419708,
+   "ending": "home",
+   "steps": 415,
+   "feel": 47,
+   "press": 6,
+   "notes": 20,
+   "digest": "05603dc5b92d8272c85d62be10d30f4ae18f33b54bb09f5091f5670dad5dc29e"
+  },
+  {
+   "seed": 427627,
+   "ending": "neutral",
+   "steps": 463,
+   "feel": 91,
+   "press": 3,
+   "notes": 31,
+   "digest": "72887d0ccdcd9609706ba0ff0d4554c66bc1fb3c15a78c740ec0d2c0d4ea1342"
+  },
+  {
+   "seed": 435546,
+   "ending": "home",
+   "steps": 425,
+   "feel": 66,
+   "press": 5,
+   "notes": 23,
+   "digest": "ce130ff2e2cf4f275ac589485698370cb6bf62bffb52faee85c4ef5963fb1c44"
+  },
+  {
+   "seed": 443465,
+   "ending": "home",
+   "steps": 388,
+   "feel": 25,
+   "press": 4,
+   "notes": 15,
+   "digest": "d6b6ec730858dc2cf98e2b394de2801e168f55e72f1329195edb85edbe1de87d"
+  },
+  {
+   "seed": 451384,
+   "ending": "gone",
+   "steps": 461,
+   "feel": 100,
+   "press": 0,
+   "notes": 25,
+   "digest": "eac1f9944b69243ab226e07eb5ebcc7663a01bb600f2aa0ecae843d0592d1ae7"
+  },
+  {
+   "seed": 459303,
+   "ending": "home",
+   "steps": 424,
+   "feel": 40,
+   "press": 6,
+   "notes": 21,
+   "digest": "0d6a2a16e1f078ac83cb221f70feac08745424f6b6644b1141fdb304adecf738"
+  },
+  {
+   "seed": 467222,
+   "ending": "neutral",
+   "steps": 480,
+   "feel": 100,
+   "press": 2,
+   "notes": 27,
+   "digest": "88df0e9b011c5322c8d765466b5196fd7819411f3e99a8fb7c2d518e6350ad89"
+  },
+  {
+   "seed": 475141,
+   "ending": "neutral",
+   "steps": 410,
+   "feel": 66,
+   "press": 3,
+   "notes": 18,
+   "digest": "e78d4239588d5f5bcf79c35a28fc48fcf5501a2bcdad6e23f7f231fbb10ecdbb"
+  },
+  {
+   "seed": 483060,
+   "ending": "home",
+   "steps": 453,
+   "feel": 86,
+   "press": 5,
+   "notes": 21,
+   "digest": "5a5318747112c4a7322e98dd9b64cc53ac9f4508ceec32d7a2b9d105bc66a92e"
+  },
+  {
+   "seed": 490979,
+   "ending": "home",
+   "steps": 404,
+   "feel": 20,
+   "press": 7,
+   "notes": 19,
+   "digest": "b2bb14a9d5d3c4ca64fda0191e7f86069c9e23173b38836715c08c906aebba29"
+  },
+  {
+   "seed": 498898,
+   "ending": "home",
+   "steps": 429,
+   "feel": 35,
+   "press": 6,
+   "notes": 20,
+   "digest": "b3999856b0809bff3f3b91ae4daf07874ef3df90d9546ccdbb8f6f0e9b344d5f"
+  },
+  {
+   "seed": 506817,
+   "ending": "neutral",
+   "steps": 452,
+   "feel": 86,
+   "press": 3,
+   "notes": 24,
+   "digest": "ad1fcddc678e5b6b6009686ad27585ece317c4e390a3768f0b603f63e3a5fd51"
+  },
+  {
+   "seed": 514736,
+   "ending": "home",
+   "steps": 378,
+   "feel": 0,
+   "press": 10,
+   "notes": 15,
+   "digest": "4968c0cd09f9ce6e31ddc165577d1c05c77aed52202fca8478e11c1e64540302"
+  },
+  {
+   "seed": 522655,
+   "ending": "home",
+   "steps": 454,
+   "feel": 87,
+   "press": 5,
+   "notes": 27,
+   "digest": "df32a35b43f5763ac21fc96a254a826ecf97c930e8d02d5a48fe037153e400d0"
+  },
+  {
+   "seed": 530574,
+   "ending": "home",
+   "steps": 425,
+   "feel": 35,
+   "press": 6,
+   "notes": 18,
+   "digest": "f007d95cac27e5c2148e9f9fc904f73c7a42ae3ff3a574b1a8e3e9c12b9d4494"
+  },
+  {
+   "seed": 538493,
+   "ending": "home",
+   "steps": 447,
+   "feel": 48,
+   "press": 6,
+   "notes": 23,
+   "digest": "6813137f717761647edb66c94509397fadc0a07322819ee9484d17d731bd1fad"
+  },
+  {
+   "seed": 546412,
+   "ending": "home",
+   "steps": 414,
+   "feel": 82,
+   "press": 5,
+   "notes": 18,
+   "digest": "8f2f355d945a13c127d49abae43fe6547aacbf40a6fd127becceee9d99c3c6af"
+  },
+  {
+   "seed": 554331,
+   "ending": "home",
+   "steps": 341,
+   "feel": 3,
+   "press": 5,
+   "notes": 15,
+   "digest": "bc2721db0e98b8b08e9aaa6c34977e099bc125f6d38ac3550b857101bd40c5c5"
+  },
+  {
+   "seed": 562250,
+   "ending": "home",
+   "steps": 443,
+   "feel": 55,
+   "press": 6,
+   "notes": 19,
+   "digest": "e4b35a70be3934b1e1dceb0ef3d451bb3e606ff0ee540f7a9fa6a32d1de9145d"
+  },
+  {
+   "seed": 570169,
+   "ending": "home",
+   "steps": 484,
+   "feel": 29,
+   "press": 6,
+   "notes": 24,
+   "digest": "8a64e947be95e263e0c3fefa7766ce8b405977ebf34b5f02b27489676a52b697"
+  },
+  {
+   "seed": 578088,
+   "ending": "home",
+   "steps": 393,
+   "feel": 24,
+   "press": 7,
+   "notes": 19,
+   "digest": "2b688770c3e4046b78d576fe1a14500c492bdbd55183920fe6ca26d806279fdb"
+  },
+  {
+   "seed": 586007,
+   "ending": "home",
+   "steps": 388,
+   "feel": 14,
+   "press": 7,
+   "notes": 15,
+   "digest": "fd71fd4b35fac0ca728118fdd82a13ad85a3b340c19c94cb8e2e59527adae625"
+  },
+  {
+   "seed": 593926,
+   "ending": "home",
+   "steps": 433,
+   "feel": 63,
+   "press": 6,
+   "notes": 20,
+   "digest": "76b9ec64adce842889b485c46f4a189fc3754bccf2b893017a2733a41b633c38"
+  },
+  {
+   "seed": 601845,
+   "ending": "home",
+   "steps": 418,
+   "feel": 50,
+   "press": 5,
+   "notes": 21,
+   "digest": "54145d44aa52f3f34deb60b27e536d75a8b2fab00508d3d9ed2443539ebe03f3"
+  },
+  {
+   "seed": 609764,
+   "ending": "home",
+   "steps": 437,
+   "feel": 55,
+   "press": 6,
+   "notes": 23,
+   "digest": "67d5710baad3e10edb8255d1baf43fb98e7e8a7a2e3b900bd00a44a555ba918e"
+  },
+  {
+   "seed": 617683,
+   "ending": "home",
+   "steps": 434,
+   "feel": 53,
+   "press": 6,
+   "notes": 21,
+   "digest": "b8b0a0c60af7764470e2a4e42e2824f3fbae666ebc0a713d7e98171250c50ae1"
+  },
+  {
+   "seed": 625602,
+   "ending": "home",
+   "steps": 372,
+   "feel": 15,
+   "press": 7,
+   "notes": 15,
+   "digest": "c217eb5da46f3207228a6bcbc4c6e806d4a70d2c5ebdae9edc25ce9d363cb848"
+  },
+  {
+   "seed": 633521,
+   "ending": "home",
+   "steps": 394,
+   "feel": 29,
+   "press": 4,
+   "notes": 19,
+   "digest": "db5a6b1e1997d772c7c0d32d93a781fa98c06ed01842eaa97dddd80eb3a97f12"
+  },
+  {
+   "seed": 641440,
+   "ending": "home",
+   "steps": 430,
+   "feel": 41,
+   "press": 6,
+   "notes": 21,
+   "digest": "e5de9cbcdadd1b848e003c717657f57b69067eea28551572c9a5f1d822c5ea44"
+  },
+  {
+   "seed": 649359,
+   "ending": "good",
+   "steps": 486,
+   "feel": 100,
+   "press": 2,
+   "notes": 31,
+   "digest": "a2595537ee6d60a357a54d1b0e742449d968a7a92c169260df93e278c3a777f3"
+  },
+  {
+   "seed": 657278,
+   "ending": "gone",
+   "steps": 432,
+   "feel": 83,
+   "press": 2,
+   "notes": 26,
+   "digest": "6159e5696f51020b77400595c52940da1d801f4fea9dd6c40815b66ebe13f73d"
+  },
+  {
+   "seed": 665197,
+   "ending": "home",
+   "steps": 387,
+   "feel": 41,
+   "press": 5,
+   "notes": 18,
+   "digest": "6baa2e4ab9c59dd824d451fde955ad65a3395c5a1990aa67e424dbabd867c061"
+  },
+  {
+   "seed": 673116,
+   "ending": "gone",
+   "steps": 476,
+   "feel": 100,
+   "press": 0,
+   "notes": 26,
+   "digest": "2791ef804c647610aeab439fc2148bc4a3ac9497c7142761bc4433156f9e4ea2"
+  },
+  {
+   "seed": 681035,
+   "ending": "home",
+   "steps": 415,
+   "feel": 30,
+   "press": 5,
+   "notes": 19,
+   "digest": "d68597e7a530d5171e86ade8799ad93a091964c94bf41087186b06ddb3bdf9a9"
+  },
+  {
+   "seed": 688954,
+   "ending": "home",
+   "steps": 429,
+   "feel": 59,
+   "press": 7,
+   "notes": 20,
+   "digest": "03d46171d98d5e9fbe4ee1943d976530448a2cb25d49f2bc43a3add2a76bafcf"
+  },
+  {
+   "seed": 696873,
+   "ending": "home",
+   "steps": 511,
+   "feel": 86,
+   "press": 4,
+   "notes": 30,
+   "digest": "0f580030a7c1b1e75c65c5ffafcdeebf6d86df9f6a3647172d3aa5a7ae42a36e"
+  },
+  {
+   "seed": 704792,
+   "ending": "home",
+   "steps": 446,
+   "feel": 33,
+   "press": 8,
+   "notes": 22,
+   "digest": "22c5583b24cc436c5e77d21c3653855a05a589641b2b518124ec8b2b554ad7c2"
+  },
+  {
+   "seed": 712711,
+   "ending": "home",
+   "steps": 351,
+   "feel": 0,
+   "press": 5,
+   "notes": 16,
+   "digest": "698109aeb4f7db5a1317c99f59cf71b5e9d967b7c07c291568d64aa31b9130cd"
+  },
+  {
+   "seed": 720630,
+   "ending": "home",
+   "steps": 471,
+   "feel": 80,
+   "press": 4,
+   "notes": 27,
+   "digest": "74d62c365626e26e8a77fd475195092d07c610a8bd3035a6b4eaae014f595009"
+  },
+  {
+   "seed": 728549,
+   "ending": "good",
+   "steps": 464,
+   "feel": 100,
+   "press": 3,
+   "notes": 29,
+   "digest": "c0fdf1ebe77d69c9895e2dded0948bb80dea69e4a7c49a1e1082c59df692d66e"
+  },
+  {
+   "seed": 736468,
+   "ending": "home",
+   "steps": 356,
+   "feel": 2,
+   "press": 5,
+   "notes": 15,
+   "digest": "3fcef281e18d310b4cd1214bfb4bba78963706cf91e9862d383ae772b43dc0e8"
+  },
+  {
+   "seed": 744387,
+   "ending": "home",
+   "steps": 426,
+   "feel": 55,
+   "press": 4,
+   "notes": 20,
+   "digest": "b713f6c4120c43984ad51d131d315e11ce222c31933a315c1f185176d5c52b2b"
+  },
+  {
+   "seed": 752306,
+   "ending": "good",
+   "steps": 447,
+   "feel": 100,
+   "press": 3,
+   "notes": 26,
+   "digest": "865e0a7fbab018a573733441f6aa0c70e354380c9a01f2132f70b35cca0ad124"
+  },
+  {
+   "seed": 760225,
+   "ending": "home",
+   "steps": 381,
+   "feel": 16,
+   "press": 6,
+   "notes": 17,
+   "digest": "5081d1a3f299c81fb697d2860da16daccf0bbba02ccbf0db5fdf88d38da7960e"
+  },
+  {
+   "seed": 768144,
+   "ending": "home",
+   "steps": 451,
+   "feel": 76,
+   "press": 5,
+   "notes": 24,
+   "digest": "97ba8cab603a080657aa0abc4da2d3de1a99b9bd09391efba560788813d70afc"
+  },
+  {
+   "seed": 776063,
+   "ending": "home",
+   "steps": 414,
+   "feel": 50,
+   "press": 8,
+   "notes": 19,
+   "digest": "506af4a964c094dd9ebe0aa686fdb85eab94c0685250d31805db49691d49e037"
+  },
+  {
+   "seed": 783982,
+   "ending": "neutral",
+   "steps": 382,
+   "feel": 65,
+   "press": 3,
+   "notes": 18,
+   "digest": "cb6ed7af8900fe7683b8328a782311a282ffffdf788ce0b5f0f5626a6f2d0556"
+  },
+  {
+   "seed": 791901,
+   "ending": "home",
+   "steps": 478,
+   "feel": 58,
+   "press": 4,
+   "notes": 24,
+   "digest": "fb1df2eec31c26ef29f307329fe7fd5e966ea098a637066b1e3e30f3152f5fa8"
+  },
+  {
+   "seed": 799820,
+   "ending": "home",
+   "steps": 428,
+   "feel": 25,
+   "press": 9,
+   "notes": 19,
+   "digest": "c6cb29e7e794ae26bcdefaac511426334f9efa11dafac988a723d6592409a4ec"
+  },
+  {
+   "seed": 807739,
+   "ending": "home",
+   "steps": 444,
+   "feel": 59,
+   "press": 6,
+   "notes": 21,
+   "digest": "17733353bd741402cd90d49239ef3a16b73234cec4af54a68b4d1c7cf19accfa"
+  },
+  {
+   "seed": 815658,
+   "ending": "home",
+   "steps": 375,
+   "feel": 13,
+   "press": 2,
+   "notes": 17,
+   "digest": "190640998bba24332eb9a102139d928d2ae6fffc383e91e9386241d51c56ecd5"
+  },
+  {
+   "seed": 823577,
+   "ending": "home",
+   "steps": 399,
+   "feel": 27,
+   "press": 5,
+   "notes": 17,
+   "digest": "d7dc06270b1e9d474e98f0d795b50ea186bd2c087d9f7d58836b809abf54520c"
+  },
+  {
+   "seed": 831496,
+   "ending": "home",
+   "steps": 448,
+   "feel": 42,
+   "press": 8,
+   "notes": 21,
+   "digest": "928ccd6ee6bf7ad7e506623fe74d34265f814dea0b2c6d1bdf0aec064f4a9153"
+  },
+  {
+   "seed": 839415,
+   "ending": "home",
+   "steps": 413,
+   "feel": 34,
+   "press": 4,
+   "notes": 20,
+   "digest": "e37e7bd261062f47e2f8f74520a6b57f5091cc6198de8359b65b1e8e59fbad34"
+  },
+  {
+   "seed": 847334,
+   "ending": "home",
+   "steps": 378,
+   "feel": 2,
+   "press": 5,
+   "notes": 16,
+   "digest": "13dbc141626442990ea4e824d5b6024ffefc2579ee0b9aaa03441af2489cc1da"
+  },
+  {
+   "seed": 855253,
+   "ending": "good",
+   "steps": 443,
+   "feel": 87,
+   "press": 4,
+   "notes": 21,
+   "digest": "f44698b7892be3e002986c4e60809517296feaddd2e04632ab4009706206a8d2"
+  },
+  {
+   "seed": 863172,
+   "ending": "home",
+   "steps": 423,
+   "feel": 35,
+   "press": 5,
+   "notes": 19,
+   "digest": "2c6bcce1530994daac81ec5eee6e333c354362fc72bcecf3b0b225915ab88513"
+  },
+  {
+   "seed": 871091,
+   "ending": "home",
+   "steps": 440,
+   "feel": 88,
+   "press": 4,
+   "notes": 25,
+   "digest": "7c9a4eb1a3ccb491dd53a67fb85a9daf3b0163a3ebf61abcc148a4f3cdf2f184"
+  },
+  {
+   "seed": 879010,
+   "ending": "home",
+   "steps": 439,
+   "feel": 45,
+   "press": 4,
+   "notes": 21,
+   "digest": "f32d4a55f3465b631e09b8bac2ef62b7f0545c8feb180f06d9b2e16e765be4b6"
+  },
+  {
+   "seed": 886929,
+   "ending": "home",
+   "steps": 407,
+   "feel": 16,
+   "press": 9,
+   "notes": 20,
+   "digest": "fac25fb61b29356a8c6ff9a98e87cd9ba26f60661536afa193dc6ac99a226d6c"
+  },
+  {
+   "seed": 894848,
+   "ending": "home",
+   "steps": 444,
+   "feel": 87,
+   "press": 4,
+   "notes": 24,
+   "digest": "b18591af42d99db80b3ae3e6c6b3c8a1e78e3528de709a46e598a6a5a66f9c10"
+  },
+  {
+   "seed": 902767,
+   "ending": "home",
+   "steps": 423,
+   "feel": 25,
+   "press": 5,
+   "notes": 22,
+   "digest": "55bea4e0dc8f193173ac231dbe6f9ec87db7f7b3ca142d6fe25546b22b723ad4"
+  },
+  {
+   "seed": 910686,
+   "ending": "home",
+   "steps": 445,
+   "feel": 68,
+   "press": 4,
+   "notes": 23,
+   "digest": "ebaa57faa960fc6667248a30c99942cbaf701aa156461e4aadd4e0737c3e20aa"
+  },
+  {
+   "seed": 918605,
+   "ending": "neutral",
+   "steps": 476,
+   "feel": 100,
+   "press": 2,
+   "notes": 26,
+   "digest": "2ba4d0b76102d5b909627cc23b35f0b947b92158ec497ca995bfc2829d2f141e"
+  },
+  {
+   "seed": 926524,
+   "ending": "home",
+   "steps": 425,
+   "feel": 34,
+   "press": 7,
+   "notes": 19,
+   "digest": "5c596d49c46fc69c57216b8329bb5c40e0d5c75c84fa1ece4ba2b75c53961341"
+  },
+  {
+   "seed": 934443,
+   "ending": "home",
+   "steps": 375,
+   "feel": 42,
+   "press": 5,
+   "notes": 17,
+   "digest": "73452a1f8d738aa7ebdb34e06018a31ee6d2550f7d946d007e74d1508a113db8"
+  },
+  {
+   "seed": 942362,
+   "ending": "gone",
+   "steps": 473,
+   "feel": 100,
+   "press": 0,
+   "notes": 27,
+   "digest": "d0560195ed3de31096984e8551f161cd715ca3f8a0e021e81305ef565c98978a"
+  },
+  {
+   "seed": 950281,
+   "ending": "neutral",
+   "steps": 493,
+   "feel": 100,
+   "press": 2,
+   "notes": 26,
+   "digest": "f40377913c4382a53a4911ac0f9c866066f87172e732368c12a2154fb16bb43b"
+  },
+  {
+   "seed": 958200,
+   "ending": "home",
+   "steps": 392,
+   "feel": 49,
+   "press": 4,
+   "notes": 17,
+   "digest": "412703961a2c8a8a21ffc25d20df2a7f4c60764f144939aecb0c065c52e8b59a"
+  },
+  {
+   "seed": 966119,
+   "ending": "home",
+   "steps": 392,
+   "feel": 35,
+   "press": 5,
+   "notes": 21,
+   "digest": "ae8c188bfe13de721a159bed78e48e5374e09921e4552684bad707b5e740fd0d"
+  },
+  {
+   "seed": 974038,
+   "ending": "neutral",
+   "steps": 451,
+   "feel": 88,
+   "press": 2,
+   "notes": 25,
+   "digest": "a41747c9b58498dc71b0a70f0c46fecf82bcc4e4b848d79e06834f3a08be4eb5"
+  },
+  {
+   "seed": 981957,
+   "ending": "home",
+   "steps": 403,
+   "feel": 41,
+   "press": 7,
+   "notes": 19,
+   "digest": "3bc8d8c55045ae1ca441d0ea2f09a66738d8cdb057423ce5dd8b944231744b24"
+  },
+  {
+   "seed": 989876,
+   "ending": "home",
+   "steps": 444,
+   "feel": 70,
+   "press": 5,
+   "notes": 23,
+   "digest": "cd1da347259d18367c63e67aca555ec00aaa65c561717bdf22f1aed3cf240f6c"
+  },
+  {
+   "seed": 997795,
+   "ending": "home",
+   "steps": 438,
+   "feel": 68,
+   "press": 4,
+   "notes": 21,
+   "digest": "ea7ce938b71be6f4ef88b8851c0ee9b26a940f5a95aaad2330e305f806468b98"
+  },
+  {
+   "seed": 1005714,
+   "ending": "home",
+   "steps": 382,
+   "feel": 36,
+   "press": 6,
+   "notes": 16,
+   "digest": "3b224330f307728a36ca7a608d1b7135c3da31ad84d1920a9f1898a26931f2c5"
+  },
+  {
+   "seed": 1013633,
+   "ending": "neutral",
+   "steps": 495,
+   "feel": 86,
+   "press": 3,
+   "notes": 26,
+   "digest": "49f3eeae210ee6eb4293cab169ab61cff6c7afe12681f48a3b4c1b7bbbc6057f"
+  },
+  {
+   "seed": 1021552,
+   "ending": "home",
+   "steps": 434,
+   "feel": 78,
+   "press": 5,
+   "notes": 24,
+   "digest": "854eae70bb5b290b45e2c8c349b68cb3bc6f45b2247ddd2f7b7d9ddecec8c321"
+  },
+  {
+   "seed": 1029471,
+   "ending": "home",
+   "steps": 417,
+   "feel": 17,
+   "press": 8,
+   "notes": 19,
+   "digest": "020a7d2f0ed56856f6ff6c5b6f7ee2ef0fbc38f05fd74daac756136f533d7422"
+  },
+  {
+   "seed": 1037390,
+   "ending": "bad",
+   "steps": 399,
+   "feel": 50,
+   "press": 3,
+   "notes": 18,
+   "digest": "cf5fa09a6d445ea039dc8d278e6edfe5a1f30d5a6c30d19cfd5fc7d306f87be4"
+  },
+  {
+   "seed": 1045309,
+   "ending": "home",
+   "steps": 399,
+   "feel": 29,
+   "press": 6,
+   "notes": 16,
+   "digest": "ee2c65d2b3edcc8e3d125e69301fc2b404fcaae4b2bffcfff1a8cfdb2864246f"
+  },
+  {
+   "seed": 1053228,
+   "ending": "home",
+   "steps": 410,
+   "feel": 41,
+   "press": 7,
+   "notes": 20,
+   "digest": "9a8372e1cc36de0354af85919861d3c61ee9c8f6b885a4d7fc17e5de2b04f7b5"
+  },
+  {
+   "seed": 1061147,
+   "ending": "home",
+   "steps": 416,
+   "feel": 24,
+   "press": 4,
+   "notes": 21,
+   "digest": "cf38cc6c3a45f269262fd30e25521d890e37c694c68cae10c553ccbe6e0cb86d"
+  },
+  {
+   "seed": 1069066,
+   "ending": "home",
+   "steps": 434,
+   "feel": 44,
+   "press": 6,
+   "notes": 22,
+   "digest": "9ebd4917c9be446028ab8cf9bd937a253bea88149803152b8480b2573a0625b1"
+  },
+  {
+   "seed": 1076985,
+   "ending": "neutral",
+   "steps": 440,
+   "feel": 86,
+   "press": 3,
+   "notes": 27,
+   "digest": "f11604a04b6b3e5eca0fcfa5bf50d8cde0832f548f9b3e98422b7e78fb48c247"
+  },
+  {
+   "seed": 1084904,
+   "ending": "home",
+   "steps": 422,
+   "feel": 5,
+   "press": 6,
+   "notes": 19,
+   "digest": "78b483ca38a149093d8929a88373ea6b6d27d2a56fed9a9b46eadd55bed9f84b"
+  },
+  {
+   "seed": 1092823,
+   "ending": "neutral",
+   "steps": 425,
+   "feel": 70,
+   "press": 3,
+   "notes": 22,
+   "digest": "6f7631a854256bd445346aafb822be122916083828022a22c60a87127d175742"
+  },
+  {
+   "seed": 1100742,
+   "ending": "home",
+   "steps": 455,
+   "feel": 75,
+   "press": 8,
+   "notes": 26,
+   "digest": "9ccaf3018aabcaebff05c0eb19fecd3b3f95974e811a34c3dc145d8410fa1b68"
+  },
+  {
+   "seed": 1108661,
+   "ending": "home",
+   "steps": 379,
+   "feel": 41,
+   "press": 5,
+   "notes": 18,
+   "digest": "63460fcbf92bd58a42f5fe89fb8f911fd03bf6b7b4ed413902a22fdcfd1d73e2"
+  },
+  {
+   "seed": 1116580,
+   "ending": "home",
+   "steps": 360,
+   "feel": 22,
+   "press": 3,
+   "notes": 15,
+   "digest": "dabaaf0d3f4c2f08ffda67660512cfd5ea51bb5ad7f30db99fff0069998643a1"
+  },
+  {
+   "seed": 1124499,
+   "ending": "neutral",
+   "steps": 512,
+   "feel": 100,
+   "press": 2,
+   "notes": 28,
+   "digest": "388be46b97008bf61085fca696dfed6a51b3de8a9d6d1e278fc197874c074433"
+  },
+  {
+   "seed": 1132418,
+   "ending": "home",
+   "steps": 428,
+   "feel": 19,
+   "press": 5,
+   "notes": 21,
+   "digest": "dad3808e2fd9c6891f8a5535d7421cf550201ad09be5f8f368b1c7e57eb96bb6"
+  },
+  {
+   "seed": 1140337,
+   "ending": "home",
+   "steps": 461,
+   "feel": 80,
+   "press": 5,
+   "notes": 28,
+   "digest": "9b7855d6b877c0428bb72dca0056ad651994ff5f15f7be4edfadafb1455752ac"
+  },
+  {
+   "seed": 1148256,
+   "ending": "home",
+   "steps": 378,
+   "feel": 24,
+   "press": 6,
+   "notes": 17,
+   "digest": "7d44663b3935068918a7150bd78ba1d947979a4290bb52b1c966eb8f58479732"
+  },
+  {
+   "seed": 1156175,
+   "ending": "home",
+   "steps": 385,
+   "feel": 10,
+   "press": 5,
+   "notes": 14,
+   "digest": "6fff81bb8481913d6549ef205070144d920b7a87c5085fb093b147882086177c"
+  },
+  {
+   "seed": 1164094,
+   "ending": "gone",
+   "steps": 458,
+   "feel": 75,
+   "press": 2,
+   "notes": 25,
+   "digest": "97bb79ad25ceac9a7af54770c47b016c0f38cc4966f060a95cbb152793b82070"
+  },
+  {
+   "seed": 1172013,
+   "ending": "home",
+   "steps": 441,
+   "feel": 66,
+   "press": 7,
+   "notes": 21,
+   "digest": "a0f32842f2cd3c4db4357fa0fdcde92a886020395be631fd7fb1445d0c728bf4"
+  },
+  {
+   "seed": 1179932,
+   "ending": "home",
+   "steps": 462,
+   "feel": 67,
+   "press": 5,
+   "notes": 23,
+   "digest": "f9e8a7ef4e38627d72b7e74e0f6f499630c0e14355f3ea2f1a7cf8067d31eab6"
+  },
+  {
+   "seed": 1187851,
+   "ending": "home",
+   "steps": 387,
+   "feel": 18,
+   "press": 6,
+   "notes": 21,
+   "digest": "296440e05aa7578be628cb4556f5d327747103fff6fac6ffdeef1c45d4c83012"
+  },
+  {
+   "seed": 1195770,
+   "ending": "good",
+   "steps": 480,
+   "feel": 80,
+   "press": 4,
+   "notes": 29,
+   "digest": "c5160d9ce2cc4257fa449ffeccdf3652d42e9d60c74d8f2d7a97f113fe918179"
+  },
+  {
+   "seed": 1203689,
+   "ending": "home",
+   "steps": 379,
+   "feel": 2,
+   "press": 7,
+   "notes": 17,
+   "digest": "34a6b2a886a6b537904ea14357621f3ed6d835abd9db8d06bd61817e5e6802d9"
+  },
+  {
+   "seed": 1211608,
+   "ending": "home",
+   "steps": 438,
+   "feel": 72,
+   "press": 7,
+   "notes": 22,
+   "digest": "9a95b6489778c3531c4a3231de9ecbb95d9d4a2ca6bbc5914c2aa9646b7b1566"
+  },
+  {
+   "seed": 1219527,
+   "ending": "good",
+   "steps": 438,
+   "feel": 100,
+   "press": 3,
+   "notes": 21,
+   "digest": "9fd3196215fde1cda366625da5eb33c2053983419cc7595facf8de548f7f38e8"
+  },
+  {
+   "seed": 1227446,
+   "ending": "home",
+   "steps": 371,
+   "feel": 6,
+   "press": 6,
+   "notes": 14,
+   "digest": "7ac5921a76ecf1e8f93f3f3d1762d67cb07bd34d9b5cd66095e79984fb678c6c"
+  },
+  {
+   "seed": 1235365,
+   "ending": "letters",
+   "steps": 511,
+   "feel": 80,
+   "press": 3,
+   "notes": 26,
+   "digest": "357571a50509adc547f35749b3d57d2fbf7f1919216447788027de69f995b32c"
+  },
+  {
+   "seed": 1243284,
+   "ending": "bad",
+   "steps": 408,
+   "feel": 68,
+   "press": 3,
+   "notes": 23,
+   "digest": "d436c80e716b6307ac5827dd6673c21045739563e37971af98762ba8a725f6c5"
+  },
+  {
+   "seed": 1251203,
+   "ending": "home",
+   "steps": 433,
+   "feel": 44,
+   "press": 8,
+   "notes": 19,
+   "digest": "2e15b2736710b803ead95c561a5fae3c12566acd45942fd5de3f2bcdb9b4cd3e"
+  },
+  {
+   "seed": 1259122,
+   "ending": "good",
+   "steps": 431,
+   "feel": 90,
+   "press": 3,
+   "notes": 22,
+   "digest": "9b2974b7720b78114c72b05b944f7232f6dd8047ef424935d00fba6eb5bdc925"
+  },
+  {
+   "seed": 1267041,
+   "ending": "home",
+   "steps": 447,
+   "feel": 68,
+   "press": 5,
+   "notes": 22,
+   "digest": "eed04535ef75c3ce343c182c6020f328d65bced1cee4b12dc4d5350a1e6043e8"
+  },
+  {
+   "seed": 1274960,
+   "ending": "home",
+   "steps": 378,
+   "feel": 13,
+   "press": 7,
+   "notes": 19,
+   "digest": "502227e2d58ed3e6c20267e4cbc3467283197f41a35b4490e3ff0247b4e7d47f"
+  },
+  {
+   "seed": 1282879,
+   "ending": "home",
+   "steps": 424,
+   "feel": 17,
+   "press": 9,
+   "notes": 22,
+   "digest": "7096e7433774eef1ed2464691dc3f171b839336489c1896bf3ed4b3d1b64f340"
+  },
+  {
+   "seed": 1290798,
+   "ending": "home",
+   "steps": 424,
+   "feel": 43,
+   "press": 5,
+   "notes": 22,
+   "digest": "d232aea8872385f36d3cc0c8ee6d5eb628c526d7b66f5720e03b427904c8d8af"
+  },
+  {
+   "seed": 1298717,
+   "ending": "home",
+   "steps": 396,
+   "feel": 32,
+   "press": 5,
+   "notes": 17,
+   "digest": "9be8f00903f3dd0ec358e4483f93f9003bce650e31ec2afeac2010568ccf00f6"
+  },
+  {
+   "seed": 1306636,
+   "ending": "gone",
+   "steps": 456,
+   "feel": 47,
+   "press": 2,
+   "notes": 22,
+   "digest": "d2f7ac8db7a7e9a5b5e93ac9f6bd8629deaf284d3a75205b77cb8f40aec1caa6"
+  },
+  {
+   "seed": 1314555,
+   "ending": "home",
+   "steps": 402,
+   "feel": 10,
+   "press": 5,
+   "notes": 17,
+   "digest": "7d7b19630d616d82388c90ff1a065e77f534a1fc63c5f01a6f1e7c39b69cc35c"
+  },
+  {
+   "seed": 1322474,
+   "ending": "neutral",
+   "steps": 487,
+   "feel": 86,
+   "press": 3,
+   "notes": 28,
+   "digest": "faf864b796d0e0308dbc73e13ffdfd7d0ef049021f2d86ea2a299d4b11910ecb"
+  },
+  {
+   "seed": 1330393,
+   "ending": "home",
+   "steps": 344,
+   "feel": 2,
+   "press": 6,
+   "notes": 17,
+   "digest": "11e2aa654e17e591f3640decafc4b8e65699edac4f047176d189c7eaa98f8c82"
+  },
+  {
+   "seed": 1338312,
+   "ending": "home",
+   "steps": 445,
+   "feel": 88,
+   "press": 4,
+   "notes": 24,
+   "digest": "bbf6a9a81e6a0644527f67113fafec5e25a3c57b5135ecf142ccaab2361d24a9"
+  },
+  {
+   "seed": 1346231,
+   "ending": "home",
+   "steps": 402,
+   "feel": 56,
+   "press": 5,
+   "notes": 20,
+   "digest": "79b1c8f34b45d17ea114a57527aa15106d0fddb4987c5a7f7e93122f9257d20d"
+  },
+  {
+   "seed": 1354150,
+   "ending": "home",
+   "steps": 400,
+   "feel": 31,
+   "press": 7,
+   "notes": 18,
+   "digest": "9bd7f8cfe46778a03a1002d8734b0074f436de59ce78ec5b93e06c8c52345e76"
+  },
+  {
+   "seed": 1362069,
+   "ending": "home",
+   "steps": 475,
+   "feel": 70,
+   "press": 4,
+   "notes": 26,
+   "digest": "1caf40a2662f4827e3e1f0428f864bcf716fe339a62c0acaf9e155955007e376"
+  },
+  {
+   "seed": 1369988,
+   "ending": "home",
+   "steps": 417,
+   "feel": 28,
+   "press": 7,
+   "notes": 22,
+   "digest": "1264673d2be821b681cb2085b028f103a59eb09503fc3f3157e44df705863c92"
+  },
+  {
+   "seed": 1377907,
+   "ending": "bad",
+   "steps": 362,
+   "feel": 35,
+   "press": 2,
+   "notes": 18,
+   "digest": "47dccda93f77eaabbc17c6e0834c2bde16979fa17f8eb3e7b2095977c0e0d370"
+  },
+  {
+   "seed": 1385826,
+   "ending": "home",
+   "steps": 456,
+   "feel": 46,
+   "press": 5,
+   "notes": 28,
+   "digest": "673557500ea844945d365b60bc00dd07d87bc02f206be06d9a0be65efc75278c"
+  },
+  {
+   "seed": 1393745,
+   "ending": "home",
+   "steps": 422,
+   "feel": 72,
+   "press": 5,
+   "notes": 21,
+   "digest": "4a7a3443ad1ec2c337a5c673cc35dd672e24e18b07b55f7833d9e70918a94bbb"
+  },
+  {
+   "seed": 1401664,
+   "ending": "home",
+   "steps": 434,
+   "feel": 78,
+   "press": 6,
+   "notes": 24,
+   "digest": "e10737251b807d8f8a517997f6b95367a011bfb33a90ec605f47ebae2fad8bd8"
+  },
+  {
+   "seed": 1409583,
+   "ending": "bad",
+   "steps": 438,
+   "feel": 56,
+   "press": 3,
+   "notes": 27,
+   "digest": "87b4955a02b2989dead74bfaefb31e64a2b8b9bc8df32b16ea1fddd2aa014018"
+  },
+  {
+   "seed": 1417502,
+   "ending": "home",
+   "steps": 429,
+   "feel": 25,
+   "press": 8,
+   "notes": 23,
+   "digest": "94feb404f9cdd180ae4657f11d3e5d1bf1e14d9b041fe3dfdc1a002b15397462"
+  },
+  {
+   "seed": 1425421,
+   "ending": "home",
+   "steps": 367,
+   "feel": 13,
+   "press": 4,
+   "notes": 19,
+   "digest": "d977af39ded7991a06e63bfea05e15e38c04ec3daa91d3c254dc678d2e386f8e"
+  },
+  {
+   "seed": 1433340,
+   "ending": "home",
+   "steps": 438,
+   "feel": 59,
+   "press": 4,
+   "notes": 20,
+   "digest": "bfe2f4e0e56d6fe6b6ff1c147a2113793b5bde1d1e13ac59d00bfb6a01d235a6"
+  },
+  {
+   "seed": 1441259,
+   "ending": "home",
+   "steps": 444,
+   "feel": 76,
+   "press": 5,
+   "notes": 25,
+   "digest": "33a1bb7c9f4d4674f2e093b7960a45ee7d129ffa9ee8f7b9d923766d6b634312"
+  },
+  {
+   "seed": 1449178,
+   "ending": "home",
+   "steps": 361,
+   "feel": 8,
+   "press": 6,
+   "notes": 16,
+   "digest": "2ffb0b662670803c3bf311d8d32697b96f95f9c3bc59aa0f87cbe846c9b6694a"
+  },
+  {
+   "seed": 1457097,
+   "ending": "home",
+   "steps": 371,
+   "feel": 36,
+   "press": 4,
+   "notes": 17,
+   "digest": "87d91897ebd311f07b364d41d6ee932579e1ba9809ff38c0717797bd7bb830aa"
+  },
+  {
+   "seed": 1465016,
+   "ending": "good",
+   "steps": 469,
+   "feel": 86,
+   "press": 4,
+   "notes": 26,
+   "digest": "ae6901052f02d3ca787e678040427cbdf4fe64dbfd088791c09c915c374dd1ac"
+  },
+  {
+   "seed": 1472935,
+   "ending": "home",
+   "steps": 423,
+   "feel": 68,
+   "press": 5,
+   "notes": 19,
+   "digest": "88cb0cda61193b65d1140d8985c5fd66da874a6a44041bf037c4c021317b0337"
+  },
+  {
+   "seed": 1480854,
+   "ending": "neutral",
+   "steps": 412,
+   "feel": 59,
+   "press": 3,
+   "notes": 20,
+   "digest": "a4c6bb39be198891aa767a4e8be6f229dfc4194aa792defd210cee7ddf334049"
+  },
+  {
+   "seed": 1488773,
+   "ending": "neutral",
+   "steps": 466,
+   "feel": 68,
+   "press": 3,
+   "notes": 27,
+   "digest": "42be8ac5be29531af2f16b7281ebdd105105536b243cda9a69eeceb610e4eae2"
+  },
+  {
+   "seed": 1496692,
+   "ending": "home",
+   "steps": 399,
+   "feel": 30,
+   "press": 8,
+   "notes": 19,
+   "digest": "464a34bc62650af61b460a191eef9755e3ba0ca453edc71dbc93886aef4b33ab"
+  },
+  {
+   "seed": 1504611,
+   "ending": "good",
+   "steps": 416,
+   "feel": 100,
+   "press": 3,
+   "notes": 25,
+   "digest": "f264e54ea9e9d8fd258a961fb48651001a1268d452810e1aaf94fd0f48b87340"
+  },
+  {
+   "seed": 1512530,
+   "ending": "gone",
+   "steps": 464,
+   "feel": 100,
+   "press": 1,
+   "notes": 24,
+   "digest": "5aa9879df65d6c84739eca58a7759fc392c067e1df04da3339e9178c53bd721b"
+  },
+  {
+   "seed": 1520449,
+   "ending": "home",
+   "steps": 374,
+   "feel": 9,
+   "press": 6,
+   "notes": 16,
+   "digest": "fae00934a0e793eecb9da16e3b1dbeed4dc5aa1a0ba8824d52e2cf5f63c7b27c"
+  },
+  {
+   "seed": 1528368,
+   "ending": "home",
+   "steps": 417,
+   "feel": 25,
+   "press": 6,
+   "notes": 22,
+   "digest": "07bad95cb2911e96dd019f88ae4b5244d3c7afa4556af5dd00ac32adf08372a3"
+  },
+  {
+   "seed": 1536287,
+   "ending": "home",
+   "steps": 399,
+   "feel": 3,
+   "press": 9,
+   "notes": 17,
+   "digest": "9115bf7fcf059cf55916b1d9e146b5a2ef8c6847f801a9f56058cc39c3dde283"
+  },
+  {
+   "seed": 1544206,
+   "ending": "home",
+   "steps": 463,
+   "feel": 74,
+   "press": 5,
+   "notes": 28,
+   "digest": "30f89b34f2f0c47a22e2d87f3617fb8372da08af4d50bb6425a9dcb3313f1454"
+  },
+  {
+   "seed": 1552125,
+   "ending": "bad",
+   "steps": 458,
+   "feel": 66,
+   "press": 3,
+   "notes": 27,
+   "digest": "e246d591c908676471496f0af04c9af8000aa11be95059e67d7b8a49f70d7124"
+  },
+  {
+   "seed": 1560044,
+   "ending": "home",
+   "steps": 423,
+   "feel": 40,
+   "press": 7,
+   "notes": 21,
+   "digest": "563fd6a07d35f34e04d76d3a961609159f713df1264c7509052f6613041ce96c"
+  },
+  {
+   "seed": 1567963,
+   "ending": "home",
+   "steps": 428,
+   "feel": 57,
+   "press": 4,
+   "notes": 22,
+   "digest": "673fb3afeda5e768e358f640344852c3438f0063c64ebc23048bb33e62b6827a"
+  },
+  {
+   "seed": 1575882,
+   "ending": "home",
+   "steps": 431,
+   "feel": 39,
+   "press": 7,
+   "notes": 22,
+   "digest": "977f9f0f2398e5f766f932da420b15ccfc0d49a402eb8ed43c2c1c8c41d9e699"
+  }
+ ]
+}

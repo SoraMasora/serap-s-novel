@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[node name="LogChapter" type="Label"]
+theme_type_variation = &"ChapterLabel"
+theme_override_colors/font_color = Color(1, 0.6, 0.75, 1)
+theme_override_font_sizes/font_size = 18
+text = "Глава"

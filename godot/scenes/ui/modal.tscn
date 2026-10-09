@@ -1,0 +1,379 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/modal.gd" id="1"]
+
+[node name="Modal" type="Control"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Panel" type="PanelContainer" parent="Center"]
+layout_mode = 2
+custom_minimum_size = Vector2(760, 0)
+
+[node name="Panels" type="Control" parent="Center/Panel"]
+layout_mode = 2
+custom_minimum_size = Vector2(700, 470)
+mouse_filter = 2
+
+[node name="Notes" type="VBoxContainer" parent="Center/Panel/Panels"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Center/Panel/Panels/Notes"]
+layout_mode = 2
+theme_type_variation = &"PanelTitle"
+text = "Заметки о Сере"
+horizontal_alignment = 1
+
+[node name="Sub" type="Label" parent="Center/Panel/Panels/Notes"]
+layout_mode = 2
+theme_type_variation = &"Hint"
+text = "0 из 0"
+horizontal_alignment = 1
+
+[node name="Scroll" type="ScrollContainer" parent="Center/Panel/Panels/Notes"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="List" type="VBoxContainer" parent="Center/Panel/Panels/Notes/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="Close" type="Button" parent="Center/Panel/Panels/Notes"]
+layout_mode = 2
+size_flags_horizontal = 4
+custom_minimum_size = Vector2(220, 0)
+text = "Закрыть"
+
+[node name="Log" type="VBoxContainer" parent="Center/Panel/Panels"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Center/Panel/Panels/Log"]
+layout_mode = 2
+theme_type_variation = &"PanelTitle"
+text = "Журнал"
+horizontal_alignment = 1
+
+[node name="Sub" type="Label" parent="Center/Panel/Panels/Log"]
+layout_mode = 2
+theme_type_variation = &"Hint"
+autowrap_mode = 3
+text = "Нажми на реплику или выбор, чтобы вернуться к этому моменту и перепройти его"
+horizontal_alignment = 1
+
+[node name="Scroll" type="ScrollContainer" parent="Center/Panel/Panels/Log"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="List" type="VBoxContainer" parent="Center/Panel/Panels/Log/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="Close" type="Button" parent="Center/Panel/Panels/Log"]
+layout_mode = 2
+size_flags_horizontal = 4
+custom_minimum_size = Vector2(220, 0)
+text = "Закрыть"
+
+[node name="Confirm" type="VBoxContainer" parent="Center/Panel/Panels"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Spacer" type="Control" parent="Center/Panel/Panels/Confirm"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Title" type="Label" parent="Center/Panel/Panels/Confirm"]
+layout_mode = 2
+theme_type_variation = &"PanelTitle"
+text = "Вернуться?"
+horizontal_alignment = 1
+
+[node name="Quote" type="Label" parent="Center/Panel/Panels/Confirm"]
+layout_mode = 2
+autowrap_mode = 3
+text = "…"
+horizontal_alignment = 1
+
+[node name="Sub" type="Label" parent="Center/Panel/Panels/Confirm"]
+layout_mode = 2
+theme_type_variation = &"Hint"
+autowrap_mode = 3
+text = "Игра продолжится с этого места. Всё, что было после, можно будет пройти заново — в том числе выбрать другой вариант."
+horizontal_alignment = 1
+
+[node name="Buttons" type="HBoxContainer" parent="Center/Panel/Panels/Confirm"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 16
+
+[node name="Yes" type="Button" parent="Center/Panel/Panels/Confirm/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 4
+custom_minimum_size = Vector2(220, 0)
+text = "Вернуться сюда"
+
+[node name="No" type="Button" parent="Center/Panel/Panels/Confirm/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 4
+custom_minimum_size = Vector2(220, 0)
+text = "Назад к журналу"
+
+[node name="Spacer2" type="Control" parent="Center/Panel/Panels/Confirm"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Slots" type="VBoxContainer" parent="Center/Panel/Panels"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Center/Panel/Panels/Slots"]
+layout_mode = 2
+theme_type_variation = &"PanelTitle"
+text = "Сохранить"
+horizontal_alignment = 1
+
+[node name="Grid" type="GridContainer" parent="Center/Panel/Panels/Slots"]
+layout_mode = 2
+size_flags_vertical = 3
+columns = 3
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+
+[node name="Slot1" type="Button" parent="Center/Panel/Panels/Slots/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Слот 1\n— пусто —"
+autowrap_mode = 3
+
+[node name="Slot2" type="Button" parent="Center/Panel/Panels/Slots/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Слот 2\n— пусто —"
+autowrap_mode = 3
+
+[node name="Slot3" type="Button" parent="Center/Panel/Panels/Slots/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Слот 3\n— пусто —"
+autowrap_mode = 3
+
+[node name="Slot4" type="Button" parent="Center/Panel/Panels/Slots/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Слот 4\n— пусто —"
+autowrap_mode = 3
+
+[node name="Slot5" type="Button" parent="Center/Panel/Panels/Slots/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Слот 5\n— пусто —"
+autowrap_mode = 3
+
+[node name="Slot6" type="Button" parent="Center/Panel/Panels/Slots/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Слот 6\n— пусто —"
+autowrap_mode = 3
+
+[node name="Close" type="Button" parent="Center/Panel/Panels/Slots"]
+layout_mode = 2
+size_flags_horizontal = 4
+custom_minimum_size = Vector2(220, 0)
+text = "Закрыть"
+
+[node name="Settings" type="VBoxContainer" parent="Center/Panel/Panels"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Center/Panel/Panels/Settings"]
+layout_mode = 2
+theme_type_variation = &"PanelTitle"
+text = "Настройки"
+horizontal_alignment = 1
+
+[node name="Speed" type="VBoxContainer" parent="Center/Panel/Panels/Settings"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Center/Panel/Panels/Settings/Speed"]
+layout_mode = 2
+text = "Скорость текста"
+horizontal_alignment = 1
+
+[node name="Slider" type="HSlider" parent="Center/Panel/Panels/Settings/Speed"]
+layout_mode = 2
+min_value = 5
+max_value = 120
+step = 1
+value = 5
+
+[node name="Music" type="VBoxContainer" parent="Center/Panel/Panels/Settings"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Center/Panel/Panels/Settings/Music"]
+layout_mode = 2
+text = "Громкость музыки"
+horizontal_alignment = 1
+
+[node name="Slider" type="HSlider" parent="Center/Panel/Panels/Settings/Music"]
+layout_mode = 2
+min_value = 0
+max_value = 1
+step = 0.05
+value = 0
+
+[node name="Auto" type="VBoxContainer" parent="Center/Panel/Panels/Settings"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Center/Panel/Panels/Settings/Auto"]
+layout_mode = 2
+text = "Пауза в авто-режиме"
+horizontal_alignment = 1
+
+[node name="Slider" type="HSlider" parent="Center/Panel/Panels/Settings/Auto"]
+layout_mode = 2
+min_value = 600
+max_value = 4000
+step = 100
+value = 600
+
+[node name="Spacer" type="Control" parent="Center/Panel/Panels/Settings"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Close" type="Button" parent="Center/Panel/Panels/Settings"]
+layout_mode = 2
+size_flags_horizontal = 4
+custom_minimum_size = Vector2(220, 0)
+text = "Готово"
+
+[node name="Endings" type="VBoxContainer" parent="Center/Panel/Panels"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Center/Panel/Panels/Endings"]
+layout_mode = 2
+theme_type_variation = &"PanelTitle"
+text = "Концовки"
+horizontal_alignment = 1
+
+[node name="List" type="VBoxContainer" parent="Center/Panel/Panels/Endings"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="Close" type="Button" parent="Center/Panel/Panels/Endings"]
+layout_mode = 2
+size_flags_horizontal = 4
+custom_minimum_size = Vector2(220, 0)
+text = "Закрыть"
+
+[node name="Menu" type="VBoxContainer" parent="Center/Panel/Panels"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Spacer" type="Control" parent="Center/Panel/Panels/Menu"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Title" type="Label" parent="Center/Panel/Panels/Menu"]
+layout_mode = 2
+theme_type_variation = &"PanelTitle"
+text = "Меню"
+horizontal_alignment = 1
+
+[node name="Buttons" type="VBoxContainer" parent="Center/Panel/Panels/Menu"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Resume" type="Button" parent="Center/Panel/Panels/Menu/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 4
+custom_minimum_size = Vector2(220, 0)
+text = "Продолжить"
+
+[node name="Settings" type="Button" parent="Center/Panel/Panels/Menu/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 4
+custom_minimum_size = Vector2(220, 0)
+text = "Настройки"
+
+[node name="Title" type="Button" parent="Center/Panel/Panels/Menu/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 4
+custom_minimum_size = Vector2(220, 0)
+text = "В главное меню"
+
+[node name="Spacer2" type="Control" parent="Center/Panel/Panels/Menu"]
+layout_mode = 2
+size_flags_vertical = 3

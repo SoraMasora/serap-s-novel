@@ -1,0 +1,16 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/log_entry.gd" id="1"]
+
+[node name="LogEntry" type="Button"]
+custom_minimum_size = Vector2(0, 28)
+size_flags_horizontal = 3
+focus_mode = 0
+theme_type_variation = &"ControlButton"
+theme_override_colors/font_color = Color(0.92, 0.88, 0.9, 1)
+theme_override_colors/font_disabled_color = Color(0.8, 0.76, 0.8, 0.8)
+theme_override_font_sizes/font_size = 17
+text = "Сера: …"
+alignment = 0
+autowrap_mode = 3
+script = ExtResource("1")

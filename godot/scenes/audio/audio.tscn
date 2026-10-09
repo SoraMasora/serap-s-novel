@@ -1,0 +1,39 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/audio/audio.gd" id="1"]
+
+[node name="Audio" type="Node"]
+process_mode = 3
+script = ExtResource("1")
+
+[node name="TrackA" type="AudioStreamPlayer" parent="."]
+bus = &"Music"
+
+[node name="TrackB" type="AudioStreamPlayer" parent="."]
+bus = &"Music"
+
+[node name="Tense" type="AudioStreamPlayer" parent="."]
+bus = &"Music"
+
+[node name="Rain" type="AudioStreamPlayer" parent="."]
+bus = &"Ambience"
+
+[node name="SfxPool" type="Node" parent="."]
+
+[node name="Sfx1" type="AudioStreamPlayer" parent="SfxPool"]
+bus = &"SFX"
+
+[node name="Sfx2" type="AudioStreamPlayer" parent="SfxPool"]
+bus = &"SFX"
+
+[node name="Sfx3" type="AudioStreamPlayer" parent="SfxPool"]
+bus = &"SFX"
+
+[node name="Sfx4" type="AudioStreamPlayer" parent="SfxPool"]
+bus = &"SFX"
+
+[node name="Sfx5" type="AudioStreamPlayer" parent="SfxPool"]
+bus = &"SFX"
+
+[node name="Sfx6" type="AudioStreamPlayer" parent="SfxPool"]
+bus = &"SFX"

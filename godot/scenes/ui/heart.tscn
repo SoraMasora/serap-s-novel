@@ -1,0 +1,16 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/heart.gd" id="1"]
+
+[node name="Heart" type="Label"]
+offset_right = 40.0
+offset_bottom = 40.0
+pivot_offset = Vector2(20, 20)
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.36, 0.54, 1)
+theme_override_colors/font_outline_color = Color(1, 0.12, 0.35, 0.5)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 30
+text = "♡"
+horizontal_alignment = 1
+script = ExtResource("1")

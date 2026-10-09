@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[node name="NoteItem" type="Label"]
+custom_minimum_size = Vector2(640, 0)
+theme_override_colors/font_color = Color(0.94, 0.9, 0.92, 1)
+theme_override_font_sizes/font_size = 18
+text = "Заметка"
+autowrap_mode = 3

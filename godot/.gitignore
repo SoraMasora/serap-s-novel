@@ -1,0 +1,7 @@
+# Godot
+.godot/
+build/
+# Генерируемые бинарные ассеты и сторонние зависимости — не коммитятся, воспроизводимы:
+#   node tools/godot/export_data.cjs --assets · node tools/godot/bake_web.cjs · bash tools/godot/fetch_deps.sh
+assets/
+addons/gut/

@@ -1,0 +1,194 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/title_screen.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/ui/dust.gd" id="2"]
+
+[sub_resource type="Gradient" id="shade_g"]
+offsets = PackedFloat32Array(0.35, 1)
+colors = PackedColorArray(0, 0, 0, 0, 0, 0, 0, 0.55)
+
+[sub_resource type="GradientTexture2D" id="shade"]
+gradient = SubResource("shade_g")
+fill = 1
+fill_from = Vector2(0.5, 0.55)
+fill_to = Vector2(1.05, 1.1)
+
+[node name="TitleScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Black" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Frames" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="t0" type="TextureRect" parent="Frames"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="t1" type="TextureRect" parent="Frames"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="t2" type="TextureRect" parent="Frames"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="tb" type="TextureRect" parent="Frames"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Shade" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = SubResource("shade")
+expand_mode = 1
+
+[node name="Dust" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2")
+
+[node name="Logo" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -300.0
+offset_top = 14.0
+offset_right = 300.0
+offset_bottom = 300.0
+grow_horizontal = 2
+mouse_filter = 2
+alignment = 0
+theme_override_constants/separation = -30
+
+[node name="Img" type="TextureRect" parent="Logo"]
+custom_minimum_size = Vector2(0, 190)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="Label" parent="Logo"]
+layout_mode = 2
+theme_type_variation = &"LogoText"
+text = "S^erap^S"
+horizontal_alignment = 1
+
+[node name="Bar" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -560.0
+offset_top = -110.0
+offset_right = 560.0
+offset_bottom = -50.0
+grow_horizontal = 2
+grow_vertical = 0
+alignment = 1
+theme_override_constants/separation = 10
+
+[node name="New" type="Button" parent="Bar"]
+layout_mode = 2
+theme_type_variation = &"VineButton"
+text = "Новая игра"
+
+[node name="Continue" type="Button" parent="Bar"]
+layout_mode = 2
+theme_type_variation = &"VineButton"
+text = "Продолжить"
+
+[node name="Load" type="Button" parent="Bar"]
+layout_mode = 2
+theme_type_variation = &"VineButton"
+text = "Загрузить"
+
+[node name="Endings" type="Button" parent="Bar"]
+layout_mode = 2
+theme_type_variation = &"VineButton"
+text = "Концовки"
+
+[node name="Settings" type="Button" parent="Bar"]
+layout_mode = 2
+theme_type_variation = &"VineButton"
+text = "Настройки"
+
+[node name="MadeBy" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -34.0
+offset_right = -18.0
+offset_bottom = -12.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_type_variation = &"Hint"
+theme_override_colors/font_color = Color(0.914, 0.863, 0.902, 0.35)
+theme_override_font_sizes/font_size = 12
+text = "Made By Sora"
+horizontal_alignment = 2
