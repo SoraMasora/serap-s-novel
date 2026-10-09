@@ -1,6 +1,7 @@
 class_name GameConfig
 extends Resource
-## Настройки правил и подачи новеллы (порт констант js/engine.js). Экземпляр: res://data/game_config.tres
+## Настройки правил и подачи новеллы (порт констант js/engine.js).
+## Экземпляр: res://data/game_config.tres
 
 @export_group("Новая игра")
 @export var start_scene := "start"
@@ -56,7 +57,10 @@ extends Resource
 	"yawn": {"seq": [["yawn1", 380], ["yawn2", 950], ["yawn3", 650]]},
 	"cover": {"seq": [["cover1", 350], ["cover2", 1300]], "hearts": 2},
 	"giggle":
-	{"seq": [["giggle1", 260], ["giggle2", 260], ["giggle1", 260], ["giggle2", 260], ["giggle1", 300]]},
+	{
+		"seq":
+		[["giggle1", 260], ["giggle2", 260], ["giggle1", 260], ["giggle2", 260], ["giggle1", 300]]
+	},
 	"huff": {"seq": [["huff1", 700], ["huff2", 1000]]},
 	"chain": {"seq": [["chain1", 520], ["chain2", 760], ["chain1", 520], ["chain2", 900]]},
 	"shout": {"seq": [["shout1", 420], ["shout2", 700], ["shout1", 520], ["shout2", 800]]},
@@ -64,14 +68,18 @@ extends Resource
 }
 ## Когда Сера плачет — CRY_MAP
 @export var cry_map := {
-	"pat": "wipe", "hop": "wipe", "shy": "wipe", "tongue": "frown", "shake": "frown", "shiver": "down"
+	"pat": "wipe",
+	"hop": "wipe",
+	"shy": "wipe",
+	"tongue": "frown",
+	"shake": "frown",
+	"shiver": "down"
 }
 
 @export_group("Мир")
 ## Фоны под открытым небом: дождь виден/слышен только здесь — OUTDOOR
-@export var outdoor_bgs := PackedStringArray(
-	["street", "roof", "court", "platform", "yard", "street_rain"]
-)
+@export
+var outdoor_bgs := PackedStringArray(["street", "roof", "court", "platform", "yard", "street_rain"])
 
 @export_group("Подача текста и режимы")
 @export var default_text_speed := 28.0

@@ -52,7 +52,9 @@ func _process(delta: float) -> void:
 	_timer = frame_min_ms + randf() * frame_jitter_ms
 	if k == "t0" and randf() < blink_chance:
 		blink.modulate.a = 1.0
-		get_tree().create_timer(blink_ms / 1000.0).timeout.connect(func() -> void: blink.modulate.a = 0.0)
+		get_tree().create_timer(blink_ms / 1000.0).timeout.connect(
+			func() -> void: blink.modulate.a = 0.0
+		)
 	if k != _cur:
 		var nf := frames.get_node(NodePath(k)) as TextureRect
 		var old := frames.get_node(NodePath(_cur)) as TextureRect

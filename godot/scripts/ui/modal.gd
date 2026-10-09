@@ -45,7 +45,9 @@ func _ready() -> void:
 		if c:
 			c.pressed.connect(close)
 	for b: Button in slots_grid.get_children():
-		b.pressed.connect(func() -> void: slot_chosen.emit(_slots_mode, String(b.name).trim_prefix("Slot")))
+		b.pressed.connect(
+			func() -> void: slot_chosen.emit(_slots_mode, String(b.name).trim_prefix("Slot"))
+		)
 	s_speed.value_changed.connect(func(v: float) -> void: setting_changed.emit("speed", v))
 	s_music.value_changed.connect(func(v: float) -> void: setting_changed.emit("music", v))
 	s_auto.value_changed.connect(func(v: float) -> void: setting_changed.emit("auto_delay", v))

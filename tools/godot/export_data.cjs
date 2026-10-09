@@ -81,6 +81,16 @@ if (process.argv.includes('--assets')) {
       manifest[group][key] = `res://assets/${group}/${file}`; n++; bytes += buf.length;
     }
   }
+  // Маркеры окна реплик из css/style.css (блок «v13: крест-маркер»): #textbox::after → cross_mark, #next → next_mark
+  const css = fs.readFileSync(path.join(ROOT, 'css', 'style.css'), 'utf8');
+  const v13 = css.slice(css.indexOf('/* v13: крест-маркер'));
+  for (const [sel, key] of [['#textbox::after', 'cross_mark'], ['#next', 'next_mark']]) {
+    const blk = v13.slice(v13.indexOf(sel));
+    const mm = /url\(data:image\/png;base64,([A-Za-z0-9+/=]+)\)/.exec(blk);
+    if (!mm) throw new Error('css marker ' + sel);
+    const buf = Buffer.from(mm[1], 'base64'); fs.writeFileSync(path.join(OUT, 'assets', 'ui', key + '.png'), buf);
+    manifest.ui[key] = `res://assets/ui/${key}.png`; n++; bytes += buf.length;
+  }
   fs.writeFileSync(path.join(OUT, 'data', 'assets_manifest.json'), JSON.stringify(manifest, null, 1) + '\n');
   console.log('assets:', n, 'files,', (bytes / 1e6).toFixed(1), 'MB');
 }

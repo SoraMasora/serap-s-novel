@@ -59,7 +59,9 @@ func _load_settings() -> void:
 	if err == ERR_FILE_NOT_FOUND:
 		return
 	if err != OK:
-		push_warning("Настройки не прочитаны (%s) — используются значения по умолчанию" % error_string(err))
+		push_warning(
+			"Настройки не прочитаны (%s) — используются значения по умолчанию" % error_string(err)
+		)
 		return
 	for k: String in settings:
 		settings[k] = float(cf.get_value("player", k, settings[k]))

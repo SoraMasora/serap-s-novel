@@ -26,7 +26,9 @@ func _drive(max_iters: int) -> Dictionary:
 			stats.ending = true
 			break
 		if main.choices.visible:
-			var btns: Array = main.choice_list.get_children().filter(func(b: Node) -> bool: return not b.is_queued_for_deletion())
+			var btns: Array = main.choice_list.get_children().filter(
+				func(b: Node) -> bool: return not b.is_queued_for_deletion()
+			)
 			(btns[0] as Button).pressed.emit()
 			stats.choices += 1
 		elif main.pixel_map.visible and main.pixel_map.is_open():

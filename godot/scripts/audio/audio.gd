@@ -97,7 +97,10 @@ func _play_track(k: String) -> void:
 	_active.volume_db = -80.0
 	_active.play()
 	_fade(
-		_active, config.track_gain_db, config.fade_in_sec if had_old else config.fade_in_first_sec, false
+		_active,
+		config.track_gain_db,
+		config.fade_in_sec if had_old else config.fade_in_first_sec,
+		false
 	)
 
 
@@ -131,3 +134,17 @@ func sfx(k: String) -> void:
 	_sfx_i += 1
 	p.stream = s
 	p.play()
+
+
+## При выходе остановить воспроизведение и отпустить потоки (гигиена; утечку
+## AudioStreamPlaybackMP3 при --quit-after не устраняет — см. docs/KNOWN_ISSUES.md).
+func _exit_tree() -> void:
+	var players: Array[Node] = [track_a, track_b, tense, rain_player]
+	players.append_array(sfx_pool.get_children())
+	for n: Node in players:
+		var p := n as AudioStreamPlayer
+		if p:
+			p.stop()
+			p.stream = null
+	_active = null
+	_streams.clear()

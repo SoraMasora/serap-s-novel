@@ -5,7 +5,7 @@ const { chromium } = require('playwright');
 const out = process.argv[2] || 'shots/godot';
 require('fs').mkdirSync(out, { recursive: true });
 (async () => {
-  const b = await chromium.launch({ executablePath: process.env.CHR || '/usr/local/bin/chromium',
+  const b = await chromium.launch({ executablePath: process.env.CHR || (require('fs').existsSync('/usr/local/bin/chromium') ? '/usr/local/bin/chromium' : undefined),
     args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--autoplay-policy=no-user-gesture-required'] });
   const page = await b.newPage({ viewport: { width: 1280, height: 720 } });
   const errors = [], logs = [];
@@ -24,6 +24,13 @@ require('fs').mkdirSync(out, { recursive: true });
     if (keys) await page.keyboard.type(keys);
     await page.waitForTimeout(wait || 1500);
     if (name) await page.screenshot({ path: `${out}/${String(k++).padStart(2, '0')}_${name}.png` });
+  }
+  const perfN = +(process.env.PERF || 0); // PERF=600 → интервалы requestAnimationFrame (главный цикл Godot web)
+  if (perfN) {
+    const d = await page.evaluate(n => new Promise(res => { const t = []; let p = performance.now();
+      const f = now => { t.push(now - p); p = now; if (t.length < n) requestAnimationFrame(f); else res(t); }; requestAnimationFrame(f); }), perfN);
+    d.shift(); d.sort((x, y) => x - y); const q = r => d[Math.min(d.length - 1, Math.floor(r * d.length))];
+    console.log('PERF', JSON.stringify({ n: d.length, avg: +(d.reduce((x, y) => x + y, 0) / d.length).toFixed(2), p50: +q(0.5).toFixed(2), p95: +q(0.95).toFixed(2), p99: +q(0.99).toFixed(2), max: +d[d.length - 1].toFixed(2) }));
   }
   require('fs').writeFileSync(`${out}/console.log`, logs.join('\n'));
   console.log('ERRORS', errors.length ? JSON.stringify(errors.slice(0, 20)) : 'none');

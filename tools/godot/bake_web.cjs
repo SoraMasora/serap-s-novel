@@ -118,7 +118,7 @@ async function bakeAudio(page) {
   console.log('audio: ok', jobs.length);
 }
 (async () => {
-  const b = await chromium.launch({ executablePath: process.env.CHR || '/usr/local/bin/chromium', args: ['--autoplay-policy=no-user-gesture-required'] });
+  const b = await chromium.launch({ executablePath: process.env.CHR || (require('fs').existsSync('/usr/local/bin/chromium') ? '/usr/local/bin/chromium' : undefined), args: ['--autoplay-policy=no-user-gesture-required'] });
   const page = await b.newPage();
   page.on('pageerror', e => { console.error('PAGEERROR', e.message); process.exitCode = 1; });
   try { const only = process.argv[2]; if (!only || only === 'pixel') await bakePixel(page); if (!only || only === 'audio') await bakeAudio(page); }

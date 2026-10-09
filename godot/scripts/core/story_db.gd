@@ -16,7 +16,9 @@ static func load_from(path: String = DEFAULT_PATH) -> StoryDB:
 	var db := StoryDB.new()
 	var f := FileAccess.open(path, FileAccess.READ)
 	if f == null:
-		db.load_error = "не удалось открыть %s: %s" % [path, error_string(FileAccess.get_open_error())]
+		db.load_error = (
+			"не удалось открыть %s: %s" % [path, error_string(FileAccess.get_open_error())]
+		)
 		push_error(db.load_error)
 		return db
 	var data: Variant = JSON.parse_string(f.get_as_text())

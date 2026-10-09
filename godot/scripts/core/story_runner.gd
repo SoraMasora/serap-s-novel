@@ -14,6 +14,7 @@ var st: Dictionary = {}
 ## Журнал: {n, t, th, ch, s(снимок для отката)}
 var log: Array[Dictionary] = []
 var _expr_cache: Dictionary = {}
+var _choice_snap: Dictionary = {}
 
 
 func _init(p_db: StoryDB, p_config: GameConfig) -> void:
@@ -191,7 +192,9 @@ func step() -> Array[Dictionary]:
 				jump(g)
 				continue
 		if c.has("card"):
-			out.append({"type": "card", "big": c.card[0], "small": c.card[1] if c.card.size() > 1 else ""})
+			out.append(
+				{"type": "card", "big": c.card[0], "small": c.card[1] if c.card.size() > 1 else ""}
+			)
 			return out
 		if c.has("note"):
 			var n: Variant = tv(c.note)
@@ -319,9 +322,6 @@ func choose(options: Array, idx: int) -> String:
 		st.press += int(o.add.get("press", 0))
 	jump(o.go)
 	return rk
-
-
-var _choice_snap: Dictionary = {}
 
 
 ## Вызывается при показе выбора (снимок до выбора — для отката)

@@ -143,7 +143,9 @@
  },
  "ui": {
   "logo": "res://assets/ui/logo.webp",
-  "vine": "res://assets/ui/vine.webp"
+  "vine": "res://assets/ui/vine.webp",
+  "cross_mark": "res://assets/ui/cross_mark.png",
+  "next_mark": "res://assets/ui/next_mark.png"
  },
  "music": {
   "roofs": "res://assets/music/roofs.mp3",

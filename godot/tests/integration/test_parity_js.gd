@@ -2,13 +2,15 @@ extends GutTest
 ## Паритет с веб-версией: те же сиды → тот же путь (digest) и та же концовка, что в js/engine.js.
 ## Эталон: tests/fixtures/js_reference.json (node tools/godot/js_reference.cjs 200).
 
+const CFG := preload("res://data/game_config.tres")
+
 
 func test_deterministic_playthroughs_match_js() -> void:
 	var f := FileAccess.open("res://tests/fixtures/js_reference.json", FileAccess.READ)
 	assert_not_null(f, "нет эталона")
 	var ref: Dictionary = JSON.parse_string(f.get_as_text())
 	var db := StoryDB.load_from()
-	var ap := AutoPlayer.new(StoryRunner.new(db, load("res://data/game_config.tres")))
+	var ap := AutoPlayer.new(StoryRunner.new(db, CFG))
 	var endings := {}
 	var mismatches := 0
 	for want: Dictionary in ref.runs:
@@ -25,7 +27,7 @@ func test_deterministic_playthroughs_match_js() -> void:
 
 func test_same_seed_same_digest() -> void:
 	var db := StoryDB.load_from()
-	var cfg: GameConfig = load("res://data/game_config.tres")
+	var cfg: GameConfig = CFG
 	var a := AutoPlayer.new(StoryRunner.new(db, cfg)).play(42)
 	var b := AutoPlayer.new(StoryRunner.new(db, cfg)).play(42)
 	assert_eq(a.digest, b.digest)

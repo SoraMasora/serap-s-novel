@@ -75,7 +75,11 @@ func _process(delta: float) -> void:
 
 func _finish(score: float) -> void:
 	var ok := score >= ok_ratio
-	txt.text = _cfg.get("ok", "Ровно. Вместе.") if ok else _cfg.get("bad", "Сбилось… но я всё равно рядом.")
+	txt.text = (
+		_cfg.get("ok", "Ровно. Вместе.")
+		if ok
+		else _cfg.get("bad", "Сбилось… но я всё равно рядом.")
+	)
 	create_tween().tween_property(hint, "modulate:a", 0.0, 0.4)
 	create_tween().tween_property(bar, "modulate:a", 0.0, 0.4)
 	get_tree().create_timer(result_hold_sec).timeout.connect(

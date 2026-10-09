@@ -52,7 +52,9 @@ func open(m: Dictionary) -> void:
 	elif m.get("timer") != null:
 		task_label.text = _base_task
 	else:
-		task_label.text = "%s · осталось: %d" % [_base_task if _base_task != "" else "Куда пойти?", left]
+		task_label.text = (
+			"%s · осталось: %d" % [_base_task if _base_task != "" else "Куда пойти?", left]
+		)
 	task_label.remove_theme_color_override("font_color")
 	pworld.open(m, pc)
 	for c: Node in signs.get_children():

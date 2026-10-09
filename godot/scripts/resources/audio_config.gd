@@ -27,7 +27,25 @@ extends Resource
 @export var sfx_dir := "res://assets/sfx_baked/"
 @export var sfx_keys := PackedStringArray(
 	[
-		"door", "enter", "bell", "train", "horn", "slam", "heart", "tear", "phone", "keys",
-		"steps", "step", "bump", "drop", "knock", "creak", "cloth", "paper", "latch", "unlock"
+		"door",
+		"enter",
+		"bell",
+		"train",
+		"horn",
+		"slam",
+		"heart",
+		"tear",
+		"phone",
+		"keys",
+		"steps",
+		"step",
+		"bump",
+		"drop",
+		"knock",
+		"creak",
+		"cloth",
+		"paper",
+		"latch",
+		"unlock"
 	]
 )

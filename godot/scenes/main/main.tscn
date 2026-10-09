@@ -189,15 +189,24 @@ grow_horizontal = 0
 theme_type_variation = &"ChapterLabel"
 horizontal_alignment = 2
 
-[node name="Side" type="TextureRect" parent="."]
+[node name="Side" type="Control" parent="."]
 visible = false
+clip_contents = true
 layout_mode = 1
 anchors_preset = -1
+anchor_left = 0.01
 anchor_top = 0.54
-anchor_right = 0.16
-anchor_bottom = 1.69
-offset_left = -120.0
-offset_right = 120.0
+anchor_right = 0.17
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="Img" type="TextureRect" parent="Side"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -1.0
+anchor_top = 0.02
+anchor_right = 2.0
+anchor_bottom = 1.52
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5

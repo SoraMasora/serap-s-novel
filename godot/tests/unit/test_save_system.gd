@@ -12,9 +12,13 @@ func after_each() -> void:
 
 
 func test_roundtrip() -> void:
-	var st := {"scene": "c1_store", "i": 3, "feel": 55.0, "press": 1, "flags": {"a": true}, "notes": ["x"]}
+	var st := {
+		"scene": "c1_store", "i": 3, "feel": 55.0, "press": 1, "flags": {"a": true}, "notes": ["x"]
+	}
 	assert_eq(SaveSystem.save_slot(SLOT, st, [{"n": "Сера", "t": "Привет"}]), OK)
-	assert_false(FileAccess.file_exists(SaveSystem.slot_path(SLOT) + ".tmp"), "временный файл удалён")
+	assert_false(
+		FileAccess.file_exists(SaveSystem.slot_path(SLOT) + ".tmp"), "временный файл удалён"
+	)
 	var d := SaveSystem.load_slot(SLOT)
 	assert_eq(d.st.scene, "c1_store")
 	assert_eq(int(d.st.i), 3)
@@ -35,7 +39,7 @@ func test_empty_file_survives() -> void:
 
 func test_corrupt_file_survives_and_is_quarantined() -> void:
 	var f := FileAccess.open(SaveSystem.slot_path(SLOT), FileAccess.WRITE)
-	f.store_string("{\"st\": {\"scene\": \"start\", ")
+	f.store_string('{"st": {"scene": "start", ')
 	f.close()
 	assert_eq(SaveSystem.load_slot(SLOT), {})
 	assert_true(FileAccess.file_exists(SaveSystem.slot_path(SLOT) + ".bad"))

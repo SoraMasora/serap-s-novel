@@ -81,11 +81,15 @@ func _layout() -> void:
 func place(x_ratio: float, instant: bool) -> void:
 	_layout()
 	var vp := get_viewport_rect().size
-	var target := Vector2(vp.x * x_ratio - size.x / 2.0, vp.y - size.y + vp.y * (height_ratio - 1.0))
+	var target := Vector2(
+		vp.x * x_ratio - size.x / 2.0, vp.y - size.y + vp.y * (height_ratio - 1.0)
+	)
 	if instant:
 		position = target
 	else:
-		create_tween().set_trans(Tween.TRANS_SINE).tween_property(self, "position", target, move_sec)
+		create_tween().set_trans(Tween.TRANS_SINE).tween_property(
+			self, "position", target, move_sec
+		)
 
 
 func appear() -> void:
@@ -128,7 +132,9 @@ func _process(delta: float) -> void:
 
 ## Реакция: seq — [[ключ_спрайта, мс], ...] (покадрово) или один спрайт на ms.
 ## loop_frames — для «погладить»: кадры зацикливаются до конца.
-func react(sprite_key: String, seq: Array, ms: float, motion_kind: String, loop_frames: Array) -> void:
+func react(
+	sprite_key: String, seq: Array, ms: float, motion_kind: String, loop_frames: Array
+) -> void:
 	reacting = true
 	blink.visible = false
 	if _react_tw:

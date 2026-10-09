@@ -72,8 +72,17 @@ func open(p_cfg: Dictionary, p_pc: PixelConfig) -> void:
 		for g: Variant in cfg.get("got", []):
 			got.append(int(g))
 		cfg.got = got
-	hero = {"x": 97.0, "y": 116.0, "dir": "down", "t": 0.0, "moving": false, "target": null,
-		"auto": "", "step_t": 0.0, "idle_t": 0.0}
+	hero = {
+		"x": 97.0,
+		"y": 116.0,
+		"dir": "down",
+		"t": 0.0,
+		"moving": false,
+		"target": null,
+		"auto": "",
+		"step_t": 0.0,
+		"idle_t": 0.0
+	}
 	if cfg.get("pos") is Dictionary:
 		hero.x = float(cfg.pos.x)
 		hero.y = float(cfg.pos.y)
@@ -167,7 +176,11 @@ func act(id: String) -> void:
 		say(v[(k - 1) % v.size()] if v is Array else str(v))
 		return
 	if id == "home":
-		var def := "Сначала — листовки. Все до одной." if cfg.has("items") else "Рано возвращаться. Хочется ещё куда-нибудь заглянуть."
+		var def := (
+			"Сначала — листовки. Все до одной."
+			if cfg.has("items")
+			else "Рано возвращаться. Хочется ещё куда-нибудь заглянуть."
+		)
 		say(cfg.get("home", def))
 		return
 	if id == "swing":
@@ -329,14 +342,29 @@ func follower() -> Vector2:
 func _init_fx() -> void:
 	_drops.clear()
 	for i in 140:
-		_drops.append({"x": randf() * (pc.screen.x + 40), "y": randf() * pc.screen.y,
-			"v": 140 + randf() * 90, "l": 3 + randi() % 4})
+		_drops.append(
+			{
+				"x": randf() * (pc.screen.x + 40),
+				"y": randf() * pc.screen.y,
+				"v": 140 + randf() * 90,
+				"l": 3 + randi() % 4
+			}
+		)
 	_splashes.clear()
 	_cars.clear()
 	_smoke.clear()
 	_crows.clear()
 	for i in 3:
-		_crows.append({"x": 60.0 + i * 170, "y": 41.0 + i, "fly": false, "vx": 0.0, "vy": 0.0, "t": randf() * 5})
+		_crows.append(
+			{
+				"x": 60.0 + i * 170,
+				"y": 41.0 + i,
+				"fly": false,
+				"vx": 0.0,
+				"vy": 0.0,
+				"t": randf() * 5
+			}
+		)
 
 
 func _upd_fx(dt: float) -> void:
@@ -353,11 +381,20 @@ func _upd_fx(dt: float) -> void:
 	_splashes = _splashes.filter(func(s: Dictionary) -> bool: return s.t < 0.25)
 	if world == "yard" and randf() < dt * 0.18 and _cars.size() < 2:
 		var dir := 1 if randf() < 0.5 else -1
-		_cars.append({"x": -40.0 if dir > 0 else pc.world_width + 40.0, "y": 170 if dir > 0 else 160,
-			"dir": dir, "v": 70 + randf() * 40, "c": CAR_COLORS[randi() % 4]})
+		_cars.append(
+			{
+				"x": -40.0 if dir > 0 else pc.world_width + 40.0,
+				"y": 170 if dir > 0 else 160,
+				"dir": dir,
+				"v": 70 + randf() * 40,
+				"c": CAR_COLORS[randi() % 4]
+			}
+		)
 	for c: Dictionary in _cars:
 		c.x += c.dir * c.v * dt
-	_cars = _cars.filter(func(c: Dictionary) -> bool: return c.x > -60 and c.x < pc.world_width + 60)
+	_cars = _cars.filter(
+		func(c: Dictionary) -> bool: return c.x > -60 and c.x < pc.world_width + 60
+	)
 	for c: Dictionary in _crows:
 		c.t += dt
 		if not c.fly and absf(c.x - hero.x) < 22 and absf(hero.y - 108) < 60 and c.y > 90:
@@ -387,12 +424,20 @@ func _upd_trains(dt: float) -> void:
 		return
 	if randf() < dt * 0.06 and _trains.is_empty():
 		var dir := -1 if randf() < 0.5 else 1
-		_trains.append({"x": pc.world_width + 20.0 if dir < 0 else 150.0, "dir": dir, "v": 110 + randf() * 40, "n": 3 + randi() % 2})
+		_trains.append(
+			{
+				"x": pc.world_width + 20.0 if dir < 0 else 150.0,
+				"dir": dir,
+				"v": 110 + randf() * 40,
+				"n": 3 + randi() % 2
+			}
+		)
 		sfx_requested.emit("train")
 	for t: Dictionary in _trains:
 		t.x += t.dir * t.v * dt
 	_trains = _trains.filter(
-		func(t: Dictionary) -> bool: return t.x + t.n * 64 > 300 if t.dir < 0 else t.x < pc.world_width + 40
+		func(t: Dictionary) -> bool:
+			return t.x + t.n * 64 > 300 if t.dir < 0 else t.x < pc.world_width + 40
 	)
 
 
@@ -412,7 +457,11 @@ func _draw() -> void:
 	_draw_trains(dark, cx)
 	for s: Dictionary in _smoke:
 		var a: float = (0.25 if dark else 0.35) * (1 - s.t / 4)
-		var col := Color(120 / 255.0, 110 / 255.0, 140 / 255.0, a) if dark else Color(220 / 255.0, 220 / 255.0, 225 / 255.0, a)
+		var col := (
+			Color(120 / 255.0, 110 / 255.0, 140 / 255.0, a)
+			if dark
+			else Color(220 / 255.0, 220 / 255.0, 225 / 255.0, a)
+		)
 		var r: float = 2 + s.t * 2
 		_r(s.x - cx - r / 2, s.y - r / 2, floorf(r), floorf(r * 0.7), col)
 	var n := near()
@@ -421,7 +470,10 @@ func _draw() -> void:
 	if world == "yard" and not quiet:
 		for npc: Array in pc.yard_npcs:
 			var need: String = npc[4]
-			if (cfg.spots.has(need) or (cfg.has("info") and cfg.info.has(need))) and (not npc[5] or time == "day"):
+			if (
+				(cfg.spots.has(need) or (cfg.has("info") and cfg.info.has(need)))
+				and (not npc[5] or time == "day")
+			):
 				actors.append([float(npc[3]), "npc", npc[0], float(npc[1]) - cx, float(npc[2])])
 	if cfg.has("follow"):
 		var f := follower()
@@ -429,9 +481,13 @@ func _draw() -> void:
 		var bob := -1.0 if mv and sin(t_ms / 90.0) > 0 else 0.0
 		actors.append([f.y, "npc", "sera", roundf(f.x - 5 - cx), roundf(f.y - 16 + bob)])
 	elif world == "yard" and dark and not cfg.has("items") and not cfg.get("noSera", false):
-		actors.append([121.0, "npc", "sera", 220 - cx, 104.0 + (0.0 if sin(t_ms / 500.0) > 0 else 1.0)])
+		actors.append(
+			[121.0, "npc", "sera", 220 - cx, 104.0 + (0.0 if sin(t_ms / 500.0) > 0 else 1.0)]
+		)
 	if cfg.get("seraBench", false):
-		actors.append([106.0, "npc", "sera_sit", 494 - cx, 93.0 + (1.0 if sin(t_ms / 700.0) > 0.3 else 0.0)])
+		actors.append(
+			[106.0, "npc", "sera_sit", 494 - cx, 93.0 + (1.0 if sin(t_ms / 700.0) > 0.3 else 0.0)]
+		)
 	for e: Dictionary in cfg.get("npcs", []):
 		actors.append([float(e.y) + 14, "npc", e.id, roundf(e.x - cx), float(e.y)])
 	actors.append([float(hero.y), "hero"])
@@ -452,7 +508,9 @@ func _draw() -> void:
 		for k in int(d.l):
 			_r(d.x - k * 0.12, d.y + k, 1, 1, rc)
 	if not dark:
-		draw_rect(Rect2(0, 0, pc.screen.x, pc.screen.y), Color(40 / 255.0, 50 / 255.0, 70 / 255.0, 0.12))
+		draw_rect(
+			Rect2(0, 0, pc.screen.x, pc.screen.y), Color(40 / 255.0, 50 / 255.0, 70 / 255.0, 0.12)
+		)
 
 
 func _draw_hero(x: float, y: float) -> void:
@@ -504,7 +562,13 @@ func _draw_trains(dark: bool, cx: float) -> void:
 			for w in range(4, 58, 7):
 				if x + w >= clip_x:
 					var on := sin(w + i) > -0.6
-					_r(x + w, y + 4, 5, 6, (Color("#ffd890") if on else Color("#3a3a40")) if dark else Color("#8fa6b0"))
+					_r(
+						x + w,
+						y + 4,
+						5,
+						6,
+						(Color("#ffd890") if on else Color("#3a3a40")) if dark else Color("#8fa6b0")
+					)
 			if i == 0:
 				var fx: float = x if t.dir < 0 else x + 61
 				if fx >= clip_x:
@@ -512,7 +576,13 @@ func _draw_trains(dark: bool, cx: float) -> void:
 				if dark:
 					var lx: float = fx - 60 if t.dir < 0 else fx + 1
 					if lx + 60 > clip_x:
-						_r(maxf(lx, clip_x), y + 4, 60 - maxf(0, clip_x - lx), 14, Color(1, 240 / 255.0, 190 / 255.0, 0.14))
+						_r(
+							maxf(lx, clip_x),
+							y + 4,
+							60 - maxf(0, clip_x - lx),
+							14,
+							Color(1, 240 / 255.0, 190 / 255.0, 0.14)
+						)
 
 
 func _draw_world_fx(dark: bool, cx: float) -> void:
@@ -545,7 +615,13 @@ func _draw_world_fx(dark: bool, cx: float) -> void:
 		_r(x + 29 if c.dir > 0 else x, y + 1, 1, 2, Color("#fff2b0") if dark else Color("#e8e8e0"))
 		_r(x if c.dir > 0 else x + 29, y + 1, 1, 2, Color("#d02a2a"))
 		if dark:
-			_r(x + 30 if c.dir > 0 else x - 30, y - 1, 30, 7, Color(1, 230 / 255.0, 160 / 255.0, 0.12))
+			_r(
+				x + 30 if c.dir > 0 else x - 30,
+				y - 1,
+				30,
+				7,
+				Color(1, 230 / 255.0, 160 / 255.0, 0.12)
+			)
 	var sc := Color(210 / 255.0, 220 / 255.0, 240 / 255.0, 0.55)
 	for s: Dictionary in _splashes:
 		var x := floorf(s.x - cx)
@@ -611,7 +687,11 @@ func _draw_markers(n: String, cx: float) -> void:
 			_r(x, by + 6, 1, 1, c)
 			continue
 		_r(x - 3, by - 1, 7, 10, Color(0, 0, 0, 0.5))
-		var col := Color(160 / 255.0, 160 / 255.0, 170 / 255.0, 0.9) if done else (Color("#ffe36b") if n == id else Color("#ff6b9a"))
+		var col := (
+			Color(160 / 255.0, 160 / 255.0, 170 / 255.0, 0.9)
+			if done
+			else (Color("#ffe36b") if n == id else Color("#ff6b9a"))
+		)
 		if done:
 			for p: Array in [[-2, 4], [-1, 5], [0, 4], [1, 3], [2, 2]]:
 				_r(x + p[0], by + p[1], 1, 1, col)

@@ -58,4 +58,6 @@ func _draw() -> void:
 		var band := mini(2, int(d.z * 3))
 		var p := Vector2(d.x * w, d.y * h)
 		var l: float = d.l * kk
-		draw_line(p, p + Vector2(-l * slant, l), Color(color, band_alpha[band]), band_width[band] * kk)
+		draw_line(
+			p, p + Vector2(-l * slant, l), Color(color, band_alpha[band]), band_width[band] * kk
+		)

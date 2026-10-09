@@ -43,7 +43,8 @@ var _toast_tw: Tween
 @onready var hud: Control = $Hud
 @onready var chapter_label: Label = $Hud/Chapter
 @onready var toast: Label = $Toast
-@onready var side: TextureRect = $Side
+@onready var side: Control = $Side
+@onready var side_img: TextureRect = $Side/Img
 @onready var textbox: TextBox = $TextBox
 @onready var choices: Control = $Choices
 @onready var choice_list: VBoxContainer = $Choices/List
@@ -246,8 +247,8 @@ func _say(e: Dictionary) -> void:
 	_set_speaker("" if (speaker == "P" and not hero_on) or thought else speaker)
 	if speaker == "P" and not hero_on:
 		var t := Game.tex("sprites", "hero_" + str(e.expr if e.expr else "neutral"))
-		if t and (not side.visible or side.texture != t):
-			side.texture = t
+		if t and (not side.visible or side_img.texture != t):
+			side_img.texture = t
 			side.modulate.a = 0.0
 			create_tween().tween_property(side, "modulate:a", 1.0, 0.35)
 		side.visible = true
@@ -259,15 +260,21 @@ func _say(e: Dictionary) -> void:
 	textbox.show_line(e.display, kind, e.text, thought, skip or Game.settings.speed <= 0)
 
 
+## Отложенный переход: только если реплика не сменилась (и авто ещё включено)
+func _advance_if(g: int, need_auto: bool) -> void:
+	if g == _gen and (auto or not need_auto):
+		advance()
+
+
 func _on_typing_done() -> void:
 	waiting = true
 	autosave()
 	var g := _gen
 	if skip:
-		_after(cfg.skip_line_delay_ms, func() -> void: if g == _gen: advance())
+		_after(cfg.skip_line_delay_ms, _advance_if.bind(g, false))
 	elif auto:
 		var n := textbox.text.get_total_character_count()
-		_after(Game.settings.auto_delay + n * auto_ms_per_char, func() -> void: if g == _gen and auto: advance())
+		_after(Game.settings.auto_delay + n * auto_ms_per_char, _advance_if.bind(g, true))
 
 
 func _after(ms: float, f: Callable) -> void:
@@ -504,7 +511,9 @@ func react(kind: String) -> void:
 	if ms <= 0.0:
 		for f: Array in seq:
 			ms += float(f[1])
-	v.react("sera_" + str(r.get("spr", "neutral")), seq, ms, kind, PAT_FRAMES if r.get("frames") else [])
+	v.react(
+		"sera_" + str(r.get("spr", "neutral")), seq, ms, kind, PAT_FRAMES if r.get("frames") else []
+	)
 	if r.has("hearts"):
 		_hearts(int(r.hearts), bool(r.get("dark", false)))
 
@@ -542,7 +551,10 @@ func finish(kind: String) -> void:
 	SaveSystem.unlock_ending(kind)
 	SaveSystem.delete_slot("auto")
 	var e: Dictionary = Game.db.endings.get(kind, {"title": kind, "text": ""})
-	var text := "%s\n\nЗаметок о Сере собрано: %d из %d" % [e.text, runner.st.notes.size(), Game.db.notes_total]
+	var text := (
+		"%s\n\nЗаметок о Сере собрано: %d из %d"
+		% [e.text, runner.st.notes.size(), Game.db.notes_total]
+	)
 	_after(ending_delay_sec * 1000.0, func() -> void: ending.open(e.title, text))
 
 
