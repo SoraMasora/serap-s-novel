@@ -8,8 +8,9 @@ from setasset import set_asset
 from v16_style import artist
 from v14_labels import fix,STORE,SHIFT
 from PIL import ImageEnhance,ImageOps
+# v17.1: гости/пельмени/иду домой/платформа(reconcile) оставлены как в v16.1 (просьба пользователя)
 # v17: CG с героем перерисованы в стиле кадров крыши (эталоны c768dee2/37376391), БЕЗ фильтра
-RAW={'cg_jacket':'c768dee2','cg_roof':'37376391','cg_reconcile':'fb6d5dd2','cg_cafe':'97160ce7','cg_dumplings':'e2cd41ef','cg_guests':'649b69c0','cg_hit':'a78e250f','cg_panic':'08295a6d','cg_roof_quiet':'d82f3bbf','cg_shoulders':'c9c90f26','cg_store_help':'8040444c','cg_study':'09408456','cg_take':'8cab2f7e','cg_walkhome':'48424a60','end_expo':'f334cde2','end_letters':'58fdac07','cafe':'00058c13','roof':'fc5c4e6c'}
+RAW={'cg_jacket':'c768dee2','cg_roof':'37376391','cg_cafe':'97160ce7','cg_hit':'a78e250f','cg_panic':'08295a6d','cg_roof_quiet':'d82f3bbf','cg_shoulders':'c9c90f26','cg_store_help':'8040444c','cg_study':'09408456','cg_take':'8cab2f7e','end_expo':'f334cde2','end_letters':'58fdac07','cafe':'00058c13','roof':'fc5c4e6c'}
 LAB={'store':('a01badb2',STORE),'cg_shift':('1fc6931f',SHIFT)}
 F='/data/.agent-service/files/'
 def fid(i): return Image.open(glob.glob(F+i+'*/*')[0]).convert('RGB').resize((1376,768),Image.LANCZOS)
