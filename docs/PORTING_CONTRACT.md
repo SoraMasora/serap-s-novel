@@ -53,6 +53,7 @@
 | Дыхание (ручной ввод) | smoke через breath_result | UNVERIFIED |
 | Сенсорный режим, safe area, «назад», джойстик, быстрое меню, 2400×1080 → карта 16:9 | `test_mobile.gd`, `test_touch_controls.gd`, `test_mobile_main.gd` (16) | PASS |
 | Телефон (эмуляция): титул, имя с экранной клавиатурой, касания, быстрое меню, джойстик на карте | `mobile_smoke.cjs` 844×390 isMobile/hasTouch, ERRORS none | PASS (host) |
-| Реальный Android / iPhone | — | UNVERIFIED (KI-009, KI-010) |
+| iOS: Xcode-проект (bundle, ориентация, iOS 14, device family) | `ios_build.sh` + проверка Info.plist/pbxproj | PASS (export) |
+| Реальный Android / iPhone, сборка .ipa | — | UNVERIFIED (KI-009, KI-010) |
 | Звук (кроссфейд, SFX) | только Dummy-драйвер | UNVERIFIED на слух |
 | Реакции/анимации | визуально по кадрам | ASSUMED близко (п.1) |

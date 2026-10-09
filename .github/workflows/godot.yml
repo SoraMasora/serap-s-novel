@@ -1,4 +1,5 @@
-# CI Godot-порта: данные → ассеты → импорт → lint → GUT → web export → Android APK (debug).
+# CI Godot-порта: данные → ассеты → импорт → lint → GUT → web export → Android APK (debug) → iOS Xcode-проект;
+# job ios (macOS): Xcode-проект → неподписанный .ipa (подпись при установке — Sideloadly/AltStore/Xcode, ADR-0006).
 # Статус: UNVERIFIED на GitHub Actions (локально те же команды проходят, см. docs/verification/latest.md).
 name: godot
 on:
@@ -77,3 +78,31 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: github.event_name != 'pull_request'
         with: { name: android-debug-apk, path: godot/build/android/serap-debug.apk, retention-days: 14 }
+      - name: iOS Xcode project (export_project_only — ADR-0006)
+        if: github.event_name != 'pull_request'
+        run: |
+          unzip -q -j t.tpz 'templates/ios.zip' -d ~/.local/share/godot/export_templates/${GODOT_VERSION/-/.}
+          mkdir -p godot/build/ios && cd godot && godot --headless --path . --export-release "iOS" build/ios/serap.xcodeproj
+          test -f build/ios/serap.pck && tar -czf ../ios-xcode.tgz -C build ios
+      - uses: actions/upload-artifact@v4
+        if: github.event_name != 'pull_request'
+        with: { name: ios-xcode-project, path: ios-xcode.tgz, retention-days: 7 }
+
+  ios:
+    needs: test
+    if: github.event_name != 'pull_request'
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: ios-xcode-project }
+      - name: Build unsigned .ipa (без подписи; подписывается при установке)
+        run: |
+          tar -xzf ios-xcode.tgz && cd ios
+          xcodebuild -project serap.xcodeproj -scheme serap -configuration Release -sdk iphoneos \
+            -destination 'generic/platform=iOS' -derivedDataPath dd \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" DEVELOPMENT_TEAM="" build
+          mkdir -p Payload && cp -R dd/Build/Products/Release-iphoneos/serap.app Payload/
+          zip -qry ../serap-unsigned.ipa Payload && ls -la ../serap-unsigned.ipa
+      - uses: actions/upload-artifact@v4
+        with: { name: ios-unsigned-ipa, path: serap-unsigned.ipa, retention-days: 14 }

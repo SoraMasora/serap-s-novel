@@ -46,7 +46,7 @@ pixel_map.tscn ── Frame (AspectRatioContainer 16:9) → View/Signs · Touch 
 | scripts/pixel | pixel_world.gd, pixel_map.gd, mini_map.gd | perf/perf_pixel_map.tscn, smoke (11 карт) | 0002 |
 | scripts/resources | game_config.gd, audio_config.gd, pixel_config.gd | все (загружают .tres) | — |
 | scripts/autoload/mobile.gd, scripts/mobile, scenes/mobile | mobile.gd, pixel_touch_controls.gd, touch_action_button.gd, touch_quick_menu.gd, mobile_config.gd | unit/test_mobile.gd, unit/test_touch_controls.gd, integration/test_mobile_main.gd | 0005 |
-| tools/godot | export_data, bake_web, js_reference, fetch_deps, web_smoke, mobile_smoke, android_setup, check_scripts | `.github/workflows/godot.yml` | 0002, 0004, 0005 |
+| tools/godot | export_data, bake_web, js_reference, fetch_deps, web_smoke, mobile_smoke, android_setup, ios_build, check_scripts | `.github/workflows/godot.yml` | 0002, 0004, 0005, 0006 |
 
 ## Детерминизм
 ГПСЧ Парка–Миллера (`s = s*16807 % 2147483647`, выбор `s % n`) одинаков в `AutoPlayer` и `tools/godot/js_reference.cjs`; digest = sha256 трассы событий. Плейтест логики — L3 (полный путь сюжета, 200 сидов); UI-смоук в skip-режиме проходит игру до концовки на реальных сценах (L2, без попиксельного сравнения кадров).

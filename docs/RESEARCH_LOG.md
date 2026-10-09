@@ -78,3 +78,10 @@
 - **Влияние:** export_presets.cfg (Web), title_screen.tscn, mobile.gd.
 - **Уверенность:** средняя (Android Chrome — эмуляция; iOS — UNVERIFIED).
 - **Fallback:** «Добавить на экран Домой».
+
+## R-012 Можно ли собрать iOS-версию Godot 4.7.2 без macOS?
+- **Источники:** [SRC] `godot --doctool` 4.7.2 → `platform/ios/doc_classes/EditorExportPlatformIOS.xml` (`application/export_project_only`, `app_store_team_id`, `targeted_device_family`, `export_method_*`, `storyboard/*`); локальный эксперимент: экспорт на Linux → `WARNING: Xcode Build: .ipa can only be built on macOS. Leaving Xcode project without building the package.`; без Team ID — `ERROR: App Store Team ID not specified`; шаблон `templates/ios.zip` из `Godot_v4.7.2-stable_export_templates.tpz` (sha256 в DEPENDENCIES).
+- **Вывод:** на Linux получается готовый Xcode-проект (serap.xcodeproj, serap.xcframework ios-arm64 + simulator, MoltenVK, serap.pck 30,6 МБ); компиляция и .ipa — только `xcodebuild` на macOS; без подписи `CODE_SIGNING_ALLOWED=NO`, подпись — при установке.
+- **Влияние:** export_presets.cfg (preset.2), tools/godot/ios_build.sh, CI job `ios`, ADR-0006.
+- **Уверенность:** высокая для экспорта (verified); средняя для `xcodebuild` (стандартная схема `serap`, не запускалось).
+- **Fallback:** веб-PWA в Safari («На экран Домой»).

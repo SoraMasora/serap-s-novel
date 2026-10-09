@@ -25,6 +25,8 @@ cd godot && mkdir -p build/android && touch build/.gdignore && godot --headless 
 (cd godot/build/web && python3 -m http.server 8765 &); NODE_PATH=<node_modules> node tools/godot/mobile_smoke.cjs shots/mobile   # смоук: телефон 844×390, касания
 godot --path godot -- --touch --jump=d1                                                                           # десктоп: сенсорный режим + сразу на карту d1
 ```
+**iPhone/iPad (ADR-0006):** `bash tools/godot/ios_build.sh` → Xcode-проект `godot/build/ios/serap.xcodeproj` (на любой ОС); на macOS+Xcode тот же скрипт собирает неподписанный `godot/build/serap-unsigned.ipa`. Без Mac — артефакт CI `ios-unsigned-ipa` (job `ios`, macos-15). Установка: Sideloadly/AltStore со своим Apple ID (бесплатный ID — переподпись раз в 7 дней) или Xcode → Signing → Team → Run.
+
 Сенсорный слой — `scenes/mobile/*.tscn` + автозагрузка `Mobile`; параметры — `data/mobile_config.tres`, тема — `ui/theme_mobile.tres` (ADR-0005).
 
 ## Карта репозитория

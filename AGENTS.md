@@ -16,6 +16,7 @@
 - Веб: `cd godot && mkdir -p build/web && godot --headless --path . --export-release "Web" build/web/index.html`; смоук: `(cd godot/build/web && python3 -m http.server 8765 &); NODE_PATH=<node_modules> node tools/godot/web_smoke.cjs shots/godot` (env `STEPS`, `PERF`)
 - Android: `bash tools/godot/android_setup.sh` (env JAVA_HOME, ANDROID_SDK_ROOT) → `cd godot && touch build/.gdignore && godot --headless --path . --export-debug "Android" build/android/serap-debug.apk`
 - Мобильный смоук: `NODE_PATH=<node_modules> node tools/godot/mobile_smoke.cjs shots/mobile` (env `VW`/`VH`/`STEPS` в долях экрана, kind `tap`/`hold:ms`/`drag:dx,dy,ms`)
+- iOS: `bash tools/godot/ios_build.sh` (Xcode-проект на любой ОС; на macOS — ещё неподписанный .ipa); `app_store_team_id="UNSIGNED00"` — заглушка, реальный Team ID ставится в Xcode, не коммитить
 - Флаги запуска: `-- --touch` / `--no-touch` (сенсорный режим), `--jump=<label>` (dev: сразу в сцену), `--autoplay=<seed>`
 
 ## Правила

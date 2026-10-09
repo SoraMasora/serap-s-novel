@@ -16,9 +16,11 @@
 | 10 | `mobile_smoke.cjs` с `--jump=d1`: карта, drag джойстика, «E» | ERRORS none; герой идёт, карта 16:9, вывески на месте | PASS (host) |
 | 11 | `godot --headless --path . --export-debug "Android" build/android/serap-debug.apk` | 58,6 МБ; `aapt2 dump badging`: com.soramasora.seraps 19/0.19.0, arm64-v8a, targetSdk 36; `apksigner verify` ок | PASS (build) |
 | 12 | `python3 -c "yaml.safe_load(...godot.yml)"` | парсится (на main падал на строке 45 — исправлено) | PASS |
+| 13 | `bash tools/godot/ios_build.sh` (Linux, preset iOS export_project_only) | Xcode-проект `serap.xcodeproj` + `serap.pck` 30,6 МБ; Info.plist: landscape L/R, UIRequiresFullScreen, UIStatusBarHidden; pbxproj: com.soramasora.seraps, iOS 14.0, TARGETED_DEVICE_FAMILY "1,2", 0.19.0/19; ERROR 0 | PASS (export) |
+| 14 | GUT на чистом клоне ветки (после отката песочницы) | 44/44, 254 asserts | PASS |
 
 ## Не проверялось
 - APK на реальном Android-телефоне (KI-009) — `adb install -r godot/build/android/serap-debug.apk`; ожидается: альбомная, касания листают текст, джойстик/«E»/«Бег» на карте, «назад» → меню, сворачивание → автосейв.
-- iOS-экспорт (KI-010) — нужен macOS + Xcode.
-- CI на GitHub Actions (KI-007) — ожидаются артефакты `web-build` и `android-debug-apk`.
+- Сборка .ipa (`xcodebuild`) и запуск на iPhone (KI-010) — нужен macOS; ожидается артефакт CI `ios-unsigned-ipa`.
+- CI на GitHub Actions (KI-007) — ожидаются артефакты `web-build`, `android-debug-apk`, `ios-xcode-project`, `ios-unsigned-ipa`.
 - Звук на слух, FPS на реальном GPU, редактор с GUI.

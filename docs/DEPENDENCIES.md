@@ -12,3 +12,4 @@
 | ffmpeg | любой с libvorbis | — | bake_web.cjs audio |
 | JDK | 17 (Temurin 17.0.20.1+1) | `java -version` | Android-экспорт (apksigner, keytool) |
 | Android SDK build-tools | 35.0.0 (+ platform-tools) | `apksigner --version` | Android-экспорт без Gradle; targetSdk 36 задан шаблоном 4.7.2 |
+| Xcode | из образа `macos-15` GitHub Actions (локально любой с iOS SDK ≥ 14) | `xcodebuild -version` | сборка .ipa (job `ios`, `ios_build.sh` на macOS) |

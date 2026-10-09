@@ -3,7 +3,7 @@
   "route": "B",
   "phase": "mobile",
   "status": "green-with-known-issues",
-  "next_task": "KI-009: установить godot/build/android/serap-debug.apk (или артефакт CI android-debug-apk) на реальный Android-телефон и пройти титул → имя → глава → карта d1 (джойстик, E, Бег, назад); затем KI-007 CI на GitHub",
+  "next_task": "KI-010/KI-009: запустить CI (push в godot-mobile) → скачать артефакты android-debug-apk и ios-unsigned-ipa; поставить на реальные Android и iPhone (Sideloadly/AltStore) и пройти титул → имя → глава → карта d1",
   "blocked_by": [
     "нет реального телефона в среде агента (KI-009)",
     "нет macOS/Xcode для iOS (KI-010)",
@@ -25,7 +25,7 @@
     },
     {
       "cmd": "GUT -gdir=res://tests -ginclude_subdirs",
-      "result": "44/44, 254 asserts",
+      "result": "44/44, 254 asserts (повторено на чистом клоне ветки)",
       "status": "PASS",
       "date": "2026-10-09"
     },
@@ -66,14 +66,20 @@
       "date": "2026-10-09"
     },
     {
-      "cmd": "godot --export-debug iOS",
-      "result": "not run (нужен macOS)",
+      "cmd": ".github/workflows/godot.yml",
+      "result": "not run; YAML теперь парсится (на main не парсился)",
       "status": "UNVERIFIED",
       "date": "2026-10-09"
     },
     {
-      "cmd": ".github/workflows/godot.yml",
-      "result": "not run; YAML теперь парсится (на main не парсился)",
+      "cmd": "bash tools/godot/ios_build.sh (Linux)",
+      "result": "Xcode-проект + serap.pck 30.6 MB; Info.plist landscape, iOS 14.0, device family 1,2, bundle com.soramasora.seraps",
+      "status": "PASS (export)",
+      "date": "2026-10-09"
+    },
+    {
+      "cmd": "xcodebuild → serap-unsigned.ipa; запуск на iPhone",
+      "result": "not run (нет macOS)",
       "status": "UNVERIFIED",
       "date": "2026-10-09"
     }
@@ -87,7 +93,8 @@
     "playwright": "1.63.0",
     "jdk": "17 (Temurin 17.0.20.1+1)",
     "android_build_tools": "35.0.0",
-    "android_target_sdk": "36 (из шаблона 4.7.2)"
+    "android_target_sdk": "36 (из шаблона 4.7.2)",
+    "xcode": "macos-15 runner image"
   },
   "budgets": {
     "frame_ms_gpu": 16.7,
@@ -109,7 +116,8 @@
     "KI-010",
     "KI-011",
     "KI-012",
-    "KI-013"
+    "KI-013",
+    "KI-014"
   ],
   "last_code_sha": "b944650 (main); ветка godot-mobile — см. git log",
   "branch": "godot-mobile",
