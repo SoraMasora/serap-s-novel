@@ -7,14 +7,18 @@ from PIL import Image
 from setasset import set_asset
 from v16_style import artist
 from v14_labels import fix,STORE,SHIFT
+from v17_labels import compose,compose_shift,fix_take
 from PIL import ImageEnhance,ImageOps
 # v17.1: гости/пельмени/иду домой/платформа(reconcile) оставлены как в v16.1 (просьба пользователя)
 # v17: CG с героем перерисованы в стиле кадров крыши (эталоны c768dee2/37376391), БЕЗ фильтра
-RAW={'cg_jacket':'c768dee2','cg_roof':'37376391','cg_cafe':'97160ce7','cg_hit':'a78e250f','cg_panic':'08295a6d','cg_roof_quiet':'d82f3bbf','cg_shoulders':'c9c90f26','cg_store_help':'8040444c','cg_study':'09408456','cg_take':'8cab2f7e','end_expo':'f334cde2','end_letters':'58fdac07','cafe':'00058c13','roof':'fc5c4e6c'}
+RAW={'cg_jacket':'c768dee2','cg_roof':'37376391','cg_roof_quiet':'d82f3bbf','roof':'fc5c4e6c'}
 LAB={'store':('a01badb2',STORE),'cg_shift':('1fc6931f',SHIFT)}
 F='/data/.agent-service/files/'
 def fid(i): return Image.open(glob.glob(F+i+'*/*')[0]).convert('RGB').resize((1376,768),Image.LANCZOS)
-OVR={'cg_tea':'c53464dc','cg_dumplings':'1ea824cf','cg_guests':'8b5f8a41','cg_walkhome':'897fd415'}  # v16.1
+OVR={'cg_tea':'c53464dc','cg_dumplings':'d8727c21','cg_guests':'8b5f8a41','cg_walkhome':'897fd415',  # v16.1
+     # v17.2: перерисованы в стиле cg_reconcile, персонажи по спрайтам; кладутся через artist() как reconcile
+     'cg_store_help':'8ed5b371','end_letters':'96f5520f','end_expo':'9fde3a14','cg_shoulders':'661dc672',
+     'cg_hit':'22838ce5','cg_study':'3db045df','cg_cafe':'09176486','cg_panic':'fa19aaa0','cg_take':'c63630b5','cafe':'2b6c0c30'}
 pat=re.compile(r"ASSETS\.(\w+)\['([^']+)'\]='data:image")
 where={}
 for js in sorted(glob.glob('assets/*.js')):
@@ -28,12 +32,12 @@ def sprite(im,k=.85):
 BL=(425,225)
 for (kind,key),js in sorted(where.items()):
     if kind=='bg':
-        src=fid(OVR[key]) if key in OVR else Image.open(f'v16src/bg_{key}.webp').convert('RGB')
+        src=(fix_take(fid(OVR[key])) if key=='cg_take' else fid(OVR[key])) if key in OVR else Image.open(f'v16src/bg_{key}.webp').convert('RGB')
         if key in RAW: im=fid(RAW[key])
         elif key in LAB:  # v16.2: надписи рисуются ПОСЛЕ фильтра (иначе контур портит «Роллтон»/«Доширак»)
             src=fid(LAB[key][0]); 
             if key=='store': src=ImageEnhance.Color(ImageEnhance.Contrast(ImageOps.autocontrast(src,cutoff=1)).enhance(1.12)).enhance(1.15)
-            im=fix(artist(src),LAB[key][1])
+            im=(compose if key=='store' else compose_shift)(artist(src))  # v17.2: надписи генератором (tools/v17_labels.py)
         else: im=artist(src)
         im.save(f'v16/{key}.jpg',quality=85); set_asset(js,'bg',key,im,80)
     elif kind=='title':
