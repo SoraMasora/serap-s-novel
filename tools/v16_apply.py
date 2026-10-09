@@ -8,7 +8,7 @@ from setasset import set_asset
 from v16_style import artist
 F='/data/.agent-service/files/'
 def fid(i): return Image.open(glob.glob(F+i+'*/*')[0]).convert('RGB').resize((1376,768),Image.LANCZOS)
-OVR={'cg_tea':'937cb55e','cg_dumplings':'afd66bd4'}
+OVR={'cg_tea':'c53464dc','cg_dumplings':'1ea824cf','cg_guests':'8b5f8a41','cg_walkhome':'897fd415'}  # v16.1: новые чай(2 кружки), пельмени, гости по концепту, иду домой
 pat=re.compile(r"ASSETS\.(\w+)\['([^']+)'\]='data:image")
 where={}
 for js in sorted(glob.glob('assets/*.js')):
