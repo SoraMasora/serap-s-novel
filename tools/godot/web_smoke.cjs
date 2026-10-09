@@ -17,10 +17,10 @@ require('fs').mkdirSync(out, { recursive: true });
   await page.waitForTimeout(12000);
   console.log('boot_ms', Date.now() - t0);
   await page.screenshot({ path: `${out}/01_title.png` });
-  const steps = JSON.parse(process.env.STEPS || '[]'); // [[x,y,'name'|null, waitMs, keys?]]
+  const steps = JSON.parse(process.env.STEPS || '[]'); // [[x,y,'name'|null, waitMs, keys?, move?]]
   let k = 2;
-  for (const [x, y, name, wait, keys] of steps) {
-    if (x != null) await page.mouse.click(x, y);
+  for (const [x, y, name, wait, keys, move] of steps) { // move=true → только навести курсор
+    if (x != null) await (move ? page.mouse.move(x, y, { steps: 8 }) : page.mouse.click(x, y));
     if (keys) await page.keyboard.type(keys);
     await page.waitForTimeout(wait || 1500);
     if (name) await page.screenshot({ path: `${out}/${String(k++).padStart(2, '0')}_${name}.png` });

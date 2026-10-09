@@ -1,0 +1,33 @@
+{
+  "project": "serap-s-novel",
+  "route": "B",
+  "phase": "port-complete-verification",
+  "status": "green-with-known-issues",
+  "next_task": "KI-007: запустить .github/workflows/godot.yml на GitHub и починить, если упадёт; затем KI-003 замер FPS на реальном GPU",
+  "blocked_by": ["нет GPU в среде агента (KI-003)", "CI не запускался (KI-007)"],
+  "verification": [
+    {"cmd": "gdformat --check scripts tests && gdlint scripts tests", "result": "no problems", "status": "PASS", "date": "2026-10-09"},
+    {"cmd": "GUT -gdir=res://tests -ginclude_subdirs", "result": "28/28, 193 asserts", "status": "PASS", "date": "2026-10-09"},
+    {"cmd": "godot --headless --path godot -- --autoplay=42", "result": "home, steps 403, digest 9a1c118c", "status": "PASS", "date": "2026-10-09"},
+    {"cmd": "godot --export-release Web", "result": "68 MB", "status": "PASS", "date": "2026-10-09"},
+    {"cmd": "web_smoke.cjs", "result": "ERRORS none, boot 12.9 s", "status": "PASS (host)", "date": "2026-10-09"},
+    {"cmd": ".github/workflows/godot.yml", "result": "not run", "status": "UNVERIFIED", "date": "2026-10-09"}
+  ],
+  "pins": {
+    "godot": "4.7.2-stable",
+    "gut": "v9.7.1",
+    "gdtoolkit": "4.5.0",
+    "google_fonts_rev": "51303ca9e8ac9dcea7b12d307ba568fd0e6fcfca",
+    "node": "24",
+    "playwright": "1.63.0"
+  },
+  "budgets": {
+    "frame_ms_gpu": 16.7,
+    "map_process_ms_avg": 4.0,
+    "map_process_ms_p99": 8.0,
+    "web_boot_s": 10,
+    "web_size_mb": 50
+  },
+  "todo": ["KI-001", "KI-002", "KI-003", "KI-004", "KI-005", "KI-006", "KI-007", "KI-008"],
+  "last_code_sha": "d5d9034"
+}

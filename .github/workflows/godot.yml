@@ -1,0 +1,67 @@
+# CI Godot-порта: данные → ассеты → импорт → lint → GUT → web export.
+# Статус: UNVERIFIED на GitHub Actions (локально те же команды проходят, см. docs/verification/latest.md).
+name: godot
+on:
+  push:
+    paths: ["godot/**", "tools/godot/**", "js/**", "assets/**", "css/**", ".github/workflows/godot.yml"]
+  pull_request:
+    paths: ["godot/**", "tools/godot/**", "js/**", "assets/**", "css/**"]
+  workflow_dispatch:
+
+env:
+  GODOT_VERSION: 4.7.2-stable
+  GODOT_SHA256: cadd3204e728a35d3f13adb7fd0d7902636b79f6b95c40c265eb73b6c35329e4
+  TEMPLATES_SHA256: f298490b8d44d934be425a5a65a51bf15f422428b229a06a6e11d9ffea248011
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "24" }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13" }
+      - name: Tools
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+          npm i --no-save playwright@1.63.0 && npx playwright install --with-deps chromium
+          pip install gdtoolkit==4.5.0
+      - name: Godot
+        run: |
+          curl -fsSL -o godot.zip "https://github.com/godotengine/godot/releases/download/$GODOT_VERSION/Godot_v${GODOT_VERSION}_linux.x86_64.zip"
+          echo "$GODOT_SHA256  godot.zip" | sha256sum -c
+          unzip -q godot.zip && sudo mv Godot_v${GODOT_VERSION}_linux.x86_64 /usr/local/bin/godot
+      - name: Data, assets, deps (воспроизводимая генерация, ADR-0002)
+        run: |
+          node tools/godot/export_data.cjs --assets
+          node tools/godot/bake_web.cjs
+          bash tools/godot/fetch_deps.sh
+          git diff --exit-code godot/data/story.json || (echo "story.json разошёлся с js/story*.js" && exit 1)
+      - name: Lint
+        working-directory: godot
+        run: gdformat --check scripts tests && gdlint scripts tests
+      - name: Import (два прохода: шрифты темы импортируются раньше темы)
+        working-directory: godot
+        run: godot --headless --path . --import --quit || true; godot --headless --path . --import --quit
+      - name: Parity reference
+        run: node tools/godot/js_reference.cjs 200 && git diff --exit-code godot/tests/fixtures/js_reference.json
+      - name: GUT
+        working-directory: godot
+        env: { GODOT_DISABLE_LEAK_CHECKS: "1" }
+        run: godot --headless -d --audio-driver Dummy --path . -s res://addons/gut/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit
+      - name: Perf probe (CPU)
+        working-directory: godot
+        run: godot --headless --audio-driver Dummy --path . res://tests/perf/perf_pixel_map.tscn -- --frames=600 | grep PERF
+      - name: Web export
+        if: github.event_name != 'pull_request'
+        run: |
+          curl -fsSL -o t.tpz "https://github.com/godotengine/godot/releases/download/$GODOT_VERSION/Godot_v${GODOT_VERSION}_export_templates.tpz"
+          echo "$TEMPLATES_SHA256  t.tpz" | sha256sum -c
+          d=~/.local/share/godot/export_templates/${GODOT_VERSION/-/.}; mkdir -p "$d"
+          unzip -q -j t.tpz 'templates/web_nothreads_release.zip' 'templates/version.txt' -d "$d"
+          mkdir -p godot/build/web && cd godot && godot --headless --path . --export-release "Web" build/web/index.html
+      - uses: actions/upload-artifact@v4
+        if: github.event_name != 'pull_request'
+        with: { name: web-build, path: godot/build/web, retention-days: 14 }
