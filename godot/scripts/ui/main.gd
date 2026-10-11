@@ -8,6 +8,7 @@ const HEART := preload("res://scenes/ui/heart.tscn")
 const PAT_FRAMES := ["sera_pat2", "sera_pat3", "sera_pat4", "sera_pat3"]
 ## Анимированные фоны: ключ фона → кадры (godot/art/bg) и fps. Сюжет пишет {bg:'bal_talk'}.
 const BG_ANIM := {
+	"bal_s0": {"frames": ["bal_l0", "bal_l1", "bal_l2", "bal_l3"], "fps": 6.0},
 	"bal_talk": {"frames": ["bal_t0", "bal_t1", "bal_t2", "bal_t3"], "fps": 2.5},
 }
 
