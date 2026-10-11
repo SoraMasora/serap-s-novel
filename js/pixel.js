@@ -397,7 +397,7 @@ function act(id) {
   if (id.startsWith('it') && cfg.items) return pickItem(id);
   if (cfg.info && cfg.info[id] && !cfg.spots.includes(id)) { const v = cfg.info[id]; const k = (cfg.infoN = cfg.infoN || {})[id] = ((cfg.infoN[id] || 0) + 1); return say(Array.isArray(v) ? v[(k - 1) % v.length] : v); }
   if (id === 'home') return say(cfg.home || (cfg.items ? 'Сначала — листовки. Все до одной.' : 'Рано возвращаться. Хочется ещё куда-нибудь заглянуть.'));
-  if (id === 'swing') return say(SWING_LINES[(cfg.title || '').length % 2]);
+  if (id === 'swing') return say(cfg.noSera ? 'Качели пустые. Сиденье мокрое — на нём никто не сидит. Её здесь нет.' : SWING_LINES[(cfg.title || '').length % 2]);
   if (cfg.done.includes(id)) return say('Сегодня я тут уже был.');
   window.Sound && Sound.sfx('enter'); stop(); onEnter && onEnter(id);
 }

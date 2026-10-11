@@ -6,6 +6,8 @@ extends Control
 ## за время кадра, без скачков на стыках. Без ключей — медленный общий наезд.
 ## anim — оверлей-спрайт поверх кадра: {spr, path:[[x,y]…] в px исходного кадра, ms, delay,
 ## scale:[от, до], wings} (например, таракан, вылетающий в окно).
+## flip — покадровая анимация внутри кадра: список картинок, fps, once (не зацикливать),
+## sfxAt:{номер_кадра: звук} (например, зажигалка на 6-м кадре).
 
 signal caption_shown(text: String)
 signal sfx_requested(key: String)
@@ -25,6 +27,7 @@ var _cam := Vector3(0.5, 0.5, 1.0)
 var _cam_tw: Tween
 var _keyed := false
 var _over: Array[Control] = []
+var _flip: Dictionary = {}
 
 @onready var stage: Control = $Stage
 @onready var imgs: Array[TextureRect] = [$Stage/A, $Stage/B]
@@ -98,12 +101,44 @@ func _next() -> void:
 		_cam_tw.tween_method(_set_cam, _cam, Vector3(c[0], c[1], c[2]), ms / 1000.0 + 0.4)
 	if f.has("anim") and not _skip:
 		_overlay(el, f.anim)
+	_flip = {}
+	if f.has("flip") and not _skip:
+		_flip = {
+			"el": el,
+			"keys": f.flip,
+			"dt": 1.0 / maxf(0.5, float(f.get("fps", 4))),
+			"once": f.get("once", false),
+			"sfx": f.get("sfxAt", {}),
+			"t": 0.0,
+			"i": 0
+		}
 	var my_k := _k
 	get_tree().create_timer(ms / 1000.0).timeout.connect(
 		func() -> void:
 			if _active and _k == my_k:
 				_next()
 	)
+
+
+func _process(delta: float) -> void:
+	if _flip.is_empty() or not _active:
+		return
+	_flip.t += delta
+	if _flip.t < _flip.dt:
+		return
+	_flip.t -= _flip.dt
+	var n: int = _flip.keys.size()
+	var i: int = _flip.i + 1
+	if i >= n:
+		if _flip.once:
+			return
+		i = 0
+	_flip.i = i
+	var el: TextureRect = _flip.el
+	el.texture = Game.tex("bg", str(_flip.keys[i]))
+	var k := str(i)
+	if _flip.sfx.has(k):
+		sfx_requested.emit(str(_flip.sfx[k]))
 
 
 ## Камера: зум вокруг точки интереса; точка не выходит за кадр, края всегда закрыты
@@ -194,6 +229,7 @@ func _clear_overlays() -> void:
 
 func _done() -> void:
 	visible = false
+	_flip = {}
 	_clear_overlays()
 	if _cam_tw:
 		_cam_tw.kill()
@@ -204,6 +240,7 @@ func _done() -> void:
 ## Прервать (загрузка/откат)
 func kill() -> void:
 	_active = false
+	_flip = {}
 	visible = false
 	if _cam_tw:
 		_cam_tw.kill()

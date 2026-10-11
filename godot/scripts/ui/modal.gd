@@ -153,10 +153,16 @@ func open_settings(s: Dictionary) -> void:
 
 func open_endings(got: Dictionary, endings: Dictionary) -> void:
 	_clear(endings_list)
+	var n := endings.keys().filter(func(k: String) -> bool: return got.get(k, false)).size()
+	$Center/Panel/Panels/Endings/Title.text = "Концовки · %d из %d" % [n, endings.size()]
 	for k: String in endings:
 		var it: Label = NOTE_ITEM.instantiate()
-		it.text = ("✝ " + str(endings[k].title)) if got.get(k) else "??? — не открыта"
+		it.text = ("✝ " + str(endings[k].title)) if got.get(k) else "???  — не открыта"
 		it.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		if got.get(k):
+			it.add_theme_color_override("font_color", Color(1, 0.72, 0.82))
+		else:
+			it.modulate.a = 0.45
 		endings_list.add_child(it)
 	_show(endings_panel)
 

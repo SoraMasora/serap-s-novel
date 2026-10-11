@@ -284,7 +284,7 @@ function say(name, text, expr) {
   tx.className = thought ? 'thought' : name ? '' : 'narr';
   setSpeaker((name === 'P' && !st.chars.hero) || thought ? null : name);
   const side = $('#side');
-  if (name === 'P' && !st.chars.hero) { const src = A.sprites['hero_' + (expr || 'neutral')]; const im = side.querySelector('img');
+  if (name === 'P' && !st.chars.hero) { const src = A.sprites['hero_' + (expr || 'neutral')] || A.sprites.hero_soft; const im = side.querySelector('img');
     if (side.classList.contains('hidden') || im.getAttribute('src') !== src) { im.src = src; im.style.animation = 'none'; void im.offsetWidth; im.style.animation = ''; }
     side.classList.remove('hidden'); } else side.classList.add('hidden');
   full = fmt(text); tIdx = 0; typing = true; waiting = false; $('#next').classList.remove('show');
@@ -525,6 +525,7 @@ function openMap() {
     onItem: n => { $('#pixTask').textContent = `${m.task} · ${n}/${m.items.length}`; saveSlot('auto', true); }, onTick: t => { m.tleft = t; } }, id => {
     m.pos = PixelMap.pos();
     if (id === '__car') { st.map = null; st.mode = ''; $('#textbox').classList.remove('hidden'); jump('end_car'); run(); return; }
+    if (id === '__lazy') { st.map = null; st.mode = ''; $('#textbox').classList.remove('hidden'); jump('end_lazy'); run(); return; }
     if (id === '__items' || id === '__late') { const a = id === '__late' ? (m.late || m.after) : m.after; st.map = null; st.mode = ''; $('#textbox').classList.remove('hidden'); jump(a); run(); return; }
     m.done.push(id);
     if (m.scenes && m.scenes[id]) { st.mode = ''; $('#textbox').classList.remove('hidden'); jump(m.scenes[id]); run(); return; } const n = (st.flags['v_' + id] || 0) + 1; st.flags['v_' + id] = n;

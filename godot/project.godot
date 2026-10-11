@@ -42,6 +42,8 @@ window/size/viewport_height=720
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 window/size/mode=3
+mouse_cursor/custom_image="res://art/ui/cursor_can.svg"
+mouse_cursor/custom_image_hotspot=Vector2(3, 2)
 
 [editor_plugins]
 

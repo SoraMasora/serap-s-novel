@@ -70,6 +70,8 @@ func _ready() -> void:
 	breath.exhale_ms = cfg.breath_exhale_ms
 	breath.ok_ratio = cfg.breath_ok_ratio
 	_connect_signals()
+	for n: Node in [modal, title, ending, name_screen, pixel_map]:
+		UiFx.decorate(n)
 	if _cli_autoplay():
 		return
 	to_title()
@@ -248,11 +250,17 @@ func _say(e: Dictionary) -> void:
 	var hero_on: bool = runner.st.chars.has("hero")
 	_set_speaker("" if (speaker == "P" and not hero_on) or thought else speaker)
 	if speaker == "P" and not hero_on:
-		var t := Game.tex("sprites", "hero_" + str(e.expr if e.expr else "neutral"))
+		var bird := str(e.expr) == "bird"
+		var t := Game.tex(
+			"sprites", "side_bird" if bird else "hero_" + str(e.expr if e.expr else "neutral")
+		)
+		_side_frame(bird)
 		if t and (not side.visible or side_img.texture != t):
 			side_img.texture = t
 			side.modulate.a = 0.0
 			create_tween().tween_property(side, "modulate:a", 1.0, 0.35)
+			if bird:
+				_bird_pop()
 		side.visible = true
 	else:
 		side.visible = false
@@ -271,6 +279,39 @@ func _say(e: Dictionary) -> void:
 
 
 ## Отложенный переход: только если реплика не сменилась (и авто ещё включено)
+## Портрет: герой (крупно лицо, кадрирование спрайта) или птичка «Вряд ли» (весь кадр)
+func _side_frame(bird: bool) -> void:
+	if bird:
+		side_img.anchor_left = 0.0
+		side_img.anchor_top = 0.0
+		side_img.anchor_right = 1.0
+		side_img.anchor_bottom = 1.0
+		side_img.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	else:
+		side_img.anchor_left = -0.62
+		side_img.anchor_top = -0.03
+		side_img.anchor_right = 1.62
+		side_img.anchor_bottom = 2.45
+		side_img.stretch_mode = TextureRect.STRETCH_SCALE
+	side_img.offset_left = 0
+	side_img.offset_top = 0
+	side_img.offset_right = 0
+	side_img.offset_bottom = 0
+
+
+## Птичка «выскакивает» вместо героя: пружинка и лёгкое покачивание
+func _bird_pop() -> void:
+	side.scale = Vector2(0.55, 0.55)
+	var tw := create_tween()
+	tw.tween_property(side, "scale", Vector2.ONE, 0.45).set_trans(Tween.TRANS_BACK).set_ease(
+		Tween.EASE_OUT
+	)
+	tw.parallel().tween_property(side, "rotation", 0.06, 0.15)
+	tw.tween_property(side, "rotation", -0.09, 0.18)
+	tw.tween_property(side, "rotation", -0.05, 0.2)
+	Audio.sfx("pop")
+
+
 func _advance_if(g: int, need_auto: bool) -> void:
 	if g == _gen and (auto or not need_auto):
 		advance()

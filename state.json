@@ -1,9 +1,9 @@
 {
   "project": "serap-s-novel",
   "route": "B",
-  "phase": "visual-polish",
+  "phase": "content-0.3.0",
   "status": "green-with-known-issues",
-  "next_task": "Проверить у пользователя на ПК: «Кадр» (H), полноэкранный (F11), пропуск прочитанного, крупные планы на карте, концовка «Обочина»; затем KI-007 (CI) и KI-003 (FPS на GPU)",
+  "next_task": "Проверить у пользователя на ПК: ветка «Дальше больше» (вт вечер → «Курю…»), «Ленивый идиот» (чт, качели 1:11), птичка в «Тихой гавани», новый GUI и курсор; затем KI-007, KI-003",
   "blocked_by": [
     "нет GPU в среде агента (KI-003)",
     "CI не запускался (KI-007)"
@@ -13,25 +13,25 @@
       "cmd": "gdformat --check scripts tests && gdlint scripts tests",
       "result": "no problems",
       "status": "PASS",
-      "date": "2026-10-10"
+      "date": "2026-10-11"
     },
     {
       "cmd": "GUT -gdir=res://tests -ginclude_subdirs",
-      "result": "28/28, 211 asserts",
+      "result": "28/28, 217 asserts",
       "status": "PASS",
-      "date": "2026-10-10"
+      "date": "2026-10-11"
     },
     {
       "cmd": "node tools/godot/js_reference.cjs 200",
-      "result": "home 148, gone 11, neutral 19, good 13, bad 8, letters 1",
+      "result": "home 131, more 32, neutral 17, good 8, gone 7, bad 5",
       "status": "PASS",
-      "date": "2026-10-10"
+      "date": "2026-10-11"
     },
     {
       "cmd": ".github/workflows/godot.yml",
       "result": "not run",
       "status": "UNVERIFIED",
-      "date": "2026-10-10"
+      "date": "2026-10-11"
     }
   ],
   "pins": {
@@ -59,7 +59,9 @@
     "KI-007",
     "KI-008",
     "KI-009",
-    "KI-010"
+    "KI-010",
+    "KI-011",
+    "KI-012"
   ],
   "last_code_sha": "d5d9034"
 }

@@ -22,21 +22,21 @@
   },
   {
    "seed": 15839,
-   "ending": "gone",
-   "steps": 450,
-   "feel": 77,
-   "press": 2,
+   "ending": "more",
+   "steps": 443,
+   "feel": 100,
+   "press": 1,
    "notes": 27,
-   "digest": "a87976036d5470036f0bd19bd6bdaf959112b55d974dcf5d5d2383fb913c7039"
+   "digest": "1407fb4ec00941ef67384e3f455052cb5924b3ff3f8f18e233dbb5dd0d5807f5"
   },
   {
    "seed": 23758,
    "ending": "gone",
-   "steps": 485,
+   "steps": 508,
    "feel": 100,
    "press": 1,
-   "notes": 27,
-   "digest": "403f40886167c64cec20876ea1bbe703cba16a6d6c08b3d42f38ae2df2c5cda6"
+   "notes": 29,
+   "digest": "62a665a938287e999f6516a9b05473cb7cdaf0551be77bb258311db6582ef9b7"
   },
   {
    "seed": 31677,
@@ -59,29 +59,29 @@
   {
    "seed": 47515,
    "ending": "home",
-   "steps": 413,
-   "feel": 52,
+   "steps": 433,
+   "feel": 48,
    "press": 6,
-   "notes": 19,
-   "digest": "6a2cd4017af6e33d2db66433dffc3f37aa91f893f260372209edf0b0d1d690c1"
+   "notes": 20,
+   "digest": "29d1a8a19ad4142eac4d96b1c717b1aeabbd752b4f304033fc3d9b8b6cd10a7f"
   },
   {
    "seed": 55434,
-   "ending": "neutral",
-   "steps": 490,
-   "feel": 96,
+   "ending": "good",
+   "steps": 518,
+   "feel": 100,
    "press": 2,
-   "notes": 27,
-   "digest": "3eb6161e0df6ae4c8d8fcc6aaa595a1536d2b1877d00f3dcc6464b0c1c37d886"
+   "notes": 29,
+   "digest": "b63d1617f86464a07a39a0b734d500afa5b44f3ea46b3fc50ac793d61c5e0598"
   },
   {
    "seed": 63353,
-   "ending": "neutral",
-   "steps": 460,
-   "feel": 75,
-   "press": 3,
-   "notes": 28,
-   "digest": "ea985c0c560590a2cd1ce2599e4341a50d94aab8c66c1072b228fd328852e25c"
+   "ending": "home",
+   "steps": 471,
+   "feel": 76,
+   "press": 5,
+   "notes": 30,
+   "digest": "3185a6d1063f161fceb17e2d6ef4ceb722a69b3498a8cd64d8672be4d61f5ae8"
   },
   {
    "seed": 71272,
@@ -94,12 +94,12 @@
   },
   {
    "seed": 79191,
-   "ending": "good",
-   "steps": 447,
+   "ending": "neutral",
+   "steps": 453,
    "feel": 100,
    "press": 3,
    "notes": 21,
-   "digest": "628ee7d61985b483e08c714969d4b2b233b5de15226ec1167247cd88e4ef0c24"
+   "digest": "c13203f677db0ecef55603e276981317d08e65fb3c6a4227193bed6bf7925406"
   },
   {
    "seed": 87110,
@@ -112,12 +112,12 @@
   },
   {
    "seed": 95029,
-   "ending": "neutral",
-   "steps": 477,
-   "feel": 100,
-   "press": 2,
-   "notes": 27,
-   "digest": "1d9c71992c99bc748745b3c7d1dbf545f16eb436c5cec5d4331619fd945f8148"
+   "ending": "more",
+   "steps": 451,
+   "feel": 97,
+   "press": 3,
+   "notes": 26,
+   "digest": "3b940a997bcf19b3a47e6743417aa53d596ed97837cc6ebafaf266cfa5206c8a"
   },
   {
    "seed": 102948,
@@ -139,21 +139,21 @@
   },
   {
    "seed": 118786,
-   "ending": "good",
-   "steps": 476,
+   "ending": "more",
+   "steps": 460,
    "feel": 100,
-   "press": 3,
-   "notes": 29,
-   "digest": "2de07ad7af463febb06f883efe8975606af0cce1b281f0f007a074176d36182e"
+   "press": 2,
+   "notes": 27,
+   "digest": "7c1a4fc83ad93e2ee120a96157aedd3c88281c1730330fdb03c6672bfd56901e"
   },
   {
    "seed": 126705,
    "ending": "home",
-   "steps": 400,
-   "feel": 41,
-   "press": 5,
+   "steps": 423,
+   "feel": 52,
+   "press": 4,
    "notes": 20,
-   "digest": "9db48bd995c92111cf31524362d67b42867b8c5d55771f9153e4d443814a1aae"
+   "digest": "e27ecc0fc2a1ba4795b09c4dce24df00f0652e2df90dadab20c84344e9f051a2"
   },
   {
    "seed": 134624,
@@ -193,12 +193,12 @@
   },
   {
    "seed": 166300,
-   "ending": "bad",
-   "steps": 447,
-   "feel": 81,
-   "press": 3,
-   "notes": 25,
-   "digest": "28afd068f4ccb3595b49ad9c47ddd9ce9285785e250e62439e02f0695258e010"
+   "ending": "gone",
+   "steps": 437,
+   "feel": 63,
+   "press": 2,
+   "notes": 23,
+   "digest": "0385fd234c418df492e5b8b213d4815124440775f3e47ed384d71a89bbe15cf5"
   },
   {
    "seed": 174219,
@@ -212,11 +212,11 @@
   {
    "seed": 182138,
    "ending": "home",
-   "steps": 420,
-   "feel": 54,
+   "steps": 427,
+   "feel": 55,
    "press": 6,
    "notes": 20,
-   "digest": "ed43e6d43910b14754e4b8b165268ee340c8316c7fb0b6d7861042c30d51a083"
+   "digest": "44b4ade65d48222dd0312b5a2c9a96f4b81f41230510f4f47afecbdbc6f7aefc"
   },
   {
    "seed": 190057,
@@ -238,21 +238,21 @@
   },
   {
    "seed": 205895,
-   "ending": "bad",
-   "steps": 462,
-   "feel": 75,
+   "ending": "more",
+   "steps": 447,
+   "feel": 77,
    "press": 3,
-   "notes": 27,
-   "digest": "93c245d0efcd22b6e21cb6fdd13edba809483b77e75c84ed11ab3492e421d662"
+   "notes": 25,
+   "digest": "bca854f0ad5e72a591fd0c0d9b7d611ec02a8724394ab0d31d6f92f9db233890"
   },
   {
    "seed": 213814,
-   "ending": "home",
-   "steps": 435,
-   "feel": 60,
-   "press": 6,
-   "notes": 23,
-   "digest": "d63a2c93c2df1b3e3ba2f1c72f8cfc3d8cc0900b6618570b72158d60044d2eeb"
+   "ending": "more",
+   "steps": 430,
+   "feel": 89,
+   "press": 3,
+   "notes": 22,
+   "digest": "2d63b4dcedc2f94c57af452391479272a3bd54a57cd7eb80becad307f02a3159"
   },
   {
    "seed": 221733,
@@ -266,20 +266,20 @@
   {
    "seed": 229652,
    "ending": "home",
-   "steps": 406,
-   "feel": 18,
+   "steps": 428,
+   "feel": 20,
    "press": 6,
-   "notes": 21,
-   "digest": "b85acd063e5e8282f9c3b7452426f4829ee1e4c71e649f73f2b577743fc33fbe"
+   "notes": 22,
+   "digest": "0ce023ce9d927c5a861d8a97d1beada6a233f011804a1ef2df955c227138a7d0"
   },
   {
    "seed": 237571,
-   "ending": "good",
-   "steps": 471,
-   "feel": 97,
+   "ending": "home",
+   "steps": 491,
+   "feel": 88,
    "press": 4,
-   "notes": 28,
-   "digest": "5db0120f0dbb626eaa71a13659d7415bf010bb827c16fb98184fd44a37db8ed9"
+   "notes": 26,
+   "digest": "2c3e12935512fe6c47769582f92e99035b151ff94d384d6dcf8d3d6b786ba887"
   },
   {
    "seed": 245490,
@@ -310,12 +310,12 @@
   },
   {
    "seed": 269247,
-   "ending": "bad",
-   "steps": 483,
-   "feel": 50,
-   "press": 3,
-   "notes": 25,
-   "digest": "60a6f2c0c19b43fa98a3c387d4869c185d8d47489e0455b8e52bfc5372468824"
+   "ending": "gone",
+   "steps": 468,
+   "feel": 51,
+   "press": 2,
+   "notes": 23,
+   "digest": "25d65552ac2aa79b06edf22a554cc0d429eb35dc8f47d6320aef38c31bf390d9"
   },
   {
    "seed": 277166,
@@ -346,12 +346,12 @@
   },
   {
    "seed": 300923,
-   "ending": "gone",
-   "steps": 439,
-   "feel": 86,
-   "press": 2,
-   "notes": 25,
-   "digest": "8e989a7b785624b284fde40da1dd3cdf647e1ec6355df857ff22eaa7b2bd280f"
+   "ending": "home",
+   "steps": 491,
+   "feel": 88,
+   "press": 4,
+   "notes": 28,
+   "digest": "6dc43163e2054f3e692c37134f3b60f9b1083c835523d6f3990347fabb50e93d"
   },
   {
    "seed": 308842,
@@ -373,12 +373,12 @@
   },
   {
    "seed": 324680,
-   "ending": "home",
+   "ending": "more",
    "steps": 404,
-   "feel": 79,
-   "press": 4,
-   "notes": 21,
-   "digest": "dfb07b5d004ebbf4c8ee01429c61e238321c5a458b38031516f9f0dac9f3096b"
+   "feel": 100,
+   "press": 3,
+   "notes": 20,
+   "digest": "8aa0208803fbbfa7951b65a6eba80c2ae123be94c5bffb828f0fc322a3afdafd"
   },
   {
    "seed": 332599,
@@ -392,20 +392,20 @@
   {
    "seed": 340518,
    "ending": "neutral",
-   "steps": 484,
+   "steps": 508,
    "feel": 88,
    "press": 3,
-   "notes": 27,
-   "digest": "2da7551b709b85c5e679c9671e5d723411d36244495bc3cf56141300e9949622"
+   "notes": 28,
+   "digest": "8140ff0725a856accd2b593d9d8dd9ab44da6aff51c54cd974d8206306323809"
   },
   {
    "seed": 348437,
-   "ending": "home",
-   "steps": 456,
-   "feel": 80,
-   "press": 4,
-   "notes": 22,
-   "digest": "0b4eb04a4b74ddaed7da88b0da0edb6178f91f605f63af33861b5c6a2dbdc764"
+   "ending": "more",
+   "steps": 450,
+   "feel": 93,
+   "press": 3,
+   "notes": 21,
+   "digest": "dff6416c1acb13f3d3c87622a44d75d52283b34ff5d7f841ba6e7319292cab58"
   },
   {
    "seed": 356356,
@@ -419,11 +419,11 @@
   {
    "seed": 364275,
    "ending": "home",
-   "steps": 396,
-   "feel": 56,
+   "steps": 426,
+   "feel": 73,
    "press": 6,
-   "notes": 19,
-   "digest": "e239986ce3ded7feb581d66f4c9d0ef87662e81939dddc62e2da5e5cf0c89d03"
+   "notes": 21,
+   "digest": "a2c18945221f42e2c120c71dd0e09f89353da6ba968ba5e322d215aecb256968"
   },
   {
    "seed": 372194,
@@ -437,20 +437,20 @@
   {
    "seed": 380113,
    "ending": "home",
-   "steps": 441,
-   "feel": 51,
-   "press": 5,
-   "notes": 22,
-   "digest": "9075fc2c2ea2fd31e888820d577404772f63c9bbfc094868e63d9ffa4e272e2c"
+   "steps": 474,
+   "feel": 72,
+   "press": 4,
+   "notes": 23,
+   "digest": "3869b1679fc08dffc9b942dbc3c894d8093e5006b37d0b7de54add581e5ca303"
   },
   {
    "seed": 388032,
-   "ending": "gone",
-   "steps": 450,
-   "feel": 87,
+   "ending": "neutral",
+   "steps": 473,
+   "feel": 90,
    "press": 2,
    "notes": 27,
-   "digest": "52920dc96e9f817033e39107ede5063b460b3f75ec7bf7791f8b9859553c5238"
+   "digest": "f3c7c39aa36181f0b1e2ba290754575044807ee32164c0d90952402f88e24714"
   },
   {
    "seed": 395951,
@@ -463,12 +463,12 @@
   },
   {
    "seed": 403870,
-   "ending": "good",
-   "steps": 450,
-   "feel": 81,
-   "press": 5,
-   "notes": 23,
-   "digest": "65a070cd7765dbcbd472b7c8cc5e74a8565db84505011b10b81736f7a163d4d8"
+   "ending": "neutral",
+   "steps": 453,
+   "feel": 98,
+   "press": 3,
+   "notes": 21,
+   "digest": "be4fd7c27fa641ee0eb43ab7717797bb83bd6c7b1c21786964c11a9f541359ac"
   },
   {
    "seed": 411789,
@@ -491,20 +491,20 @@
   {
    "seed": 427627,
    "ending": "neutral",
-   "steps": 464,
-   "feel": 91,
+   "steps": 495,
+   "feel": 88,
    "press": 3,
-   "notes": 31,
-   "digest": "737d21df2be7081274fc3a74914dd0503c6669953b24de98b263d51d66b4b581"
+   "notes": 30,
+   "digest": "7ba8e690513f4d55874ef7bb25b6a53cec36c87d767389301f862c0f6b562d51"
   },
   {
    "seed": 435546,
    "ending": "home",
-   "steps": 426,
-   "feel": 66,
+   "steps": 425,
+   "feel": 47,
    "press": 5,
-   "notes": 23,
-   "digest": "fd69d5b555276b7db4e0bb645641d0e58d823dbe4c00a7fdac050cc16299c302"
+   "notes": 21,
+   "digest": "2d127ad501cf4e9b8a5762b7dcddba719be06750509dcf2e125521153684d57b"
   },
   {
    "seed": 443465,
@@ -517,48 +517,48 @@
   },
   {
    "seed": 451384,
-   "ending": "gone",
-   "steps": 462,
+   "ending": "neutral",
+   "steps": 492,
    "feel": 100,
    "press": 0,
-   "notes": 25,
-   "digest": "c55780b7dfcfd2c321f6157dd9eac3c28c14d078eab6cea59662fee15dc32f71"
+   "notes": 29,
+   "digest": "a10373daa0b5a6590c0180fdd16ab19e82bb6ce2db936d624ba3465dbbf91492"
   },
   {
    "seed": 459303,
-   "ending": "home",
-   "steps": 425,
-   "feel": 40,
-   "press": 6,
+   "ending": "more",
+   "steps": 423,
+   "feel": 53,
+   "press": 5,
    "notes": 21,
-   "digest": "28eaa6ea0acacfc28819d963b58c58a150ae2ac0284b24a02ecd62e6b84f46d3"
+   "digest": "1ac32b7876c04f814d6dee5474d7b1eaf8fb24de15a52aea65a95e870f27c8dd"
   },
   {
    "seed": 467222,
    "ending": "neutral",
-   "steps": 482,
-   "feel": 100,
-   "press": 2,
+   "steps": 464,
+   "feel": 77,
+   "press": 3,
    "notes": 27,
-   "digest": "bb74d4240b4cf0c190e2255c1b12b2b2efef20500173c556dc2be808cbf813b2"
+   "digest": "89983033392878eefc43bad4a5441e24bacb3bf30b22d30490110ca1f446d2ca"
   },
   {
    "seed": 475141,
-   "ending": "neutral",
-   "steps": 411,
-   "feel": 66,
-   "press": 3,
-   "notes": 18,
-   "digest": "29926b1d9133f98b5a4be0fc3eb4f29383806b5e1b7b53c7debe92794ded2593"
+   "ending": "home",
+   "steps": 404,
+   "feel": 22,
+   "press": 7,
+   "notes": 17,
+   "digest": "a7a396a671c658fa08f22375feb433f71804ec690f0460dc936afca6bd2a6def"
   },
   {
    "seed": 483060,
-   "ending": "home",
-   "steps": 454,
-   "feel": 86,
-   "press": 5,
-   "notes": 21,
-   "digest": "19b8c69edb61c85684b9272e9f9f457d713409c5a45792dde556011694e18c0e"
+   "ending": "more",
+   "steps": 453,
+   "feel": 97,
+   "press": 4,
+   "notes": 22,
+   "digest": "1d68b728325d7d56ff065cbae397922219f44554370bb2683c45eaeacd2163fd"
   },
   {
    "seed": 490979,
@@ -572,20 +572,20 @@
   {
    "seed": 498898,
    "ending": "home",
-   "steps": 430,
-   "feel": 35,
-   "press": 6,
+   "steps": 434,
+   "feel": 42,
+   "press": 5,
    "notes": 20,
-   "digest": "936d88d2015c6f2c5f1ad9b08e10e3d866ba7a556d722c19f73199549a624c97"
+   "digest": "c1e7daaea59a3c4ef635ff8fefa3ed18b389d86377126f057bc4749a557a98bc"
   },
   {
    "seed": 506817,
-   "ending": "neutral",
-   "steps": 453,
-   "feel": 86,
-   "press": 3,
+   "ending": "home",
+   "steps": 463,
+   "feel": 80,
+   "press": 5,
    "notes": 24,
-   "digest": "9930b62d1bd9f12f4c6d5978ad9d257e2bf4815ad5b7c6eabfe0de8ebc25da3a"
+   "digest": "2742ea183080e2c139565f2b83a95db17ff82b753c45484ef4c71410f911a800"
   },
   {
    "seed": 514736,
@@ -598,39 +598,39 @@
   },
   {
    "seed": 522655,
-   "ending": "home",
-   "steps": 455,
-   "feel": 87,
-   "press": 5,
-   "notes": 27,
-   "digest": "da67d2028cb9d842b9de9550cf148d2db1aeb3f21a0a296fc61a43fae424aab9"
+   "ending": "more",
+   "steps": 451,
+   "feel": 97,
+   "press": 3,
+   "notes": 26,
+   "digest": "7bb7ea0f7d791e4a9bb2ee38a76491d510637c1eff848f6e8f24a39ec0f4c018"
   },
   {
    "seed": 530574,
    "ending": "home",
-   "steps": 426,
+   "steps": 433,
    "feel": 35,
    "press": 6,
    "notes": 18,
-   "digest": "42422a8cbed8d7368ed70ccb466618548c17a0408d106d37341ab71b540af518"
+   "digest": "cf782c291bf369e3f25e3e1311324e1854e12eced1facacfeaf51ac8e1a84b12"
   },
   {
    "seed": 538493,
-   "ending": "home",
+   "ending": "more",
    "steps": 448,
-   "feel": 48,
-   "press": 6,
+   "feel": 73,
+   "press": 4,
    "notes": 23,
-   "digest": "23ce5f9fe88c2508ea8646e69131d597df32b790bf75887697593c0665cf6ccf"
+   "digest": "038ffd2b7dadb2346195e5f1beb75533d77d063b474199c8b888693cd56f9301"
   },
   {
    "seed": 546412,
-   "ending": "home",
-   "steps": 415,
-   "feel": 82,
-   "press": 5,
-   "notes": 18,
-   "digest": "acd9e9aa00d11dda12f76566945cc94a45dc64e98b044ec7416fe2e8f7cfc5b4"
+   "ending": "good",
+   "steps": 427,
+   "feel": 92,
+   "press": 3,
+   "notes": 21,
+   "digest": "08ebedf4cbc0c4444a2c4fc51e122dd3901a276107eb3b821593112893402837"
   },
   {
    "seed": 554331,
@@ -644,29 +644,29 @@
   {
    "seed": 562250,
    "ending": "home",
-   "steps": 444,
-   "feel": 55,
-   "press": 6,
+   "steps": 448,
+   "feel": 50,
+   "press": 5,
    "notes": 19,
-   "digest": "b7ec1e6b5e934c3d69756cbadec41395dc580b0b46200cecd2a856246b7295c5"
+   "digest": "74479c5e5c27a1763b212d77c12962cc03e5c5fa3c0a4496ee11eb677e68fcbc"
   },
   {
    "seed": 570169,
-   "ending": "home",
-   "steps": 485,
-   "feel": 29,
-   "press": 6,
-   "notes": 24,
-   "digest": "0c48a753fce299f5cf80818dc5f430f253233486df427a8f0f70d9cd6dc80473"
+   "ending": "more",
+   "steps": 450,
+   "feel": 61,
+   "press": 3,
+   "notes": 22,
+   "digest": "909fa4fc9d40b28692cdae67357343ceca2a1a2a3da40f33ad052420fe560ca8"
   },
   {
    "seed": 578088,
    "ending": "home",
-   "steps": 394,
-   "feel": 24,
+   "steps": 424,
+   "feel": 38,
    "press": 7,
-   "notes": 19,
-   "digest": "cdfa130510ca6f40fceb9068d5a6bc1b53f3737d8406638829f4497d5ee31a6c"
+   "notes": 20,
+   "digest": "3eaa3050c6e4ffd1aeb9b064442b85f3831c8ba5651ba5efb779af2227bfc52a"
   },
   {
    "seed": 586007,
@@ -679,12 +679,12 @@
   },
   {
    "seed": 593926,
-   "ending": "home",
-   "steps": 434,
-   "feel": 63,
-   "press": 6,
+   "ending": "more",
+   "steps": 431,
+   "feel": 92,
+   "press": 4,
    "notes": 20,
-   "digest": "a78b36ce988b11dd344db6f94a06af65b78f626a53e00d953a5d3c02c3f0eefb"
+   "digest": "6a9e3c24a3284167270021de903dec37e98ab29e2ce79e143cb4f36ac238d4f9"
   },
   {
    "seed": 601845,
@@ -697,21 +697,21 @@
   },
   {
    "seed": 609764,
-   "ending": "home",
-   "steps": 438,
-   "feel": 55,
-   "press": 6,
-   "notes": 23,
-   "digest": "cc470febc5772cb50abada1d9d7f02ebfab6c9a71f155e4816625e1af86a74bd"
+   "ending": "more",
+   "steps": 432,
+   "feel": 70,
+   "press": 4,
+   "notes": 22,
+   "digest": "570de9dd5e9139b40a8d64382048cacde2e90decb25b1990cf95e3dd92d12415"
   },
   {
    "seed": 617683,
    "ending": "home",
-   "steps": 435,
-   "feel": 53,
-   "press": 6,
-   "notes": 21,
-   "digest": "2621d64f6f7479c9ff4648dcde8369d858cf47f4e445c3de7ba179984f1ae34a"
+   "steps": 445,
+   "feel": 59,
+   "press": 5,
+   "notes": 20,
+   "digest": "b9964bd806ffe92221a98da4bfded1d8bad45fa8c7c23940c2f31b2fd9d1406b"
   },
   {
    "seed": 625602,
@@ -734,11 +734,11 @@
   {
    "seed": 641440,
    "ending": "home",
-   "steps": 431,
-   "feel": 41,
-   "press": 6,
-   "notes": 21,
-   "digest": "36be8d2c79576b88a1c29ecffed87637d569bca4b1d08cc7168615bf7eea2a66"
+   "steps": 437,
+   "feel": 31,
+   "press": 7,
+   "notes": 22,
+   "digest": "0861516028f8f3c78be2a0df692bde4d9063cdb1ec9c471e20ef9ae21e85a4d3"
   },
   {
    "seed": 649359,
@@ -752,29 +752,29 @@
   {
    "seed": 657278,
    "ending": "gone",
-   "steps": 433,
-   "feel": 83,
+   "steps": 439,
+   "feel": 72,
    "press": 2,
    "notes": 26,
-   "digest": "9252c40faf81efb6d8bb02590989db7a2686c53e31cae1497634ec46a6d10342"
+   "digest": "b3dcdd832874a6b49b7ed0c9b0bb140e92f083b9214778041d87cfbd03f66bea"
   },
   {
    "seed": 665197,
    "ending": "home",
-   "steps": 388,
-   "feel": 41,
+   "steps": 397,
+   "feel": 42,
    "press": 5,
-   "notes": 18,
-   "digest": "247c5183591df2f259881d60361f1bc69bec95e5b5a5ebf464ff695af3d55d95"
+   "notes": 20,
+   "digest": "edaf0ec11a86dd9bd8aff03aa24610dc93a4bc22d56a8a78aa79a7b390c2c85e"
   },
   {
    "seed": 673116,
    "ending": "gone",
-   "steps": 477,
+   "steps": 485,
    "feel": 100,
    "press": 0,
    "notes": 26,
-   "digest": "460ca983f41a707563c0d5ef5ad718295216b56362620d86bea6562f66942dbb"
+   "digest": "8372eb1e0693d91989bd203ac5ea03ae73234ef7de697fb8c6b4b822512c8550"
   },
   {
    "seed": 681035,
@@ -787,30 +787,30 @@
   },
   {
    "seed": 688954,
-   "ending": "home",
-   "steps": 430,
-   "feel": 59,
-   "press": 7,
-   "notes": 20,
-   "digest": "5923900e448c7607073b2b2a1647d312d7126e3bc79aefb2a0a308698581f792"
+   "ending": "good",
+   "steps": 441,
+   "feel": 81,
+   "press": 3,
+   "notes": 22,
+   "digest": "45eb97b965c4ddaa7e635671d82a6f9483518232f3f1ab148a4d75b9ecc00de7"
   },
   {
    "seed": 696873,
-   "ending": "home",
-   "steps": 512,
-   "feel": 86,
-   "press": 4,
-   "notes": 30,
-   "digest": "27579799f6c4576d0ac8324392652037d21c8c3bd6c56ceb51f03610e60323ca"
+   "ending": "more",
+   "steps": 464,
+   "feel": 100,
+   "press": 1,
+   "notes": 29,
+   "digest": "b2e41d43d11899913cefdf55ab4dc08273c05ee9f3196ee7a2a58afce272d0b8"
   },
   {
    "seed": 704792,
    "ending": "home",
-   "steps": 447,
-   "feel": 33,
-   "press": 8,
-   "notes": 22,
-   "digest": "f8e71b8c32f0f3e4089e5c49fd063faea691e72f64920307c433fe8028e08c2f"
+   "steps": 453,
+   "feel": 37,
+   "press": 7,
+   "notes": 21,
+   "digest": "7df847a9a1e2c230a0ebea9d5da3e3d18a11d87ec49f541bb54f58769a260ae6"
   },
   {
    "seed": 712711,
@@ -824,11 +824,11 @@
   {
    "seed": 720630,
    "ending": "home",
-   "steps": 477,
-   "feel": 80,
-   "press": 4,
+   "steps": 458,
+   "feel": 83,
+   "press": 5,
    "notes": 27,
-   "digest": "deecd1be176b74942defab5ff6cacedd558143e3cadeb58f4a3aa1746b4ad57d"
+   "digest": "148426be22f6079c83e5402f16ec7060aee77541a8ea67177d85f219401daae8"
   },
   {
    "seed": 728549,
@@ -851,11 +851,11 @@
   {
    "seed": 744387,
    "ending": "home",
-   "steps": 427,
-   "feel": 55,
-   "press": 4,
-   "notes": 20,
-   "digest": "58e81a8ae149559d8859f8f01d6b7c7daf3eef39b4db645f219a83a3985afd2d"
+   "steps": 435,
+   "feel": 47,
+   "press": 6,
+   "notes": 21,
+   "digest": "04ec288b4137f0f50284417ee436959bb75380694debc8dcc5d8dc877c6a0401"
   },
   {
    "seed": 752306,
@@ -878,56 +878,56 @@
   {
    "seed": 768144,
    "ending": "home",
-   "steps": 452,
-   "feel": 76,
-   "press": 5,
-   "notes": 24,
-   "digest": "3502e36aaf6a6c19450c910b8252d072d54f3880990600d1240fafb4cbb154eb"
+   "steps": 459,
+   "feel": 59,
+   "press": 9,
+   "notes": 23,
+   "digest": "1341a10b70dfae8c2fa1f405e9b9f754e5f472fed931d5db82f9d54a40c7a5ec"
   },
   {
    "seed": 776063,
-   "ending": "home",
-   "steps": 415,
-   "feel": 50,
-   "press": 8,
+   "ending": "more",
+   "steps": 413,
+   "feel": 76,
+   "press": 5,
    "notes": 19,
-   "digest": "616c8067d3bed656f6383b35a799a3d3d43c86f8076b4600ba575b74328a0acd"
+   "digest": "8edccac630fce2c9779000b6e4da29359e5dda95b1c941fc117fbc17b514226f"
   },
   {
    "seed": 783982,
-   "ending": "neutral",
-   "steps": 383,
-   "feel": 65,
-   "press": 3,
-   "notes": 18,
-   "digest": "9c40656b71778263cb04cd473d1492a3659c3ce25514f66224a439705d27eeb7"
+   "ending": "home",
+   "steps": 384,
+   "feel": 32,
+   "press": 6,
+   "notes": 17,
+   "digest": "22383bb1bd7552ffe8250b5db7f80b30aa55237c0d1f15c4a2801e1626b9e178"
   },
   {
    "seed": 791901,
-   "ending": "home",
-   "steps": 492,
-   "feel": 67,
-   "press": 4,
-   "notes": 25,
-   "digest": "c2d3e5f4c45bd03163a6259927f481011412d1b39f46b151d4d0fc67842fedb7"
+   "ending": "more",
+   "steps": 444,
+   "feel": 91,
+   "press": 2,
+   "notes": 24,
+   "digest": "05bb2c2fdf32117073d8a24497dd014ba90440620d32b50c26eaf4d900edd77f"
   },
   {
    "seed": 799820,
    "ending": "home",
-   "steps": 429,
-   "feel": 25,
-   "press": 9,
+   "steps": 434,
+   "feel": 55,
+   "press": 4,
    "notes": 19,
-   "digest": "959cc0ae9c7061938651a91c93820c4cb675639f2415be326e62244df82eff03"
+   "digest": "d8696a89d0623db3c56674d3a04205840487ce853012e5b57e6ce464bc510c7f"
   },
   {
    "seed": 807739,
    "ending": "home",
-   "steps": 445,
-   "feel": 59,
-   "press": 6,
-   "notes": 21,
-   "digest": "ae98c01aa646713ba1cd839b95d196588ec640f08e65e172f5a9e352933e0d7a"
+   "steps": 455,
+   "feel": 71,
+   "press": 5,
+   "notes": 23,
+   "digest": "bcaaf441a39d560de6169d882c35d7f69c4956a972564d21524163b8f1f40d76"
   },
   {
    "seed": 815658,
@@ -941,29 +941,29 @@
   {
    "seed": 823577,
    "ending": "home",
-   "steps": 400,
-   "feel": 27,
-   "press": 5,
-   "notes": 17,
-   "digest": "9a24256dc6ad142c559e67f8b7917e308a267ad84e9dd2a7078eea1ec625b626"
+   "steps": 413,
+   "feel": 43,
+   "press": 4,
+   "notes": 16,
+   "digest": "5708fee56424a3075cbfe31101a96bafe756534f26f8fed5bb4db26e677fd468"
   },
   {
    "seed": 831496,
    "ending": "home",
-   "steps": 449,
-   "feel": 42,
-   "press": 8,
-   "notes": 21,
-   "digest": "4215b82b7399adcf87b3c015d73fffbe988c4fa2eb57e46f1bc4a42d48db2663"
+   "steps": 470,
+   "feel": 53,
+   "press": 6,
+   "notes": 25,
+   "digest": "779302c923120de7673f69541cfa25b9aead7f2d4e09448a32b8a805a1ebcab1"
   },
   {
    "seed": 839415,
    "ending": "home",
-   "steps": 414,
-   "feel": 34,
-   "press": 4,
-   "notes": 20,
-   "digest": "eb8f68811cbb18bbf92cfb2a0cd2c20d3fc4d92e44d9228f521a8fcd224edc73"
+   "steps": 436,
+   "feel": 36,
+   "press": 7,
+   "notes": 21,
+   "digest": "545388f9ef719eee150a0ecdda3e7fca0ae87db96593dc626b73fa8b77ab165e"
   },
   {
    "seed": 847334,
@@ -976,39 +976,39 @@
   },
   {
    "seed": 855253,
-   "ending": "good",
-   "steps": 444,
-   "feel": 87,
-   "press": 4,
-   "notes": 21,
-   "digest": "86a14f8c495b3169b8fdf6c508639afcad0161cd0abfed5504388572ad03b60f"
+   "ending": "home",
+   "steps": 443,
+   "feel": 74,
+   "press": 5,
+   "notes": 20,
+   "digest": "f52d5450dfb6236530c7455bdc7dc368801ed20e880f636e8182d9089cfe4148"
   },
   {
    "seed": 863172,
-   "ending": "home",
-   "steps": 424,
-   "feel": 35,
-   "press": 5,
+   "ending": "more",
+   "steps": 427,
+   "feel": 62,
+   "press": 4,
    "notes": 19,
-   "digest": "d369892590595910d80d32c3b4f3fcd630ee52e9ba2c104d0db8bfd874e28023"
+   "digest": "f7824cd3911557a65491985543f3e797b174cd19590b77ccf0e5aa111836b57d"
   },
   {
    "seed": 871091,
    "ending": "home",
-   "steps": 447,
-   "feel": 88,
-   "press": 4,
-   "notes": 25,
-   "digest": "d797fb4a3ca15bd4bae3f39732936d2374797188f725b0e1eaf1572ace7a6f9a"
+   "steps": 427,
+   "feel": 53,
+   "press": 7,
+   "notes": 24,
+   "digest": "f4d37516bde6ce258366f312b568d4eaf0f3c5eb095233031715e574a1052e9a"
   },
   {
    "seed": 879010,
    "ending": "home",
-   "steps": 440,
-   "feel": 45,
-   "press": 4,
-   "notes": 21,
-   "digest": "835dd9ca0961dfb56aac2ce57a1d68b5309df6ad5402927519b2cdae2ca44ff6"
+   "steps": 449,
+   "feel": 52,
+   "press": 5,
+   "notes": 22,
+   "digest": "3b2a81cd8abdd4d75463d2521adf5cf77640723ce5bff0e96f345871ee63a638"
   },
   {
    "seed": 886929,
@@ -1021,12 +1021,12 @@
   },
   {
    "seed": 894848,
-   "ending": "home",
-   "steps": 445,
-   "feel": 87,
-   "press": 4,
+   "ending": "more",
+   "steps": 442,
+   "feel": 100,
+   "press": 3,
    "notes": 24,
-   "digest": "3c685133d2b7e0eceab47a81301d3ae4a8749af812b392a24649aa02925744ee"
+   "digest": "239c67ecbffdbcd2a8ea379c64dff2aa3e913279ccaec124b28f6b7abb76eb4c"
   },
   {
    "seed": 902767,
@@ -1039,57 +1039,57 @@
   },
   {
    "seed": 910686,
-   "ending": "home",
+   "ending": "more",
    "steps": 446,
-   "feel": 68,
+   "feel": 81,
    "press": 4,
    "notes": 23,
-   "digest": "da5c7661f7181dd2669af918bb27b5f542f2d233132a3c85c47cba2826d0fe8b"
+   "digest": "b3fa6b7b7d51e6592829d773034f88e9df31dd95371af25714a771eec1a2ba76"
   },
   {
    "seed": 918605,
-   "ending": "neutral",
-   "steps": 478,
-   "feel": 100,
-   "press": 2,
-   "notes": 26,
-   "digest": "81fa86ad682d1f0269d037d692f11e2bcb7242b8a4c94797948b7cd555c24831"
+   "ending": "bad",
+   "steps": 437,
+   "feel": 73,
+   "press": 3,
+   "notes": 27,
+   "digest": "908675d2cde85c7180298a14c1c8c5ed2a291db40d80f9e1c7adc5b0b06a3b2d"
   },
   {
    "seed": 926524,
    "ending": "home",
-   "steps": 426,
-   "feel": 34,
+   "steps": 436,
+   "feel": 38,
    "press": 7,
-   "notes": 19,
-   "digest": "5d8ff10a51fffeb2425de301f7504a5d8f2f9c407993f66545fccb721261f5bc"
+   "notes": 20,
+   "digest": "ec1754e4da6eda49e5380fb60374302285090a12c68f8eb1d7b37c4fc1bd55ec"
   },
   {
    "seed": 934443,
-   "ending": "home",
-   "steps": 376,
-   "feel": 42,
+   "ending": "more",
+   "steps": 378,
+   "feel": 60,
    "press": 5,
-   "notes": 17,
-   "digest": "0456b6db526a491dfb58bcbe2357052d227c2310795767970b3728c3ddc2925b"
+   "notes": 18,
+   "digest": "f68544f43df90005d0c6cb9c47cba38e7590abcf0391cacc42fa241eb72faf51"
   },
   {
    "seed": 942362,
-   "ending": "gone",
-   "steps": 474,
-   "feel": 100,
-   "press": 0,
-   "notes": 27,
-   "digest": "b5bbad3f677fa87f80a2b89c7df8ffce7944ec6e680b25f2a0698ff6e2739c6c"
+   "ending": "more",
+   "steps": 458,
+   "feel": 97,
+   "press": 1,
+   "notes": 28,
+   "digest": "0f0d3faef8975c01bc874d0bc2295643bc807f949520d2a689c101d2e7f2c244"
   },
   {
    "seed": 950281,
-   "ending": "neutral",
-   "steps": 495,
+   "ending": "more",
+   "steps": 465,
    "feel": 100,
    "press": 2,
    "notes": 26,
-   "digest": "d36372f0aa44c8dd1b8e36c0d74a4815024899436e42f880882c8c0b0b2eb182"
+   "digest": "e164e2a4fe0b1aa48166922fe432846c70b07b33ac6ae1b161323d2ebe9f9cb3"
   },
   {
    "seed": 958200,
@@ -1103,38 +1103,38 @@
   {
    "seed": 966119,
    "ending": "home",
-   "steps": 393,
-   "feel": 35,
-   "press": 5,
-   "notes": 21,
-   "digest": "a1b9d7e61116fd9314aded3562aabac87dc7a77a5864aa1cf297c3fb553e4c0a"
+   "steps": 417,
+   "feel": 25,
+   "press": 8,
+   "notes": 22,
+   "digest": "c8dd3a418b7bf6aa5517120ec1dcbf9adec73751dae1597b40b03b77d2cc02af"
   },
   {
    "seed": 974038,
    "ending": "neutral",
-   "steps": 453,
+   "steps": 508,
    "feel": 88,
-   "press": 2,
-   "notes": 25,
-   "digest": "a90bdd3fa93a283ade4913ccd5050e8047c7b4c3d52cde79a89986607d4ab417"
+   "press": 3,
+   "notes": 27,
+   "digest": "444d608efa4885fe7df3e11d989a1edc28a3bb56f0ae817f89645f65118eb025"
   },
   {
    "seed": 981957,
-   "ending": "home",
+   "ending": "more",
    "steps": 404,
-   "feel": 41,
-   "press": 7,
-   "notes": 19,
-   "digest": "fc4d78364d2ced6260c8e3d168fba37d7ed147e8e28e7c1990f79ea10c0918f9"
+   "feel": 52,
+   "press": 6,
+   "notes": 18,
+   "digest": "990ae52e6b0a43af7cfd6814feaba9aeeb3b608fa0266b05ff7d503ab46a85a7"
   },
   {
    "seed": 989876,
-   "ending": "home",
-   "steps": 445,
-   "feel": 70,
+   "ending": "more",
+   "steps": 435,
+   "feel": 73,
    "press": 5,
-   "notes": 23,
-   "digest": "17ceeaf197e557194557e33abb18a27434b2dfd0972a9992dac9c9a23baf357c"
+   "notes": 22,
+   "digest": "ec882ed66a3c383917204816c49bad0f78474e985ca9fa15870e19989269b718"
   },
   {
    "seed": 997795,
@@ -1147,30 +1147,30 @@
   },
   {
    "seed": 1005714,
-   "ending": "home",
+   "ending": "more",
    "steps": 383,
-   "feel": 36,
-   "press": 6,
+   "feel": 55,
+   "press": 5,
    "notes": 16,
-   "digest": "a32b1608a06030fe54e35f9f78644526260c8c16fc4ec419be84a64e80b42de9"
+   "digest": "42da04928c005005cd58b0f32fda13bd0e844612d441a0a6205f0ad1823ec8e1"
   },
   {
    "seed": 1013633,
    "ending": "neutral",
-   "steps": 497,
-   "feel": 86,
+   "steps": 533,
+   "feel": 88,
    "press": 3,
-   "notes": 26,
-   "digest": "1ec4f4e843a9ecc63161ab8c3cc90ca19a66e88a4f6a4169a9710a2b72bdf682"
+   "notes": 27,
+   "digest": "eda83b6a2217227ee60fe1c7e06f67c68e1b9cd8e3424e9a50d0d55ed93677c0"
   },
   {
    "seed": 1021552,
-   "ending": "home",
-   "steps": 435,
-   "feel": 78,
-   "press": 5,
-   "notes": 24,
-   "digest": "ec33a6ed8f47facbf9ebd0f04a2df04e8b54e728c410284216859f5efcbea772"
+   "ending": "bad",
+   "steps": 438,
+   "feel": 83,
+   "press": 3,
+   "notes": 23,
+   "digest": "a97abc8ff1401f022acb27984c6c7ddfad7bda691b0a8167627a92c9eba8f477"
   },
   {
    "seed": 1029471,
@@ -1203,10 +1203,10 @@
    "seed": 1053228,
    "ending": "home",
    "steps": 411,
-   "feel": 41,
-   "press": 7,
-   "notes": 20,
-   "digest": "b78a0de1826272cbcf98a6ab8aef139edad57ac5d8516a27a8102fb31190535b"
+   "feel": 35,
+   "press": 6,
+   "notes": 19,
+   "digest": "c9147cfc3e70d9c391b515eb64843737b6a8da59f153badeab399b2e76ef1571"
   },
   {
    "seed": 1061147,
@@ -1219,21 +1219,21 @@
   },
   {
    "seed": 1069066,
-   "ending": "home",
-   "steps": 435,
-   "feel": 44,
-   "press": 6,
+   "ending": "more",
+   "steps": 436,
+   "feel": 78,
+   "press": 4,
    "notes": 22,
-   "digest": "f88214e61d9a65327f2ecb55e8c530e8d14894f54b27a8f9024a6ac28d78c583"
+   "digest": "7ae9bc5bfa56ce9ae535910afe8f04f182b60f5f21cdab50ed077b0e244fbed2"
   },
   {
    "seed": 1076985,
-   "ending": "neutral",
-   "steps": 441,
-   "feel": 86,
-   "press": 3,
-   "notes": 27,
-   "digest": "6a9768c5846a853d1ccb8d388e4682f9c6b6aa3ab3eb4296b09d70ea3c0c9e21"
+   "ending": "home",
+   "steps": 450,
+   "feel": 80,
+   "press": 5,
+   "notes": 26,
+   "digest": "751beab6d1938fd12230583617b5b781d3027d4e2972162e3e1d5c0491370485"
   },
   {
    "seed": 1084904,
@@ -1246,30 +1246,30 @@
   },
   {
    "seed": 1092823,
-   "ending": "neutral",
-   "steps": 426,
-   "feel": 70,
+   "ending": "more",
+   "steps": 414,
+   "feel": 80,
    "press": 3,
-   "notes": 22,
-   "digest": "5818c3905a240dbdf7de9b41f0efbc07924f76ac864eeeb1bf40b8a69cd64ea7"
+   "notes": 20,
+   "digest": "641796564e8eb378a5927899836173df7e08ef6448fdc6885e4e28c083e4ae17"
   },
   {
    "seed": 1100742,
    "ending": "home",
    "steps": 456,
-   "feel": 75,
-   "press": 8,
-   "notes": 26,
-   "digest": "979b433e7a7e91e91ebd3b079dfc042fe47e557b82204c44715fba17ef2813eb"
+   "feel": 82,
+   "press": 6,
+   "notes": 25,
+   "digest": "54c145d8f54398062c4f5b48498fd6621ee8759c96f7e82ec9a577b77b4da267"
   },
   {
    "seed": 1108661,
    "ending": "home",
-   "steps": 380,
-   "feel": 41,
-   "press": 5,
+   "steps": 388,
+   "feel": 12,
+   "press": 8,
    "notes": 18,
-   "digest": "a06fca55c4c2c97d4809c51f5580bd38aa15a879e9d1fb3f3b45b057d1458de6"
+   "digest": "e375a4181cf3a9a404567b6707bae33e070c2e8baa7f28f949fa3a31f08177a2"
   },
   {
    "seed": 1116580,
@@ -1283,11 +1283,11 @@
   {
    "seed": 1124499,
    "ending": "neutral",
-   "steps": 514,
+   "steps": 509,
    "feel": 100,
    "press": 2,
-   "notes": 28,
-   "digest": "bfb19c581b981a07c40ae0e05ee3d8b13cd13ffcc617018ade7c55c4f1c1f16b"
+   "notes": 27,
+   "digest": "8758237cf1054851bc043d0a7efe97d5aac7dc3475dd3766b11a01783c7734d3"
   },
   {
    "seed": 1132418,
@@ -1300,12 +1300,12 @@
   },
   {
    "seed": 1140337,
-   "ending": "home",
-   "steps": 462,
-   "feel": 80,
-   "press": 5,
-   "notes": 28,
-   "digest": "894e3ccb2aff9833cdda3fa5d000a62d023a596c92b8e1f1672ccab02695a246"
+   "ending": "good",
+   "steps": 512,
+   "feel": 86,
+   "press": 4,
+   "notes": 31,
+   "digest": "8bff936e85bb6035b85a434210baa278b317d12a606c0667286d1fef5d6921af"
   },
   {
    "seed": 1148256,
@@ -1328,29 +1328,29 @@
   {
    "seed": 1164094,
    "ending": "gone",
-   "steps": 459,
-   "feel": 75,
+   "steps": 466,
+   "feel": 73,
    "press": 2,
    "notes": 25,
-   "digest": "c96b7dafd29a6d3f1a0135aebce5e511822ef978583e973c3119130b2b979358"
+   "digest": "0e6382873c262392d8f667982ab7bdc4e68c8b064213781e8c454e9288711e66"
   },
   {
    "seed": 1172013,
-   "ending": "home",
-   "steps": 442,
-   "feel": 66,
-   "press": 7,
+   "ending": "more",
+   "steps": 441,
+   "feel": 97,
+   "press": 5,
    "notes": 21,
-   "digest": "2f67d9a22a84a8d13e07d1ca480e98b4f40fc0bf6f7b5e257baa6ee34670a748"
+   "digest": "487350d1cd43c15786edfb8cb938be6f75c6ea91ca2619ef69b789d63bd0f09b"
   },
   {
    "seed": 1179932,
    "ending": "home",
-   "steps": 463,
-   "feel": 67,
+   "steps": 472,
+   "feel": 75,
    "press": 5,
-   "notes": 23,
-   "digest": "0851146e129575e6f45b020d076a3c778aeb2fec935c82b9818223e6cb77e846"
+   "notes": 24,
+   "digest": "189cd69077f9881129c7519f01909395cf3038e174dbb87a9b808ad122bcba8b"
   },
   {
    "seed": 1187851,
@@ -1381,21 +1381,21 @@
   },
   {
    "seed": 1211608,
-   "ending": "home",
-   "steps": 439,
-   "feel": 72,
-   "press": 7,
+   "ending": "more",
+   "steps": 438,
+   "feel": 92,
+   "press": 5,
    "notes": 22,
-   "digest": "59bad84f0f05aee83e928974d1b2e11f4d031db568a0692ea96c988cd9a0b1c6"
+   "digest": "c1b087c06ce5ce01ec19b8f966480f3bb3aac1f0ed76139880a24c8e17e46af3"
   },
   {
    "seed": 1219527,
-   "ending": "good",
-   "steps": 439,
-   "feel": 100,
-   "press": 3,
+   "ending": "home",
+   "steps": 444,
+   "feel": 88,
+   "press": 5,
    "notes": 21,
-   "digest": "33d4e9076578aa1a2688a076f9a01b7cb7c3a45de51ec49ccd45e8740281e730"
+   "digest": "03b7bb097386467becce7f9b9cc15c6f57d86f733c2d5488d89ae8a0d4f70ed8"
   },
   {
    "seed": 1227446,
@@ -1408,48 +1408,48 @@
   },
   {
    "seed": 1235365,
-   "ending": "letters",
-   "steps": 512,
-   "feel": 80,
-   "press": 3,
-   "notes": 26,
-   "digest": "e94947634ed7d5aeace47978e42635404f1f009f2d7df28df9cc9555b560d361"
+   "ending": "neutral",
+   "steps": 559,
+   "feel": 100,
+   "press": 1,
+   "notes": 29,
+   "digest": "25849aae6fefcc9f2019e16fbcaaed36916a8b6a1149891cea98ab44a3639692"
   },
   {
    "seed": 1243284,
-   "ending": "bad",
-   "steps": 409,
-   "feel": 68,
-   "press": 3,
+   "ending": "home",
+   "steps": 423,
+   "feel": 49,
+   "press": 4,
    "notes": 23,
-   "digest": "e16b16e92a587cbcf76fc0e31c1e6b07e915e574d78af21efe3e56b41c1c90dd"
+   "digest": "caaaf6c8349c2a450bd3a21fc7ff04808a3d016781ad8d570d5a0cdfe5c5af8b"
   },
   {
    "seed": 1251203,
    "ending": "home",
-   "steps": 434,
-   "feel": 44,
-   "press": 8,
-   "notes": 19,
-   "digest": "d82e610167772837132ca3f6d3a07e2fb3676cf30972100d443189641684df20"
+   "steps": 452,
+   "feel": 46,
+   "press": 7,
+   "notes": 20,
+   "digest": "f8c016780a449f32ebdb8a53979167fdd2f03557d646e211db71e09245778936"
   },
   {
    "seed": 1259122,
-   "ending": "good",
-   "steps": 432,
-   "feel": 90,
-   "press": 3,
+   "ending": "home",
+   "steps": 435,
+   "feel": 77,
+   "press": 4,
    "notes": 22,
-   "digest": "5bcfc9f063282b77ea43fe48ccebf443afb240ec8d74c28f8a726363ade48738"
+   "digest": "42bfe203cd737cbc8cbc4b6a76dc75d97406ab26c3c8670d14416d56ccb65fba"
   },
   {
    "seed": 1267041,
    "ending": "home",
-   "steps": 448,
-   "feel": 68,
-   "press": 5,
+   "steps": 457,
+   "feel": 69,
+   "press": 4,
    "notes": 22,
-   "digest": "762895fd6a79911e676b61ec15f929606b280059966cc5d632a939cd81d78e36"
+   "digest": "34fd4032399785167aedfb700e881130a497fadaf061fea964a6c218da2bfcf6"
   },
   {
    "seed": 1274960,
@@ -1489,12 +1489,12 @@
   },
   {
    "seed": 1306636,
-   "ending": "gone",
-   "steps": 457,
-   "feel": 47,
-   "press": 2,
-   "notes": 22,
-   "digest": "ac3dcf374bc96e2978ec92c419c5448be6aa2af3523e4d2086b0fd91377cbcd0"
+   "ending": "more",
+   "steps": 441,
+   "feel": 57,
+   "press": 3,
+   "notes": 23,
+   "digest": "17938b0d21d7a259e1fd7a38deb40c2cb7589e7a1ad758365ff44fcc3b07ffac"
   },
   {
    "seed": 1314555,
@@ -1507,12 +1507,12 @@
   },
   {
    "seed": 1322474,
-   "ending": "neutral",
-   "steps": 494,
-   "feel": 86,
-   "press": 3,
-   "notes": 28,
-   "digest": "f467f1b295a79a68bbaaab045efc7acf4272ad00bfa44523724cb2fec8d87205"
+   "ending": "gone",
+   "steps": 484,
+   "feel": 88,
+   "press": 1,
+   "notes": 26,
+   "digest": "cd7a198873e3dc95eb7872d116dcad57cab71056cbf231ac9f141b034e0c9a8f"
   },
   {
    "seed": 1330393,
@@ -1526,20 +1526,20 @@
   {
    "seed": 1338312,
    "ending": "home",
-   "steps": 447,
-   "feel": 88,
-   "press": 4,
-   "notes": 24,
-   "digest": "453a0911778de30a3d16c9ac89133dcacd2facd68f93dfd6ca525f77430669f1"
+   "steps": 428,
+   "feel": 74,
+   "press": 5,
+   "notes": 25,
+   "digest": "3c0a182336389730378e5c1f744e5ff218cb46da2b8b639abf266cb4adf25c60"
   },
   {
    "seed": 1346231,
    "ending": "home",
-   "steps": 403,
-   "feel": 56,
-   "press": 5,
+   "steps": 406,
+   "feel": 33,
+   "press": 6,
    "notes": 20,
-   "digest": "57676c0eac134b2e6385f2b292ffe3b93bab13d70eea89333806b0801dd16eca"
+   "digest": "c3c1abca83b678caa263451e42e3c57c9a2dfc25ed34268560176a5e6fe1c604"
   },
   {
    "seed": 1354150,
@@ -1552,12 +1552,12 @@
   },
   {
    "seed": 1362069,
-   "ending": "home",
-   "steps": 476,
-   "feel": 70,
-   "press": 4,
+   "ending": "neutral",
+   "steps": 475,
+   "feel": 97,
+   "press": 1,
    "notes": 26,
-   "digest": "3bf42764322eb03ecf86b1b17e1773a522031253dc23deac4635f4dd5d9df500"
+   "digest": "8e66f89c98c2e7e283357f01d08a2f0f8530e28041c44ac7be5f33f8e3dfda99"
   },
   {
    "seed": 1369988,
@@ -1579,48 +1579,48 @@
   },
   {
    "seed": 1385826,
-   "ending": "home",
-   "steps": 457,
-   "feel": 46,
-   "press": 5,
-   "notes": 28,
-   "digest": "ab3bb7a04ab5669638f295cc2773983bb0dd6e10a7853ff903b602feb3d1ea54"
+   "ending": "neutral",
+   "steps": 464,
+   "feel": 56,
+   "press": 3,
+   "notes": 27,
+   "digest": "670d30e68ed4cd14bd238714ca75605db414cf9072c82e6aa5879b0a5e896b14"
   },
   {
    "seed": 1393745,
    "ending": "home",
-   "steps": 423,
-   "feel": 72,
-   "press": 5,
-   "notes": 21,
-   "digest": "af8424b7e6af618100e0299567286eccbabf04d19b70c30a21e6dee8b9ce9814"
+   "steps": 447,
+   "feel": 68,
+   "press": 6,
+   "notes": 23,
+   "digest": "86e228c6c6f6cb392027909d748624ec16723fbc84a6bbd79eb47cd84bf05a81"
   },
   {
    "seed": 1401664,
-   "ending": "home",
-   "steps": 435,
-   "feel": 78,
-   "press": 6,
+   "ending": "neutral",
+   "steps": 438,
+   "feel": 94,
+   "press": 3,
    "notes": 24,
-   "digest": "e21c313c7f904e32669642e232c7a576419c65e76d3fc78a1fb8d6d87a8ce682"
+   "digest": "baa6617528d7e330566ad3cde5be84edd01f3a68e3cf93784a0be215c5842dac"
   },
   {
    "seed": 1409583,
    "ending": "bad",
-   "steps": 439,
-   "feel": 56,
+   "steps": 463,
+   "feel": 58,
    "press": 3,
    "notes": 27,
-   "digest": "24ff2df0d2d149e81946dc47ab8e3c2774ffb08245b62f37fba87c1960e1aecf"
+   "digest": "fd4636206e7c4962d03fd549bc51cf956ce2f79d7e8dd617b2566ea26b4aa289"
   },
   {
    "seed": 1417502,
    "ending": "home",
-   "steps": 430,
-   "feel": 25,
-   "press": 8,
-   "notes": 23,
-   "digest": "9f65419cd599ac4123f98efab07675252d45dfb0db1566ec078812a60eb84c72"
+   "steps": 431,
+   "feel": 39,
+   "press": 6,
+   "notes": 22,
+   "digest": "9c578ad1fe880c6aec11a54b1ab7541ed3aa2b633c3f8316e65801113fa5b2e4"
   },
   {
    "seed": 1425421,
@@ -1634,20 +1634,20 @@
   {
    "seed": 1433340,
    "ending": "home",
-   "steps": 439,
-   "feel": 59,
+   "steps": 459,
+   "feel": 78,
    "press": 4,
-   "notes": 20,
-   "digest": "028d46b5381f1a2999bbfcf9e5f572d3f8b48c6bb2ba0e07829bd3da8ef916d4"
+   "notes": 23,
+   "digest": "2c292f932a293742448783e9141f098225f17b9f51fa90fccb31eb82b74764b5"
   },
   {
    "seed": 1441259,
    "ending": "home",
-   "steps": 445,
-   "feel": 76,
-   "press": 5,
-   "notes": 25,
-   "digest": "d3c0ae35d21f34010acba7d16865e6a22c1d8a95a1d6170ef31e956ed1fb108c"
+   "steps": 509,
+   "feel": 88,
+   "press": 4,
+   "notes": 26,
+   "digest": "3cb38252f713ca3005ee09bdd69795fdac0f933e12c051236854381db3c90fd1"
   },
   {
    "seed": 1449178,
@@ -1669,39 +1669,39 @@
   },
   {
    "seed": 1465016,
-   "ending": "good",
-   "steps": 470,
-   "feel": 86,
-   "press": 4,
-   "notes": 26,
-   "digest": "60137e2b67bf46d045620f523faa61d8296dd7b5813475eecc279c0a1e319acb"
+   "ending": "home",
+   "steps": 435,
+   "feel": 69,
+   "press": 5,
+   "notes": 25,
+   "digest": "b0098b1658e95182bb5fc4ebe8b0aa492b8187937cec9c8e48ba956c703c609c"
   },
   {
    "seed": 1472935,
    "ending": "home",
-   "steps": 424,
-   "feel": 68,
-   "press": 5,
-   "notes": 19,
-   "digest": "c1390424753da69684c6d93027c52612267fd094baef292f19e757b6cae36573"
+   "steps": 426,
+   "feel": 43,
+   "press": 7,
+   "notes": 17,
+   "digest": "dda32b513750964c3969a56909b6ceb321baa9fd62ec23201612cadd2e7fdc21"
   },
   {
    "seed": 1480854,
    "ending": "neutral",
-   "steps": 413,
-   "feel": 59,
+   "steps": 439,
+   "feel": 58,
    "press": 3,
-   "notes": 20,
-   "digest": "993f5c31b4256e5be0cc86aaa32ece886f13855f608b5c837c48a22e54e49181"
+   "notes": 21,
+   "digest": "e623bd287c129f342192e294e3434202731e2a4603b5ab89256fdfad5bd4f11b"
   },
   {
    "seed": 1488773,
    "ending": "neutral",
-   "steps": 467,
-   "feel": 68,
-   "press": 3,
-   "notes": 27,
-   "digest": "5072e0a4baf811cd166b6423be9ae200a4b6e8f00f99d5e5036117aec816f497"
+   "steps": 540,
+   "feel": 88,
+   "press": 2,
+   "notes": 28,
+   "digest": "1146f7ea84228daf1ef4e805fc51412c215a64b7e0aff2bcc587aff233ba243b"
   },
   {
    "seed": 1496692,
@@ -1714,21 +1714,21 @@
   },
   {
    "seed": 1504611,
-   "ending": "good",
-   "steps": 417,
-   "feel": 100,
-   "press": 3,
+   "ending": "home",
+   "steps": 421,
+   "feel": 84,
+   "press": 5,
    "notes": 25,
-   "digest": "30dfe298aea63fc721300b43f2e9e766f3c0575eeaeb4ef55e155b48640a03c4"
+   "digest": "e9ffad49487e732606940f6e0b97def9623e28a476adcceedc9e09eb758589a8"
   },
   {
    "seed": 1512530,
-   "ending": "gone",
-   "steps": 465,
+   "ending": "neutral",
+   "steps": 532,
    "feel": 100,
-   "press": 1,
-   "notes": 24,
-   "digest": "006bd5dfa0077eb0b4fc3134a0523eba6c1bd55a7b1fdcf046701bbd0b2f7422"
+   "press": 2,
+   "notes": 27,
+   "digest": "a9c5f2c99363cd0d57929e355775b854c8a64eabc911c97d3e64b1ca6e5e5523"
   },
   {
    "seed": 1520449,
@@ -1768,21 +1768,21 @@
   },
   {
    "seed": 1552125,
-   "ending": "bad",
-   "steps": 459,
-   "feel": 66,
-   "press": 3,
-   "notes": 27,
-   "digest": "4caaf656168b60954d0bbacbff07b46071b8b247207e8adec0ac2f761da8f534"
+   "ending": "more",
+   "steps": 424,
+   "feel": 100,
+   "press": 1,
+   "notes": 26,
+   "digest": "9a9b3478a99ba6f75d2f25e04dfbc6852af8aac320c508b79919932da5b4c879"
   },
   {
    "seed": 1560044,
    "ending": "home",
-   "steps": 424,
-   "feel": 40,
-   "press": 7,
-   "notes": 21,
-   "digest": "9b223ef851ad2f43d71a9237cdd19b0b4e0c0c930a00ac404d632f3c8228b8a0"
+   "steps": 426,
+   "feel": 33,
+   "press": 6,
+   "notes": 20,
+   "digest": "bf2e1f0d5a6f01e959126faacf4181d24d1d899c08bdfda4993109615086967e"
   },
   {
    "seed": 1567963,
@@ -1796,11 +1796,11 @@
   {
    "seed": 1575882,
    "ending": "home",
-   "steps": 432,
-   "feel": 39,
-   "press": 7,
-   "notes": 22,
-   "digest": "b1153f472610451d3ac433d6860fed361104490ccbc745d4f4892662abba3e5b"
+   "steps": 440,
+   "feel": 53,
+   "press": 5,
+   "notes": 23,
+   "digest": "2c548b15916aa5a8c5d2196936f86056ed368cdf45d795005106324154f9fd1c"
   }
  ]
 }

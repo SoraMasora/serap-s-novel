@@ -51,6 +51,12 @@ func _go() -> void:
 		if ac != "":
 			await create_timer(0.3).timeout
 			w.act(ac)
+	var ex := _arg("expr", "")
+	if ex != "":
+		await create_timer(0.4).timeout
+		var e := Expression.new()
+		e.parse(ex.replace("~", ","), ["Game", "SaveSystem"])
+		e.execute([root.get_node("Game"), root.get_node("SaveSystem")], main)
 	var hv := int(_arg("hover", "-1"))
 	if hv >= 0:
 		await create_timer(0.6).timeout

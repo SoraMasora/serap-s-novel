@@ -200,7 +200,9 @@ func _process(delta: float) -> void:
 				prompt.text = "E · " + str(pworld.cfg.get("itemLabel", "Сорвать листовку"))
 			else:
 				var done: bool = n != "home" and pworld.cfg.done.has(n)
-				prompt.text = "E · %s%s" % [pworld.spots()[n].label, " (уже был)" if done else ""]
+				prompt.text = "E · %s%s" % [pworld.spot_label(n), " (уже был)" if done else ""]
+				if pworld.sitting:
+					prompt.text = "W — вперёд · A — назад · E — встать"
 			prompt.visible = true
 		else:
 			prompt.visible = false

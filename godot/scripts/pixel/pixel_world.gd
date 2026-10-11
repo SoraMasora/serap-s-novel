@@ -27,6 +27,10 @@ var t_ms := 0.0
 var hero := {}
 var msg_t := 0.0
 var bake: Dictionary = {}
+## Качели без Серы: герой садится сам (W — вперёд, A — назад).
+## 1:11 качания — концовка «Ленивый идиот»
+var sitting := false
+var swing_time := 0.0
 var _tex: Dictionary = {}
 var _drops: Array = []
 var _splashes: Array = []
@@ -45,6 +49,10 @@ var _say_text := ""
 var _road_t := 0.0
 var _road_warned := false
 var _hit_t := -1.0
+var _sw_ang := 0.0
+var _sw_vel := 0.0
+var _sw_sign := 0
+var _sw_line := 0
 
 @onready var light: Sprite2D = $"../Light"
 @onready var halo: Sprite2D = $"../Halo"
@@ -77,6 +85,10 @@ func open(p_cfg: Dictionary, p_pc: PixelConfig) -> void:
 	_road_t = 0.0
 	_road_warned = false
 	_hit_t = -1.0
+	sitting = false
+	swing_time = 0.0
+	_sw_ang = 0.0
+	_sw_vel = 0.0
 	if cfg.has("items"):
 		var got: Array = []
 		for g: Variant in cfg.get("got", []):
@@ -150,6 +162,8 @@ func _item_near() -> String:
 
 
 func near() -> String:
+	if sitting:
+		return "swing"
 	var it := _item_near()
 	if it != "":
 		return it
@@ -197,6 +211,9 @@ func act(id: String) -> void:
 		say(cfg.get("home", def))
 		return
 	if id == "swing":
+		if cfg.get("noSera", false):
+			_toggle_sit()
+			return
 		say(pc.swing_lines[str(cfg.get("title", "")).length() % 2])
 		closeup.emit("swing", _say_text)
 		return
@@ -206,6 +223,59 @@ func act(id: String) -> void:
 	sfx_requested.emit("enter")
 	stop()
 	entered.emit(id)
+
+
+func spot_label(id: String) -> String:
+	if id == "swing" and cfg.get("noSera", false):
+		return "Встать" if sitting else "Сесть на качели"
+	return str(spots()[id].label)
+
+
+func _toggle_sit() -> void:
+	sitting = not sitting
+	swing_time = 0.0
+	_sw_line = 0
+	_sw_vel = 0.0
+	_sw_ang = 0.0
+	hero.target = null
+	hero.moving = false
+	if sitting:
+		hero.x = 226.0
+		hero.y = 124.0
+		say(pc.sit_hint)
+	else:
+		say(pc.stand_line)
+
+
+## Маятник: W — толкнуться вперёд, A — назад (в такт — раскачивает, невпопад — гасит)
+func _upd_sit(dt: float) -> void:
+	if Input.is_action_just_pressed("map_up"):
+		_sw_vel += pc.swing_push if _sw_vel >= -0.15 else -pc.swing_push * 0.4
+	if Input.is_action_just_pressed("map_left"):
+		_sw_vel -= pc.swing_push if _sw_vel <= 0.15 else -pc.swing_push * 0.4
+	_sw_vel += (-pc.swing_gl * sin(_sw_ang) - pc.swing_damp * _sw_vel) * dt
+	_sw_ang = clampf(_sw_ang + _sw_vel * dt, -1.1, 1.1)
+	var e := 0.5 * _sw_vel * _sw_vel + pc.swing_gl * (1.0 - cos(_sw_ang))
+	var amp := acos(clampf(1.0 - e / pc.swing_gl, -1.0, 1.0))
+	var sg := signi(int(signf(_sw_vel)))
+	if sg != 0 and sg != _sw_sign:
+		_sw_sign = sg
+		if amp > 0.12:
+			sfx_requested.emit("swing_creak")
+	if amp > pc.swing_min_amp:
+		swing_time += dt
+	var lines: Array = pc.sit_lines
+	if _sw_line < lines.size() and swing_time >= float(lines[_sw_line][0]):
+		say(str(lines[_sw_line][1]))
+		_sw_line += 1
+	if swing_time >= pc.lazy_seconds:
+		sitting = false
+		stop()
+		entered.emit("__lazy")
+
+
+func swing_amp() -> float:
+	return absf(_sw_ang)
 
 
 func _pick_item(i: int) -> void:
@@ -308,6 +378,17 @@ func _update(dt: float) -> void:
 	if _hit_t >= 0.0:
 		_upd_road(dt)
 		_upd_fx(dt)
+		return
+	if sitting:
+		_upd_sit(dt)
+		if not running:
+			return
+		if msg_t > 0:
+			msg_t -= dt
+		var tg := clampf(hero.x - pc.screen.x / 2.0, 0, pc.world_width - pc.screen.x)
+		cam_x += (tg - cam_x) * minf(1.0, dt * 5.0)
+		_upd_fx(dt)
+		_upd_trains(dt)
 		return
 	var dx := Input.get_axis("map_left", "map_right")
 	var dy := Input.get_axis("map_up", "map_down")
@@ -562,7 +643,8 @@ func _draw() -> void:
 		)
 	for e: Dictionary in cfg.get("npcs", []):
 		actors.append([float(e.y) + 14, "npc", e.id, roundf(e.x - cx), float(e.y)])
-	actors.append([float(hero.y), "hero"])
+	if not sitting:
+		actors.append([float(hero.y), "hero"])
 	actors.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
 	for a: Array in actors:
 		if a[1] == "hero":
@@ -615,6 +697,9 @@ func _draw_swing(cx: float, with_sera: bool, dark: bool) -> void:
 	var sw := sin(t_ms / 650.0) * (2.0 if with_sera else 0.6)
 	var dx := roundf(sw)
 	var seat_y := 116.0 - absf(sw) * 0.3
+	if sitting:
+		dx = roundf(sin(_sw_ang) * 12.0)
+		seat_y = 104.0 + cos(_sw_ang) * 12.0
 	var chain := Color("#8a8a96") if not dark else Color("#6a6a78")
 	for x0: float in [216.0, 234.0]:
 		for k in 12:
@@ -623,6 +708,8 @@ func _draw_swing(cx: float, with_sera: bool, dark: bool) -> void:
 				_r(x0 + dx * f - cx, 104 + (seat_y - 104) * f, 1, 1, chain)
 	_r(217 + dx - cx, seat_y, 18, 1, Color("#6a4426"))
 	_r(217 + dx - cx, seat_y + 1, 18, 1, Color("#3a2414"))
+	if sitting:
+		_draw_sitting_hero(220.0 + dx - cx, seat_y, dark)
 	if with_sera:
 		var sx := 219.0 + dx - cx
 		var sy := seat_y - 13.0
@@ -636,6 +723,34 @@ func _draw_swing(cx: float, with_sera: bool, dark: bool) -> void:
 		if fmod(t_ms / 1000.0, 3.0) < 1.2:
 			_r(sx + 4, sy + 5, 2, 1, Color("#e8607e"))
 			_r(sx + 4, sy + 6, 1, 1, Color("#e8607e"))
+
+
+## Герой на сиденье (тот же масштаб, что и спрайт героя): лохматая чёлка, чёрная футболка, кеды
+func _draw_sitting_hero(sx: float, seat_y: float, dark: bool) -> void:
+	var hair := Color("#121018")
+	var skin := Color("#f3e3db") if not dark else Color("#d8c4bc")
+	var tee := Color("#19181f")
+	var pants := Color("#6a6a78")
+	var y := seat_y - 15.0
+	var lean := roundf(clampf(_sw_vel * 0.6, -1.0, 1.0))
+	_r(sx + 2 + lean, y, 7, 2, hair)
+	_r(sx + 1 + lean, y + 1, 9, 4, hair)
+	_r(sx + 2 + lean, y + 3, 7, 4, skin)
+	_r(sx + 2 + lean, y + 3, 7, 1, hair)
+	_r(sx + 2 + lean, y + 4, 1, 1, hair)
+	_r(sx + 6 + lean, y + 4, 1, 1, hair)
+	_r(sx + 3 + lean, y + 5, 1, 1, Color("#2a2436"))
+	_r(sx + 6 + lean, y + 5, 1, 1, Color("#2a2436"))
+	_r(sx + 1, y + 7, 9, 7, tee)
+	_r(sx - 2, y + 4, 2, 4, tee)
+	_r(sx + 11, y + 4, 2, 4, tee)
+	_r(sx - 2, y + 3, 1, 1, skin)
+	_r(sx + 12, y + 3, 1, 1, skin)
+	var kick := roundf(clampf(_sw_vel * 1.5, -2.0, 2.0))
+	for lx: float in [sx + 2, sx + 6]:
+		_r(lx, seat_y + 1, 3, 2, pants)
+		_r(lx + kick * 0.5, seat_y + 3, 2, 3, pants)
+		_r(lx + kick - 0.0, seat_y + 6, 3, 1, Color("#0c0c10"))
 
 
 func _draw_npc(id: String, x: float, y: float) -> void:

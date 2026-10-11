@@ -45,44 +45,52 @@ func _draw() -> void:
 
 
 func _panel() -> void:
+	panel(self, Rect2(Vector2.ZERO, size), fill, accent, radius, glow)
+
+
+## Плашка: заливка, мягкий градиент, двойная рамка, крестики по углам (общая для всех окон)
+static func panel(
+	ci: CanvasItem, r: Rect2, p_fill: Color, p_accent: Color, p_radius: float, p_glow: float
+) -> void:
 	var sb := StyleBoxFlat.new()
-	sb.bg_color = fill
-	sb.set_corner_radius_all(int(radius))
+	sb.bg_color = p_fill
+	sb.set_corner_radius_all(int(p_radius))
 	sb.set_border_width_all(1)
-	sb.border_color = accent
-	sb.shadow_color = Color(accent.r, accent.g * 0.5, accent.b * 0.7, 0.16 + glow * 0.2)
+	sb.border_color = p_accent
+	sb.shadow_color = Color(p_accent.r, p_accent.g * 0.5, p_accent.b * 0.7, 0.16 + p_glow * 0.2)
 	sb.shadow_size = 18
 	sb.anti_aliasing = true
-	draw_style_box(sb, Rect2(Vector2.ZERO, size))
-	# мягкий градиент сверху вниз
+	ci.draw_style_box(sb, r)
 	var top := Color(1, 0.55, 0.7, 0.06)
 	var bot := Color(0, 0, 0, 0.0)
-	draw_polygon(
+	var p0 := r.position
+	var sz := r.size
+	ci.draw_polygon(
 		PackedVector2Array(
 			[
-				Vector2(radius, 1),
-				Vector2(size.x - radius, 1),
-				Vector2(size.x - radius, size.y * 0.55),
-				Vector2(radius, size.y * 0.55)
+				p0 + Vector2(p_radius, 1),
+				p0 + Vector2(sz.x - p_radius, 1),
+				p0 + Vector2(sz.x - p_radius, sz.y * 0.55),
+				p0 + Vector2(p_radius, sz.y * 0.55)
 			]
 		),
 		PackedColorArray([top, top, bot, bot])
 	)
 	var inner := StyleBoxFlat.new()
 	inner.draw_center = false
-	inner.set_corner_radius_all(int(maxf(2.0, radius - 6.0)))
+	inner.set_corner_radius_all(int(maxf(2.0, p_radius - 6.0)))
 	inner.set_border_width_all(1)
 	inner.border_color = Color(1, 0.62, 0.76, 0.16)
 	inner.anti_aliasing = true
-	draw_style_box(inner, Rect2(Vector2(6, 6), size - Vector2(12, 12)))
-	var c := Color(accent.r, accent.g, accent.b, minf(1.0, accent.a + 0.25))
+	ci.draw_style_box(inner, Rect2(p0 + Vector2(6, 6), sz - Vector2(12, 12)))
+	var c := Color(p_accent.r, p_accent.g, p_accent.b, minf(1.0, p_accent.a + 0.25))
 	for p: Vector2 in [
 		Vector2(18, 18),
-		Vector2(size.x - 18, 18),
-		Vector2(18, size.y - 18),
-		Vector2(size.x - 18, size.y - 18)
+		Vector2(sz.x - 18, 18),
+		Vector2(18, sz.y - 18),
+		Vector2(sz.x - 18, sz.y - 18)
 	]:
-		cross(self, p, 5.0, c)
+		cross(ci, p0 + p, 5.0, c)
 
 
 func _ribbon() -> void:
