@@ -346,11 +346,16 @@ func map_spot_available(id: String) -> bool:
 	return m.spots.has(id)
 
 
-## Вход в точку карты (id) или служебные '__items'/'__late'
+## Вход в точку карты (id) или служебные '__items'/'__late'/'__car' (сбила машина)
 func map_enter(id: String, pos: Variant = null) -> void:
 	var m: Dictionary = st.map
 	if pos != null:
 		m.pos = pos
+	if id == "__car":
+		st.map = null
+		st.mode = ""
+		jump("end_car")
+		return
 	if id == "__items" or id == "__late":
 		var a: String = m.get("late", m.after) if id == "__late" else m.after
 		st.map = null

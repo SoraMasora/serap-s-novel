@@ -524,6 +524,7 @@ function openMap() {
     lines: m.lines, seraBench: m.seraBench, noSera: m.noSera, timer: m.timer, tleft: m.tleft,
     onItem: n => { $('#pixTask').textContent = `${m.task} · ${n}/${m.items.length}`; saveSlot('auto', true); }, onTick: t => { m.tleft = t; } }, id => {
     m.pos = PixelMap.pos();
+    if (id === '__car') { st.map = null; st.mode = ''; $('#textbox').classList.remove('hidden'); jump('end_car'); run(); return; }
     if (id === '__items' || id === '__late') { const a = id === '__late' ? (m.late || m.after) : m.after; st.map = null; st.mode = ''; $('#textbox').classList.remove('hidden'); jump(a); run(); return; }
     m.done.push(id);
     if (m.scenes && m.scenes[id]) { st.mode = ''; $('#textbox').classList.remove('hidden'); jump(m.scenes[id]); run(); return; } const n = (st.flags['v_' + id] || 0) + 1; st.flags['v_' + id] = n;

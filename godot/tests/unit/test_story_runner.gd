@@ -14,7 +14,7 @@ func before_each() -> void:
 
 func test_story_loaded() -> void:
 	assert_eq(db.load_error, "")
-	assert_eq(db.scenes.size(), 234, "число сцен как в веб-версии")
+	assert_eq(db.scenes.size(), 251, "число сцен как в веб-версии")
 	assert_eq(db.notes_total, 48)
 
 
@@ -36,7 +36,7 @@ func test_all_conditions_parse_and_run() -> void:
 				e.execute([50.0, 0.0], r, true)
 				assert_false(e.has_execute_failed(), c.when)
 				n += 1
-	assert_eq(n, 50)
+	assert_eq(n, 58)
 
 
 func test_tier_thresholds() -> void:
