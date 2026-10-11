@@ -34,6 +34,7 @@ func _ready() -> void:
 	pworld.entered.connect(_on_entered)
 	pworld.said.connect(func(t: String) -> void: _msg = t)
 	pworld.sfx_requested.connect(func(k: String) -> void: Audio.sfx(k))
+	pworld.sfx_tuned.connect(func(k: String, v: float, p: float) -> void: Audio.sfx(k, v, p))
 	pworld.item_picked.connect(
 		func(n: int, total: int) -> void:
 			task_label.text = "%s · %d/%d" % [_base_task, n, total]

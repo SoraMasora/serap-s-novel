@@ -9,6 +9,8 @@ signal said(text: String)
 signal item_picked(count: int, total: int)
 signal ticked(seconds_left: int)
 signal sfx_requested(key: String)
+## Звук с громкостью/высотой (скрип качелей тише при слабом размахе).
+signal sfx_tuned(key: String, volume_db: float, pitch: float)
 ## Пиксельный крупный план (godot/art/pixel/closeup_<key>_N.webp) с репликой
 signal closeup(key: String, text: String)
 
@@ -261,7 +263,9 @@ func _upd_sit(dt: float) -> void:
 	if sg != 0 and sg != _sw_sign:
 		_sw_sign = sg
 		if amp > 0.12:
-			sfx_requested.emit("swing_creak")
+			var k := "swing_%s%d" % ["fwd" if sg > 0 else "back", randi_range(1, 3)]
+			var vol := lerpf(-16.0, -3.0, clampf((amp - 0.12) / 0.8, 0.0, 1.0))
+			sfx_tuned.emit(k, vol, randf_range(0.94, 1.06))
 	if amp > pc.swing_min_amp:
 		swing_time += dt
 	var lines: Array = pc.sit_lines

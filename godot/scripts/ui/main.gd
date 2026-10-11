@@ -6,6 +6,10 @@ const CHARACTER := preload("res://scenes/ui/character_view.tscn")
 const CHOICE := preload("res://scenes/ui/choice_button.tscn")
 const HEART := preload("res://scenes/ui/heart.tscn")
 const PAT_FRAMES := ["sera_pat2", "sera_pat3", "sera_pat4", "sera_pat3"]
+## Анимированные фоны: ключ фона → кадры (godot/art/bg) и fps. Сюжет пишет {bg:'bal_talk'}.
+const BG_ANIM := {
+	"bal_talk": {"frames": ["bal_t0", "bal_t1", "bal_t2", "bal_t3"], "fps": 2.5},
+}
 
 @export var bg_fade_sec := 1.2
 @export var cam_default_ms := 1400.0
@@ -34,6 +38,7 @@ var _bg_front: TextureRect
 var _bg_back: TextureRect
 var _toast_tw: Tween
 var _ui_hidden := false
+var _bg_anim: Dictionary = {}
 var _line_key := ""
 
 @onready var stage: Control = $Stage
@@ -447,7 +452,12 @@ func set_bg(k: String, instant: bool) -> void:
 	cam_to(null)
 	Audio.set_loc(k)
 	_apply_rain()
-	var t := Game.tex("bg", k)
+	_bg_anim = {}
+	if BG_ANIM.has(k):
+		_bg_anim = {
+			"frames": BG_ANIM[k].frames, "dt": 1.0 / float(BG_ANIM[k].fps), "t": 0.0, "i": 0
+		}
+	var t := Game.tex("bg", _bg_anim.frames[0] if _bg_anim else k)
 	if t == null:
 		push_warning("Нет фона: " + k)
 	if instant:
@@ -462,6 +472,17 @@ func set_bg(k: String, instant: bool) -> void:
 	var tmp := _bg_front
 	_bg_front = _bg_back
 	_bg_back = tmp
+
+
+func _process(delta: float) -> void:
+	if _bg_anim.is_empty():
+		return
+	_bg_anim.t += delta
+	if _bg_anim.t < _bg_anim.dt:
+		return
+	_bg_anim.t -= _bg_anim.dt
+	_bg_anim.i = (int(_bg_anim.i) + 1) % _bg_anim.frames.size()
+	_bg_front.texture = Game.tex("bg", str(_bg_anim.frames[_bg_anim.i]))
 
 
 func cam_to(c: Variant) -> void:

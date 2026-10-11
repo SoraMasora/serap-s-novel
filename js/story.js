@@ -1535,7 +1535,7 @@ end_more: [
 end_lazy: [
   {chapter:'Концовка · Ленивый идиот'}, {music:'none'}, {hide:'all'},
   {cut:[
-    {img:'lazy_sw0', flip:['lazy_sw0', 'lazy_sw1', 'lazy_sw2', 'lazy_sw3'], fps:5, ms:3400, sfx:'swing_creak', text:'Скрип. Скрип. Двор пустой. Её окно — тёмное.'},
+    {img:'lazy_sw0', flip:['lazy_sw0', 'lazy_sw1', 'lazy_sw2', 'lazy_sw3'], fps:5, ms:3400, sfx:'swing_fwd1', text:'Скрип. Скрип. Двор пустой. Её окно — тёмное.'},
     {img:'lazy_s0', flip:['lazy_s0', 'lazy_s1', 'lazy_s2', 'lazy_s3', 'lazy_s4', 'lazy_s5', 'lazy_s6', 'lazy_s7'], fps:3.2, once:true, ms:3200, sfxAt:{5:'lighter'}, text:'Я остановил качели ногой. Пачка нашлась во внутреннем кармане — мятая, как и я.'},
     {img:'lazy_l0', flip:['lazy_l0', 'lazy_l1', 'lazy_l2', 'lazy_l3'], fps:2.5, ms:4200, text:'Затяжка. Дым ушёл вверх — туда, где горели чужие окна.'},
   ]},

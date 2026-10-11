@@ -1,7 +1,7 @@
 {
   "project": "serap-s-novel",
   "route": "B",
-  "phase": "content-0.3.0",
+  "phase": "content-0.3.1",
   "status": "green-with-known-issues",
   "next_task": "Проверить у пользователя на ПК: ветка «Дальше больше» (вт вечер → «Курю…»), «Ленивый идиот» (чт, качели 1:11), птичка в «Тихой гавани», новый GUI и курсор; затем KI-007, KI-003",
   "blocked_by": [

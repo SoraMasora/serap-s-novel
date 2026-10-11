@@ -122,11 +122,11 @@ func rain(on: bool) -> void:
 		_fade(rain_player, -80.0, config.rain_fade_out_sec, true)
 
 
-func sfx(k: String) -> void:
+func sfx(k: String, volume_db := 0.0, pitch := 1.0) -> void:
 	# новый звук из godot/art/sfx (например, brake/siren) — в обход запечённого набора
 	var art := "res://art/sfx/%s.ogg" % k
 	if ResourceLoader.exists(art):
-		_play_sfx(_stream(art, false))
+		_play_sfx(_stream(art, false), volume_db, pitch)
 		return
 	if not config.sfx_keys.has(k):
 		push_warning("Неизвестный SFX: " + k)
@@ -135,12 +135,14 @@ func sfx(k: String) -> void:
 	_play_sfx(_stream(config.sfx_dir + key + ".ogg", false))
 
 
-func _play_sfx(s: AudioStream) -> void:
+func _play_sfx(s: AudioStream, volume_db := 0.0, pitch := 1.0) -> void:
 	if s == null:
 		return
 	var p: AudioStreamPlayer = sfx_pool.get_child(_sfx_i % sfx_pool.get_child_count())
 	_sfx_i += 1
 	p.stream = s
+	p.volume_db = volume_db
+	p.pitch_scale = pitch
 	p.play()
 
 

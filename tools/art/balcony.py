@@ -1,415 +1,624 @@
-"""Балкон героя (ветка «Дальше больше»): фон balcony, CG cg_balcony1..3, кадры концовки end_more1..3.
-Собирается из готовых ассетов игры (вид — roof.webp, персонажи — спрайты) + дорисованные кодом
-перила, стены, банка-пепельница, сигареты, дым, дождь/снег. Линия и зерно — как у остальных фонов.
-Запуск из корня репо: python3 tools/art/balcony.py → godot/art/bg/*.webp"""
+"""Балкон героя (ветка «Дальше больше») — в стилистике фонов/CG игры: тонкая тушь, приглушённые
+краски, облупленная краска с обводкой, зерно. Вид — roof.webp (ТЭЦ, дома) и yard.webp (двор внизу),
+персонажи со спины — вырезаны из cg_roof.webp (GrabCut) и доработаны: руки, сигареты, зажигалка,
+дым дорисованы кодом.
+
+Выход (godot/art/bg/):
+  balcony                 — пустой балкон (фон для диалогов со спрайтами)
+  bal_s0                  — стоят у перил
+  bal_p0..p4              — Сера достаёт пачку и передаёт сигарету, Кир берёт её в зубы
+  bal_l0..l2              — зажигалка: прикуривает Киру, потом себе
+  bal_i0..i4              — затяжка и выдох дыма
+  bal_t0..t3              — стоят, курят и разговаривают (цикл, фон «bal_talk»)
+  end_more1..3            — кадры концовки «Дальше больше»
+Запуск из корня репо: python3 tools/art/balcony.py   (BAL_QUICK=1 — только фон и bal_s0)"""
 import math
 import os
 import random
 
+import cv2
 import numpy as np
-from PIL import Image, ImageDraw, ImageFilter, ImageChops
+from PIL import Image, ImageDraw, ImageFilter
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
-A = os.path.join(ROOT, "godot", "assets")
+A = os.path.join(ROOT, "godot", "assets", "bg")
 OUT = os.path.join(ROOT, "godot", "art", "bg")
 W, H = 1376, 768
-SS = 2  # суперсэмплинг для линий
-INK = (43, 33, 40, 255)
+SS = 2
+INK = (38, 30, 36)
+# кадр персонажей: область cg_roof (x0, y0) масштабируется в K раз
+CX0, CY0, K = 238.0, 262.0, 1.864
+KIR_SHIFT = -25  # Кир ближе к Сере (в пикселях cg_roof)
+RAIL_Y = 505  # верх перил
+WALL_L, WALL_R, SLAB_Y = 112, 1264, 44
 
 
-def load(p):
-    return Image.open(os.path.join(A, p)).convert("RGBA")
+def noise(seed, cell, w=W, h=H):
+    r = np.random.default_rng(seed)
+    n = r.standard_normal((h // cell + 3, w // cell + 3)).astype(np.float32)
+    n = cv2.resize(n, (w + 3 * cell, h + 3 * cell), interpolation=cv2.INTER_CUBIC)[:h, :w]
+    return n / (np.abs(n).max() + 1e-6)
 
 
-def grain(im, amt=7, seed=1):
-    rng = np.random.default_rng(seed)
-    a = np.asarray(im).astype(np.int16)
-    n = rng.normal(0, amt, a.shape[:2])[..., None]
-    a[..., :3] = np.clip(a[..., :3] + n, 0, 255)
-    return Image.fromarray(a.astype(np.uint8), "RGBA")
+def arr(im):
+    return np.asarray(im).astype(np.float32)
 
 
-def grade(im, mul, add=(0, 0, 0)):
-    a = np.asarray(im).astype(np.float32)
-    a[..., :3] = np.clip(a[..., :3] * np.array(mul) + np.array(add), 0, 255)
-    return Image.fromarray(a.astype(np.uint8), "RGBA")
-
-
-def watercolor(im, seed=11):
-    """Акварельные пятна (низкочастотный шум яркости) + мягкость линии, как у фонов игры."""
-    rng = np.random.default_rng(seed)
-    n = rng.normal(0, 1, (H // 24 + 2, W // 24 + 2)).astype(np.float32)
-    n = np.asarray(Image.fromarray(((n + 3) * 40).clip(0, 255).astype(np.uint8)).resize((W, H), Image.BICUBIC)).astype(np.float32)
-    k = 1 + (n / 255 - 0.47) * 0.22
-    a = np.asarray(im.filter(ImageFilter.GaussianBlur(0.6))).astype(np.float32)
-    a[..., :3] *= k[..., None]
+def img(a):
     return Image.fromarray(np.clip(a, 0, 255).astype(np.uint8), "RGBA")
 
 
-def wobble(pts, amp=1.2, seed=0):
-    r = random.Random(seed)
-    return [(x + r.uniform(-amp, amp), y + r.uniform(-amp, amp)) for x, y in pts]
+def poly_mask(pts, blur=0.0):
+    m = Image.new("L", (W * SS, H * SS), 0)
+    ImageDraw.Draw(m).polygon([(x * SS, y * SS) for x, y in pts], fill=255)
+    m = m.resize((W, H), Image.LANCZOS)
+    if blur:
+        m = m.filter(ImageFilter.GaussianBlur(blur))
+    return np.asarray(m).astype(np.float32)[..., None] / 255.0
 
 
-def view(time="night"):
-    """Вид с балкона: небо, ТЭЦ, дома — из roof.webp (без парапета и будки), чуть размыт (глубина)."""
-    src = load("bg/roof.webp")
-    v = src.crop((0, 221, 820, 221 + 458)).resize((W, H), Image.LANCZOS)
-    canvas = Image.new("RGBA", (W, H), (30, 28, 44, 255))
-    canvas.paste(v, (0, 0))
-    canvas = canvas.filter(ImageFilter.GaussianBlur(1.6))
-    if time == "dawn":
-        canvas = grade(canvas, (1.18, 1.0, 0.92), (26, 10, 0))
-        g = Image.new("RGBA", (W, H))
-        d = ImageDraw.Draw(g)
-        for y in range(H):
-            t = max(0.0, 1 - abs(y - 430) / 330)
-            d.line([(0, y), (W, y)], fill=(255, 170, 120, int(70 * t)))
-        canvas = Image.alpha_composite(canvas, g)
-    return canvas
+def paint(base, color, mask, mottle=0.08, seed=0, streaks=0.0):
+    """Залить маску «краской»: цвет + акварельные пятна + вертикальные подтёки."""
+    c = np.ones((H, W, 3), np.float32) * np.array(color, np.float32)
+    c *= (1 + mottle * noise(seed, 40)[..., None] + mottle * 0.5 * noise(seed + 1, 9)[..., None])
+    if streaks:
+        r = np.random.default_rng(seed + 5)
+        s = r.standard_normal((1, W)).astype(np.float32)
+        s = cv2.GaussianBlur(s, (0, 0), 2.2)
+        s = np.repeat(s, H, 0) * (0.6 + 0.4 * noise(seed + 7, 60))
+        c *= (1 + streaks * s[..., None])
+    base[..., :3] = base[..., :3] * (1 - mask) + c * mask
+    return base
 
 
-class Layer:
+class Ink:
+    """Тушь поверх картинки (суперсэмплинг ×2, лёгкое дрожание линии)."""
+
     def __init__(self):
         self.im = Image.new("RGBA", (W * SS, H * SS), (0, 0, 0, 0))
         self.d = ImageDraw.Draw(self.im)
+        self.r = random.Random(3)
 
-    def poly(self, pts, fill, line=INK, w=3, seed=0):
-        p = [(x * SS, y * SS) for x, y in wobble(pts, 0.9, seed)]
-        self.d.polygon(p, fill=fill)
-        if line:
-            self.d.line(p + [p[0]], fill=line, width=w * SS, joint="curve")
+    def line(self, pts, w=1.6, col=INK, wob=0.6, alpha=230):
+        pts = [(x + self.r.uniform(-wob, wob), y + self.r.uniform(-wob, wob)) for x, y in pts]
+        self.d.line([(x * SS, y * SS) for x, y in pts], fill=col + (alpha,), width=max(1, int(w * SS)), joint="curve")
 
-    def line(self, pts, col=INK, w=3, seed=0):
-        p = [(x * SS, y * SS) for x, y in wobble(pts, 0.7, seed)]
-        self.d.line(p, fill=col, width=max(1, int(w * SS)), joint="curve")
+    def seg(self, a, b, w=1.6, n=6, **kw):
+        pts = [(a[0] + (b[0] - a[0]) * t / n, a[1] + (b[1] - a[1]) * t / n) for t in range(n + 1)]
+        self.line(pts, w, **kw)
 
-    def ell(self, box, fill, line=INK, w=3):
-        b = [c * SS for c in box]
-        self.d.ellipse(b, fill=fill, outline=line, width=w * SS if line else 0)
+    def poly(self, pts, w=1.5, fill=None, **kw):
+        if fill:
+            self.d.polygon([(x * SS, y * SS) for x, y in pts], fill=fill)
+        self.line(pts + [pts[0]], w, **kw)
 
-    def done(self, paint=True):
-        im = self.im.resize((W, H), Image.LANCZOS)
-        return watercolor(im) if paint else im
+    def ellipse(self, box, w=1.4, fill=None, col=INK):
+        x0, y0, x1, y1 = box
+        self.d.ellipse((x0 * SS, y0 * SS, x1 * SS, y1 * SS), fill=fill, outline=col + (230,), width=int(w * SS))
 
-
-def balcony(time="night", snow=False, seed=3):
-    """Передний план: потолочная плита, левая стена с дверью (тёплый свет), правая — лыжи, перила."""
-    L = Layer()
-    night = time == "night"
-    wall = (150, 160, 140, 255) if not night else (92, 98, 96, 255)
-    wall_d = (118, 126, 112, 255) if not night else (70, 74, 76, 255)
-    conc = (120, 116, 118, 255) if not night else (64, 62, 70, 255)
-    # потолок (плита балкона сверху)
-    L.poly([(0, 0), (W, 0), (W, 58), (1240, 70), (150, 74), (0, 64)], conc, seed=1)
-    L.line([(150, 74), (1240, 70)], (30, 26, 32, 255), 2)
-    for x in range(180, 1220, 64):
-        L.line([(x, 66), (x + 3, 72)], (40, 36, 44, 200), 2, seed=x)
-    # бельевая верёвка + прищепки + полотенце
-    rope = [(150 + i * 27, 112 + 22 * math.sin(i / 40 * math.pi)) for i in range(41)]
-    L.line(rope, (210, 205, 196, 255) if not night else (150, 146, 140, 255), 2)
-    for x in (430, 470, 860):
-        y = 112 + 22 * math.sin((x - 150) / 1080 * math.pi)
-        L.poly([(x - 4, y - 8), (x + 4, y - 8), (x + 3, y + 10), (x - 3, y + 10)], (196, 120, 140, 255), w=2, seed=x)
-    ty = 112 + 22 * math.sin((450 - 150) / 1080 * math.pi)
-    L.poly([(424, ty), (478, ty + 2), (474, ty + 118), (452, ty + 112), (430, ty + 120)],
-           (196, 182, 160, 255) if not night else (120, 112, 104, 255), w=2, seed=5)
-    for k in range(4):
-        L.line([(428, ty + 30 + k * 18), (476, ty + 31 + k * 18)], (160, 70, 80, 220), 3, seed=k)
-    # левая стена и балконная дверь с тёплым светом
-    L.poly([(0, 64), (150, 74), (150, H), (0, H)], wall, seed=2)
-    L.poly([(18, 150), (128, 156), (128, H), (18, H)], (60, 46, 40, 255), seed=3)
-    L.poly([(30, 166), (116, 170), (116, 470), (30, 466)],
-           (255, 214, 150, 255) if night else (236, 226, 200, 255), w=2, seed=4)
-    L.line([(73, 168), (73, 468)], INK, 3)
-    L.line([(30, 318), (116, 320)], INK, 3)
-    L.poly([(30, 490), (116, 492), (116, H), (30, H)], (88, 66, 54, 255), w=2, seed=6)
-    for (x, y, r) in ((60, 600, 26), (100, 120, 14), (20, 700, 18)):
-        L.poly([(x - r, y), (x - r * 0.3, y - r * 0.8), (x + r, y - r * 0.3), (x + r * 0.6, y + r * 0.7)],
-               wall_d, line=(60, 60, 60, 160), w=2, seed=x)
-    # правая стена + лыжи
-    L.poly([(1240, 70), (W, 58), (W, H), (1240, H)], wall, seed=7)
-    for k, col in enumerate(((150, 52, 58, 255), (60, 92, 140, 255))):
-        x0 = 1262 + k * 34
-        L.poly([(x0, 130), (x0 + 16, 126), (x0 + 30, H), (x0 + 14, H)], col if not night else
-               tuple(int(c * 0.62) for c in col[:3]) + (255,), seed=20 + k)
-        L.line([(x0 + 6, 128), (x0 + 22, H)], (230, 230, 220, 150), 2)
-    L.ell((1250, 116, 1330, 150), (60, 56, 52, 255), w=2)  # загнутые носы
-    # перила: нижняя панель (крашеный профлист, ржавчина), поручень
-    top = 480
-    panel = (78, 112, 112, 255) if not night else (46, 64, 70, 255)
-    L.poly([(150, top + 18), (1240, top + 14), (1240, H), (150, H)], panel, seed=9)
-    for x in range(168, 1240, 30):
-        L.line([(x, top + 22), (x + 2, H)], (30, 44, 48, 200) if night else (52, 80, 82, 220), 3, seed=x)
-        L.line([(x + 12, top + 22), (x + 13, H)], (110, 150, 150, 120) if night else (130, 170, 168, 140), 2, seed=x + 1)
-    rnd = random.Random(seed)
-    for _ in range(14):
-        x = rnd.uniform(170, 1220)
-        y = rnd.uniform(top + 30, H - 40)
-        L.line([(x, y), (x + rnd.uniform(-3, 3), y + rnd.uniform(30, 120))], (140, 70, 40, 140), rnd.uniform(3, 7), seed=int(x))
-    L.poly([(140, top - 6), (1250, top - 10), (1250, top + 16), (140, top + 20)],
-           (112, 84, 64, 255) if night else (150, 112, 84, 255), seed=10)
-    L.line([(146, top - 2), (1246, top - 6)], (200, 170, 140, 160), 2)
-    im = L.done()
-    return im, top
+    def comp(self, base):
+        lay = self.im.resize((W, H), Image.LANCZOS)
+        return Image.alpha_composite(base, lay)
 
 
-def can_ashtray(L, cx, by, butts=2, s=1.0):
-    """Банка из-под шпрот на поручне: овальная, с отогнутой крышкой, окурки."""
-    w, h = 64 * s, 26 * s
-    L.ell((cx - w / 2, by - h, cx + w / 2, by), (150, 150, 160, 255), w=2)
-    L.ell((cx - w / 2 + 5, by - h + 4, cx + w / 2 - 5, by - 6), (64, 56, 52, 255), w=2)
-    L.poly([(cx + w / 2 - 6, by - h + 2), (cx + w / 2 + 20 * s, by - h - 26 * s), (cx + w / 2 + 26 * s, by - h - 20 * s),
-            (cx + w / 2, by - h + 8)], (186, 186, 196, 255), w=2, seed=int(cx))
-    for k in range(butts):
-        x = cx - 18 * s + k * 16 * s
-        L.poly([(x, by - 14 * s), (x + 22 * s, by - 20 * s), (x + 23 * s, by - 16 * s), (x + 1, by - 10 * s)],
-               (230, 222, 206, 255), w=2, seed=k + 40)
-        L.poly([(x, by - 14 * s), (x + 7 * s, by - 16 * s), (x + 8 * s, by - 12 * s), (x + 1, by - 10 * s)],
-               (196, 140, 80, 255), line=None)
-
-
-def smoke(im, x, y, seed, length=260, alpha=110, drift=1.0):
-    g = Image.new("RGBA", im.size, (0, 0, 0, 0))
-    d = ImageDraw.Draw(g)
+def peel(ink, cx, cy, s, seed, col):
+    """Пятно облупленной краски с обводкой (как в подъезде из stairs.webp)."""
     r = random.Random(seed)
-    px, py = x, y
-    for i in range(70):
-        t = i / 70
-        px += math.sin(i * 0.23 + seed) * 2.2 * drift + 0.6 * drift
-        py -= length / 70
-        rad = 3 + t * 22
-        a = int(alpha * (1 - t) * (0.6 + 0.4 * r.random()))
-        d.ellipse([px - rad, py - rad, px + rad, py + rad], fill=(220, 220, 232, a))
-    g = g.filter(ImageFilter.GaussianBlur(7))
-    return Image.alpha_composite(im, g)
+    n = 16
+    pts = []
+    for i in range(n):
+        a = i / n * 2 * math.pi
+        rr = s * (r.uniform(0.6, 0.95) if i % 2 else r.uniform(0.85, 1.1))
+        pts.append((cx + math.cos(a) * rr * 1.25, cy + math.sin(a) * rr))
+    ink.poly(pts, 1.0, fill=col + (255,), alpha=170)
 
 
-def glow(im, x, y, r, col, a):
-    g = Image.new("RGBA", im.size, (0, 0, 0, 0))
-    d = ImageDraw.Draw(g)
-    d.ellipse([x - r, y - r, x + r, y + r], fill=col + (a,))
-    g = g.filter(ImageFilter.GaussianBlur(r * 0.45))
-    return Image.alpha_composite(im, g)
+# ── вид ──
+def view():
+    src = Image.open(os.path.join(A, "roof.webp")).convert("RGBA")
+    sc = 1.376
+    v = src.crop((0, 0, 1000, 558)).resize((W, round(558 * sc)), Image.LANCZOS)
+    can = Image.new("RGBA", (W, H), (36, 32, 48, 255))
+    y0 = round(RAIL_Y + 15 - 545 * sc)  # линия парапета roof.webp прячется под перилами
+    can.paste(v, (0, y0))
+    can = can.filter(ImageFilter.GaussianBlur(1.1))
+    a = arr(can)
+    a[..., :3] = a[..., :3] * np.array([0.82, 0.8, 0.92])  # вечер, чуть темнее и холоднее
+    return img(a)
 
 
-def rain(im, seed, n=320, snow=False):
-    g = Image.new("RGBA", im.size, (0, 0, 0, 0))
-    d = ImageDraw.Draw(g)
+def balcony_bg():
+    base = arr(view())
+    ink = Ink()
+    # потолок — плита соседского балкона сверху
+    m = poly_mask([(0, 0), (W, 0), (WALL_R, SLAB_Y), (WALL_L, SLAB_Y)])
+    base = paint(base, (52, 50, 58), m, 0.12, 21)
+    m = poly_mask([(WALL_L, SLAB_Y), (WALL_R, SLAB_Y), (WALL_R, SLAB_Y + 20), (WALL_L, SLAB_Y + 22)])
+    base = paint(base, (88, 86, 94), m, 0.1, 22, streaks=0.15)
+    # стены по бокам (перегородки балкона)
+    wl = [(0, 0), (WALL_L, SLAB_Y), (WALL_L, H), (0, H)]
+    wr = [(W, 0), (WALL_R, SLAB_Y), (WALL_R, H), (W, H)]
+    base = paint(base, (118, 128, 122), poly_mask(wl), 0.1, 23, streaks=0.1)
+    base = paint(base, (104, 114, 110), poly_mask(wr), 0.1, 24, streaks=0.1)
+    # под поручнем — двор внизу (yard.webp, ночь), сквозь стойки ограждения
+    yard = Image.open(os.path.join(A, "yard.webp")).convert("RGBA").crop((0, 400, 940, 740))
+    yard = yard.resize((WALL_R - WALL_L, H - RAIL_Y - 14), Image.LANCZOS).filter(ImageFilter.GaussianBlur(1.4))
+    ya = arr(yard)
+    ya[..., :3] = ya[..., :3] * np.array([0.34, 0.33, 0.46])
+    gy = np.zeros(ya.shape[:2], np.float32)
+    rr0 = np.random.default_rng(4)
+    for _ in range(9):  # тёплые окна первых этажей и фонарь
+        cv2.circle(gy, (int(rr0.uniform(0, ya.shape[1])), int(rr0.uniform(0, ya.shape[0] * 0.5))), 3, 1.0, -1)
+    gy = cv2.GaussianBlur(gy, (0, 0), 7)
+    ya[..., :3] += np.array([255, 190, 110]) * (gy / (gy.max() + 1e-6))[..., None] * 0.35
+    base[RAIL_Y + 14:, WALL_L:WALL_R, :3] = ya[..., :3]
+    # нижняя полоса ограждения и стойки (крашеный металл)
+    pm = poly_mask([(WALL_L, H - 34), (WALL_R, H - 34), (WALL_R, H - 20), (WALL_L, H - 20)])
+    base = paint(base, (58, 70, 64), pm, 0.12, 25)
+    for x in np.arange(WALL_L + 22, WALL_R - 10, 38):
+        pm = poly_mask([(x - 3.5, RAIL_Y + 14), (x + 3.5, RAIL_Y + 14), (x + 3.5, H), (x - 3.5, H)])
+        base = paint(base, (54, 64, 60), pm, 0.15, int(x))
+    # поручень — деревянный, крашенный коричневым
+    hm = poly_mask([(WALL_L - 4, RAIL_Y - 8), (WALL_R + 4, RAIL_Y - 8), (WALL_R + 4, RAIL_Y + 14), (WALL_L - 4, RAIL_Y + 14)])
+    base = paint(base, (92, 62, 46), hm, 0.14, 26)
+    hm2 = poly_mask([(WALL_L - 4, RAIL_Y - 8), (WALL_R + 4, RAIL_Y - 8), (WALL_R + 4, RAIL_Y - 2), (WALL_L - 4, RAIL_Y - 2)])
+    base = paint(base, (128, 92, 70), hm2, 0.1, 27)  # верхняя грань светлее
+    # свет: стены темнеют к улице и к потолку, в углах тень; снизу-сзади тёплый свет из комнаты
+    yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
+    side = np.clip(np.minimum(xx / WALL_L, (W - xx) / (W - WALL_R)), 0, 1)
+    wall = (xx < WALL_L) | (xx > WALL_R) | (yy < SLAB_Y)
+    shade = np.where(wall, 0.55 + 0.45 * (1 - side) * (0.6 + 0.4 * yy / H), 1.0)
+    base[..., :3] *= shade[..., None]
+    ao = np.exp(-np.minimum(np.abs(xx - WALL_L), np.abs(xx - WALL_R)) / 26) * wall
+    base[..., :3] *= (1 - 0.35 * ao)[..., None]
+    warm = np.exp(-(((xx - W / 2) / (W * 0.55)) ** 2 + ((yy - H * 1.1) / (H * 0.6)) ** 2))
+    base[..., :3] += np.array([70, 42, 16]) * (warm * np.where(wall, 1.0, 0.45))[..., None]
+    im = img(base)
+
+    # тушь: края плит, стен, перил
+    ink.seg((0, 0), (WALL_L, SLAB_Y), 2.0)
+    ink.seg((W, 0), (WALL_R, SLAB_Y), 2.0)
+    ink.seg((WALL_L, SLAB_Y), (WALL_R, SLAB_Y), 1.6, n=30)
+    ink.seg((WALL_L, SLAB_Y + 22), (WALL_R, SLAB_Y + 20), 1.8, n=30)
+    ink.seg((WALL_L, SLAB_Y), (WALL_L, H), 2.0, n=20)
+    ink.seg((WALL_R, SLAB_Y), (WALL_R, H), 2.0, n=20)
+    ink.seg((WALL_L - 4, RAIL_Y - 8), (WALL_R + 4, RAIL_Y - 8), 1.8, n=40)
+    ink.seg((WALL_L - 4, RAIL_Y - 2), (WALL_R + 4, RAIL_Y - 2), 0.9, n=40, alpha=150)
+    ink.seg((WALL_L - 4, RAIL_Y + 14), (WALL_R + 4, RAIL_Y + 14), 1.6, n=40)
+    for k in range(14):  # волокна и сколы краски на поручне
+        x0 = WALL_L + (WALL_R - WALL_L) * k / 14 + 20
+        ink.seg((x0, RAIL_Y + 4 + (k % 3) * 3), (x0 + 50 + (k % 4) * 12, RAIL_Y + 5 + (k % 3) * 3), 0.7, n=3, col=(60, 40, 30), alpha=140)
+    for x in np.arange(WALL_L + 22, WALL_R - 10, 38):
+        ink.seg((x - 3.5, RAIL_Y + 14), (x - 3.5, H), 1.1, n=8, alpha=200)
+        ink.seg((x + 3.5, RAIL_Y + 14), (x + 3.5, H), 1.1, n=8, alpha=200)
+        ink.seg((x - 1.5, RAIL_Y + 16), (x - 1.5, H), 0.8, n=8, col=(120, 136, 128), alpha=150)
+    ink.seg((WALL_L, H - 34), (WALL_R, H - 34), 1.3, n=40)
+    ink.seg((WALL_L, H - 20), (WALL_R, H - 20), 1.3, n=40)
+    # капли на краю плиты
+    rr = random.Random(5)
+    for _ in range(26):
+        x = rr.uniform(WALL_L + 8, WALL_R - 8)
+        ink.ellipse((x - 2, SLAB_Y + 22, x + 2, SLAB_Y + 28), 0.8, fill=(190, 200, 220, 200), col=(70, 70, 90))
+    # облупленная краска на стенах — крупные рваные пятна у углов, трещины
+    for i, (cx, cy, sz) in enumerate(((60, 120, 30), (90, 420, 22), (40, 640, 34))):
+        peel(ink, cx, cy, sz, 40 + i, (128, 136, 126))
+    for i, (cx, cy, sz) in enumerate(((W - 50, 300, 28), (W - 90, 560, 24), (W - 30, 700, 30))):
+        peel(ink, cx, cy, sz, 60 + i, (116, 124, 116))
+    for (x0, y0) in ((96, 230), (W - 104, 380)):
+        pts = [(x0, y0)]
+        for k in range(6):
+            pts.append((pts[-1][0] + rr.uniform(-9, 9), pts[-1][1] + rr.uniform(10, 22)))
+        ink.line(pts, 1.0, alpha=170)
+    # бельевая верёвка, прищепки и полотенце «с августа»
+    rope = [(WALL_L, 108)] + [(WALL_L + (WALL_R - WALL_L) * t / 20, 108 + 26 * math.sin(math.pi * t / 20)) for t in range(1, 20)] + [(WALL_R, 104)]
+    ink.line(rope, 2.0, col=(40, 34, 34), wob=0.2, alpha=255)
+    tx = 300
+    ty = 108 + 26 * math.sin(math.pi * (tx - WALL_L) / (WALL_R - WALL_L))
+    towel = [(tx - 34, ty), (tx + 34, ty + 2), (tx + 31, ty + 120), (tx + 2, ty + 108), (tx - 30, ty + 122)]
+    ink.poly(towel, 1.5, fill=(152, 140, 118, 255))
+    for k in range(4):
+        yy_ = ty + 26 + k * 20
+        ink.seg((tx - 31, yy_), (tx + 32, yy_ + 1), 2.2, col=(176, 70, 78), wob=0.3, alpha=200)
+    for px in (tx - 26, tx + 24, 860):
+        py = 108 + 26 * math.sin(math.pi * (px - WALL_L) / (WALL_R - WALL_L))
+        ink.poly([(px - 4, py - 8), (px + 4, py - 8), (px + 4, py + 8), (px - 4, py + 8)], 1.0, fill=(214, 120, 132, 255))
+    # лыжи у левой стены: широкие, загнутые носы, крепления
+    for dx, col, top in ((14, (112, 128, 150), 150), (50, (150, 92, 86), 176)):
+        ink.poly([(dx, H + 6), (dx + 24, H + 6), (dx + 62, top + 22), (dx + 60, top), (dx + 46, top + 6), (dx + 40, top + 24)], 1.6, fill=col + (255,))
+        ink.seg((dx + 12, H), (dx + 50, top + 26), 0.9, col=(230, 226, 220), alpha=150)
+        by = top + (H - top) * 0.55
+        bx = dx + 24 - (by - top) * 0.06 + 10
+        ink.poly([(bx - 14, by - 10), (bx + 10, by - 12), (bx + 12, by + 10), (bx - 12, by + 12)], 1.3, fill=(48, 44, 50, 255))
+    # трубы по правой стене
+    for xx_, col in ((WALL_R + 40, (150, 60, 62)), (WALL_R + 70, (60, 80, 140))):
+        ink.poly([(xx_, 40), (xx_ + 12, 40), (xx_ + 12, H), (xx_, H)], 1.3, fill=col + (255,))
+        ink.seg((xx_ + 3, 44), (xx_ + 3, H), 1.2, col=(235, 230, 230), alpha=140)
+    # банка-пепельница и цветок в горшке на поручне
+    bx = 640
+    ink.poly([(bx - 26, RAIL_Y - 8), (bx - 22, RAIL_Y - 16), (bx + 22, RAIL_Y - 16), (bx + 26, RAIL_Y - 8)], 1.3, fill=(170, 168, 160, 255))
+    ink.seg((bx - 12, RAIL_Y - 14), (bx + 6, RAIL_Y - 13), 2, col=(220, 150, 80), alpha=200)
+    gx = 1170
+    ink.poly([(gx - 22, RAIL_Y - 8), (gx - 26, RAIL_Y - 44), (gx + 26, RAIL_Y - 44), (gx + 22, RAIL_Y - 8)], 1.5, fill=(150, 84, 62, 255))
+    for a in (-1.2, -0.7, -0.2, 0.3, 0.8, 1.25):
+        ink.line([(gx, RAIL_Y - 44), (gx + 30 * math.sin(a), RAIL_Y - 70 - 30 * math.cos(a)), (gx + 50 * math.sin(a), RAIL_Y - 64 - 20 * math.cos(a))], 1.6, col=(70, 82, 56), wob=0.4)
+    return ink.comp(im)
+
+
+# ── персонажи ──
+def cutouts():
+    src = cv2.imread(os.path.join(A, "cg_roof.webp"))
+    figs = {}
+    for name, (x0, y0, x1, y1) in {"sera": (445, 335, 650, 752), "kir": (672, 282, 815, 748)}.items():
+        mask = np.zeros(src.shape[:2], np.uint8)
+        bg = np.zeros((1, 65), np.float64)
+        fg = np.zeros((1, 65), np.float64)
+        cv2.grabCut(src, mask, (x0, y0, x1 - x0, y1 - y0), bg, fg, 8, cv2.GC_INIT_WITH_RECT)
+        m = np.where((mask == 1) | (mask == 3), 255, 0).astype(np.uint8)
+        if name == "sera":  # ноги в чулках GrabCut теряет — добавить по контуру
+            cv2.fillPoly(m, [np.array([(517, 596), (541, 596), (538, 640), (534, 700), (515, 700), (512, 640)])], 255)
+            cv2.fillPoly(m, [np.array([(553, 596), (578, 596), (576, 640), (572, 700), (556, 700), (552, 640)])], 255)
+        n, lab, stats, _ = cv2.connectedComponentsWithStats(m)
+        big = 1 + int(np.argmax(stats[1:, cv2.CC_STAT_AREA]))
+        m = np.where(lab == big, 255, 0).astype(np.uint8)
+        m = cv2.GaussianBlur(m, (3, 3), 0)
+        rgba = cv2.cvtColor(src, cv2.COLOR_BGR2RGBA)
+        rgba[..., 3] = m
+        gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
+        if name == "kir":
+            # левое предплечье Кира (светлое, у кармана) — закрасить футболкой/штанами
+            arm = np.zeros(m.shape, np.uint8)
+            cv2.fillPoly(arm, [np.array([(694, 474), (714, 474), (714, 528), (694, 528)])], 255)
+            arm = ((arm > 0) & (gray > 70)).astype(np.uint8) * 255
+            arm = cv2.dilate(arm, np.ones((3, 3), np.uint8), 2)
+            figs["kir_noarm"] = rgba.copy()
+            figs["kir_noarm"][..., :3] = cv2.inpaint(cv2.cvtColor(src, cv2.COLOR_BGR2RGB), arm, 5, cv2.INPAINT_TELEA)
+        if name == "sera":
+            # правая кисть Серы на плече — закрасить курткой
+            hand_m = np.zeros(m.shape, np.uint8)
+            cv2.circle(hand_m, (622, 441), 10, 255, -1)
+            hand_m = ((hand_m > 0) & (gray > 90)).astype(np.uint8) * 255
+            hand_m = cv2.dilate(hand_m, np.ones((3, 3), np.uint8), 2)
+            figs["sera_nohand"] = rgba.copy()
+            figs["sera_nohand"][..., :3] = cv2.inpaint(cv2.cvtColor(src, cv2.COLOR_BGR2RGB), hand_m, 4, cv2.INPAINT_TELEA)
+        figs[name] = rgba
+    return figs
+
+
+def place(base, rgba, kir=False):
+    """Наложить фигуру (полный кадр cg_roof RGBA) с масштабом и сдвигом; тёплый свет из комнаты."""
+    dx = (KIR_SHIFT if kir else 0)
+    M = np.float32([[K, 0, (dx - CX0) * K], [0, K, -CY0 * K]])
+    warped = cv2.warpAffine(rgba, M, (W, H), flags=cv2.INTER_LANCZOS4, borderValue=(0, 0, 0, 0))
+    f = warped.astype(np.float32)
+    blur = cv2.GaussianBlur(f[..., :3], (0, 0), 1.2)
+    f[..., :3] = np.clip(f[..., :3] * 1.35 - blur * 0.35, 0, 255)  # лёгкая резкость после увеличения
+    yy = np.linspace(0, 1, H)[:, None, None]
+    f[..., :3] = f[..., :3] * 0.97 + np.array([16, 9, 3]) * yy
+    a = f[..., 3:4] / 255.0
+    base = arr(base)
+    base[..., :3] = base[..., :3] * (1 - a) + f[..., :3] * a
+    return img(base)
+
+
+SKIN = (164, 154, 158)
+SKIN_SH = (120, 112, 118)
+JACKET = (36, 32, 35)
+SHIRT = (31, 31, 34)
+CIG = (236, 232, 226)
+
+
+def spline(pts, n=10):
+    """Catmull-Rom через точки — плавная линия руки."""
+    if len(pts) < 3:
+        return [(pts[0][0] + (pts[1][0] - pts[0][0]) * t / n, pts[0][1] + (pts[1][1] - pts[0][1]) * t / n) for t in range(n + 1)]
+    q = [pts[0]] + list(pts) + [pts[-1]]
+    out = []
+    for i in range(1, len(q) - 2):
+        p0, p1, p2, p3 = q[i - 1], q[i], q[i + 1], q[i + 2]
+        for k in range(n):
+            t = k / n
+            t2, t3 = t * t, t * t * t
+            out.append(tuple(0.5 * ((2 * p1[j]) + (-p0[j] + p2[j]) * t + (2 * p0[j] - 5 * p1[j] + 4 * p2[j] - p3[j]) * t2 + (-p0[j] + 3 * p1[j] - 3 * p2[j] + p3[j]) * t3) for j in range(2)))
+    out.append(pts[-1])
+    return out
+
+
+def limb(ink, pts, w0, w1, fill, folds=True, cap=True, shade=None):
+    """Рука/рукав: плавная трубка с сужением, тушь по контуру, складки ткани."""
+    c = spline(pts)
+    n = len(c)
+    L, R = [], []
+    for i, (x, y) in enumerate(c):
+        j0, j1 = max(0, i - 1), min(n - 1, i + 1)
+        dx, dy = c[j1][0] - c[j0][0], c[j1][1] - c[j0][1]
+        ln = math.hypot(dx, dy) or 1
+        nx, ny = -dy / ln, dx / ln
+        t = i / (n - 1)
+        w = (w0 + (w1 - w0) * t) / 2 * (1 + 0.08 * math.sin(t * 9))  # ткань чуть «дышит»
+        L.append((x + nx * w, y + ny * w))
+        R.append((x - nx * w, y - ny * w))
+    endc = []
+    if cap:
+        x, y = c[-1]
+        dx, dy = c[-1][0] - c[-2][0], c[-1][1] - c[-2][1]
+        a0 = math.atan2(dy, dx)
+        for k in range(1, 6):
+            a = a0 + math.pi / 2 - k * math.pi / 6
+            endc.append((x + math.cos(a) * w1 / 2, y + math.sin(a) * w1 / 2))
+    shape = L + endc + R[::-1]
+    ink.d.polygon([(x * SS, y * SS) for x, y in shape], fill=fill + (255,))
+    if shade:  # теневая сторона
+        sh = [((l[0] * 0.55 + r[0] * 0.45), (l[1] * 0.55 + r[1] * 0.45)) for l, r in zip(L, R)]
+        ink.d.polygon([(x * SS, y * SS) for x, y in sh + R[::-1]], fill=shade + (255,))
+    ink.line(shape, 1.7, wob=0.25)
+    if folds:
+        r = random.Random(int(pts[0][0] * 7 + pts[-1][1]))
+        for k in range(3):
+            i = int(n * (0.3 + 0.22 * k))
+            if 0 < i < n - 1:
+                x, y = c[i]
+                l, rr_ = L[i], R[i]
+                ink.line([(l[0] * 0.8 + x * 0.2, l[1] * 0.8 + y * 0.2), (x + r.uniform(-2, 2), y + r.uniform(-2, 2)),
+                          (rr_[0] * 0.5 + x * 0.5, rr_[1] * 0.5 + y * 0.5)], 0.9, col=(96, 92, 108), wob=0.4, alpha=200)
+    return c
+
+
+def cig(ink, a, b, lit=0.0):
+    """Сигарета от a (фильтр) к b (кончик); lit 0..1 — тлеет."""
+    ink.seg(a, b, 4.4, n=2, col=INK, wob=0)
+    ink.seg(a, b, 2.8, n=2, col=CIG, wob=0, alpha=255)
+    fx = (a[0] + (b[0] - a[0]) * 0.3, a[1] + (b[1] - a[1]) * 0.3)
+    ink.seg(a, fx, 2.8, n=1, col=(206, 140, 84), wob=0, alpha=255)
+    if lit:
+        ink.ellipse((b[0] - 2.6, b[1] - 2.6, b[0] + 2.6, b[1] + 2.6), 0.6, fill=(255, 110 + int(80 * lit), 50, 255), col=(110, 40, 20))
+
+
+def glow(im, pts, rad, col=(255, 150, 70), amt=0.6):
+    g = np.zeros((H, W), np.float32)
+    for (x, y), s_ in pts:
+        cv2.circle(g, (int(x), int(y)), 2, s_, -1)
+    g = cv2.GaussianBlur(g, (0, 0), rad)
+    g = g / (g.max() + 1e-6)
+    a = arr(im)
+    a[..., :3] = a[..., :3] + np.array(col) * g[..., None] * amt
+    return img(a)
+
+
+def blob(ink, pts, w=1.4, fill=SKIN):
+    """Замкнутый плавный контур (кисть) — сплайн по опорным точкам."""
+    c = spline(pts + pts[:3], 6)[6:-7]
+    ink.poly(c, w, fill=fill + (255,), wob=0.1)
+
+
+def hand(ink, c, ang, s=1.3, pose="fist"):
+    """Кисть (вид сзади/сбоку): ладонь + пальцы; ang — куда смотрят пальцы. Возвращает T(локальные→кадр)."""
+    x, y = c
+    ca, sa = math.cos(ang), math.sin(ang)
+
+    def T(px, py):
+        return (x + (px * ca - py * sa) * s, y + (px * sa + py * ca) * s)
+
+    if pose == "fist":
+        blob(ink, [T(-6, -6), T(2, -8), T(8, -6), T(11, -1), T(10, 5), T(4, 8), T(-5, 7), T(-8, 1)])
+        for k in (-4, -0.5, 3):
+            ink.line([T(6, k - 1), T(9.5, k), T(8.5, k + 2)], 0.8, wob=0.1, alpha=170)
+        ink.line([T(-2, -7), T(4, -10), T(8, -9)], 1.2, wob=0.1)
+    elif pose == "cup":  # ладонь лодочкой вокруг огня
+        blob(ink, [T(-6, -5), T(4, -9), T(12, -7), T(14, 0), T(10, 7), T(-4, 7), T(-8, 1)])
+        ink.line([T(4, -9), T(8, -2), T(10, 7)], 0.8, wob=0.1, alpha=170)
+    else:  # pinch — держит сигарету двумя пальцами
+        blob(ink, [T(-6, -6), T(3, -7), T(9, -4), T(10, 2), T(4, 7), T(-6, 6), T(-8, 0)])
+        ink.poly([T(8, -4), T(15, -4.5), T(15.5, -1.5), T(8.5, -0.5)], 1.0, fill=SKIN + (255,), wob=0.1)
+        ink.poly([T(8, 0), T(14, 0.5), T(14, 3), T(8, 3.5)], 1.0, fill=SKIN + (255,), wob=0.1)
+    return T
+
+
+def smoke(im, paths, seed, alpha=0.5):
+    """Дым: мягкие клубы вдоль кривых [(x, y, r), ...]."""
+    lay = np.zeros((H, W), np.float32)
+    r = np.random.default_rng(seed)
+    for path in paths:
+        for x, y, rad in path:
+            cv2.circle(lay, (int(x + r.normal(0, 1.5)), int(y)), max(1, int(rad)), float(r.uniform(0.5, 1.0)), -1)
+    lay = cv2.GaussianBlur(lay, (0, 0), 4.5)
+    lay *= 0.7 + 0.5 * noise(seed, 14)
+    lay = np.clip(lay, 0, 1)[..., None] * alpha
+    a = arr(im)
+    a[..., :3] = a[..., :3] * (1 - lay) + np.array([212, 208, 218]) * lay
+    return img(a)
+
+
+def trail(x, y, h, seed, phase=0.0, wide=1.0):
+    """Тонкая струйка дыма вверх, извивается."""
+    pts = []
+    for i in range(int(h / 3)):
+        t = i / (h / 3)
+        pts.append((x + math.sin(t * 7 + phase + seed) * (3 + 22 * t) * wide, y - i * 3, 1.2 + 9 * t ** 1.4))
+    return pts
+
+
+def puff(x, y, s, seed, rise=0.0):
+    """Клуб выдоха: несколько расширяющихся шаров."""
+    r = random.Random(seed)
+    pts = []
+    for i in range(14):
+        t = i / 13
+        pts.append((x - 40 * t * s + r.uniform(-6, 6) * s, y - (20 + 80 * t) * s - rise, (6 + 22 * t) * s))
+    return pts
+
+
+def post(im, seed):
+    a = arr(im)
+    r = np.random.default_rng(seed)
+    a[..., :3] += r.normal(0, 6.5, a.shape[:2])[..., None]
+    v = noise(seed + 3, 24) * 0.05
+    a[..., :3] *= (1 + v[..., None])
+    yy, xx = np.mgrid[0:H, 0:W]
+    d = ((xx - W / 2) / (W / 1.6)) ** 2 + ((yy - H / 2) / (H / 1.4)) ** 2
+    a[..., :3] *= (1 - 0.28 * np.clip(d, 0, 1))[..., None]
+    return img(a).convert("RGB")
+
+
+def rain(im, seed, n=260, a=0.22):
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(lay)
     r = random.Random(seed)
     for _ in range(n):
-        x, y = r.uniform(0, W), r.uniform(70, H)
-        if snow:
-            s = r.uniform(1.5, 4.2)
-            d.ellipse([x - s, y - s, x + s, y + s], fill=(240, 242, 250, int(r.uniform(120, 220))))
-        else:
-            ln = r.uniform(14, 34)
-            d.line([(x, y), (x - ln * 0.18, y + ln)], fill=(200, 210, 235, int(r.uniform(40, 110))), width=1)
-    return Image.alpha_composite(im, g.filter(ImageFilter.GaussianBlur(0.6 if snow else 0.3)))
+        x = r.uniform(WALL_L, WALL_R)
+        y = r.uniform(SLAB_Y + 20, RAIL_Y - 10)
+        ln = r.uniform(10, 26)
+        d.line((x, y, x - 2, y + ln), fill=(210, 215, 235, int(255 * a)), width=1)
+    return Image.alpha_composite(im, lay)
 
 
-def drips(im, top, seed):
-    """Капли, висящие на поручне и на краю плиты."""
-    L = Layer()
-    r = random.Random(seed)
-    for _ in range(26):
-        x = r.uniform(160, 1230)
-        y = top + 16 + r.uniform(-2, 2)
-        L.ell((x - 3, y, x + 3, y + 8), (190, 205, 230, 200), line=None)
-    for _ in range(16):
-        x = r.uniform(170, 1220)
-        L.ell((x - 2.5, 72, x + 2.5, 80), (190, 205, 230, 180), line=None)
-    return Image.alpha_composite(im, L.done())
-
-
-def sprite(name, h, night=True):
-    s = load("sprites/%s.webp" % name)
-    k = h / s.height
-    s = s.resize((int(s.width * k), int(h)), Image.LANCZOS)
-    if night:
-        s = grade(s, (0.74, 0.74, 0.86), (4, 2, 10))
-    return s
-
-
-def cigarette(L, x0, y0, ang, ln=34, ember=True):
-    """Сигарета между пальцами: фильтр, бумага, тлеющий кончик."""
-    dx, dy = math.cos(ang), math.sin(ang)
-    nx, ny = -dy * 3.2, dx * 3.2
-    x1, y1 = x0 + dx * ln, y0 + dy * ln
-    xf, yf = x0 + dx * ln * 0.3, y0 + dy * ln * 0.3
-    L.poly([(x0 + nx, y0 + ny), (xf + nx, yf + ny), (xf - nx, yf - ny), (x0 - nx, y0 - ny)], (206, 146, 84, 255), w=2)
-    L.poly([(xf + nx, yf + ny), (x1 + nx, y1 + ny), (x1 - nx, y1 - ny), (xf - nx, yf - ny)], (240, 236, 228, 255), w=2)
-    if ember:
-        L.ell((x1 - 4, y1 - 4, x1 + 4, y1 + 4), (255, 120, 60, 255), line=(120, 40, 30, 255), w=1)
-    return x1, y1
-
-
-def compose_people(base, top, pair, night=True, snow=False, seed=1, smoking=True):
-    """Сера слева, герой справа, спиной к перилам. pair = (sera_expr, hero_expr)."""
-    im = base.copy()
-    se, he = pair
-    L0 = Layer()
-    can_ashtray(L0, 640, top - 4, 2)
-    im = Image.alpha_composite(im, L0.done())
-    sk, hk = 1000 / 1494, 980 / 1494
-    sx, sy, hx, hy = 250, 92, 690, 40
-    s = sprite("sera_" + se, 1000, night)
-    h = sprite("hero_" + he, 980, night)
-    im.alpha_composite(s, (sx, sy))
-    im.alpha_composite(h, (hx, hy))
-    L = Layer()
-    embers = []
-    if smoking:
-        # Сера: сигарета в пальцах, выглядывающих из рукава (руки сложены у пояса)
-        embers.append(cigarette(L, sx + 600 * sk, sy + 1000 * sk, -1.2, 30))
-        # герой: в опущенной правой руке (на спрайте слева)
-        embers.append(cigarette(L, hx + 228 * hk, hy + 1040 * hk, -0.45, 32))
-    im = Image.alpha_composite(im, L.done(False))
-    for (x, y) in embers:
-        im = glow(im, x, y, 30, (255, 120, 60), 130)
-        im = smoke(im, x, y - 4, seed=int(x), length=300, alpha=90)
-    return im
-
-
-def lighter_close(night=True, mugs=False, snow=False, seed=4):
-    """Крупный план: поручень, банка-пепельница, пачка, розовая зажигалка с огоньком; размытый город."""
-    v = view("night" if night else "dawn").filter(ImageFilter.GaussianBlur(9))
-    v = v.resize((int(W * 1.25), int(H * 1.25)), Image.LANCZOS).crop((120, 40, 120 + W, 40 + H))
-    # боке окон
-    g = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    d = ImageDraw.Draw(g)
-    r = random.Random(seed)
-    for _ in range(60):
-        x, y, rr = r.uniform(0, W), r.uniform(200, 470), r.uniform(8, 26)
-        d.ellipse([x - rr, y - rr, x + rr, y + rr], fill=(255, 200, 120, int(r.uniform(30, 90))))
-    v = Image.alpha_composite(v, g.filter(ImageFilter.GaussianBlur(3)))
-    L = Layer()
-    top = 520
-    L.poly([(-10, top), (W + 10, top - 30), (W + 10, top + 70), (-10, top + 110)], (106, 80, 62, 255), w=4, seed=1)
-    L.poly([(-10, top + 110), (W + 10, top + 70), (W + 10, H + 10), (-10, H + 10)], (40, 56, 62, 255), w=4, seed=2)
-    for x in range(0, W, 60):
-        L.line([(x, top + 116 - x * 0.03), (x + 4, H)], (24, 34, 38, 220), 5, seed=x)
-    # банка крупно
-    cx, by = 560, top + 28
-    w, hh = 260, 96
-    L.ell((cx - w / 2, by - hh, cx + w / 2, by), (156, 156, 166, 255), w=4)
-    L.ell((cx - w / 2 + 16, by - hh + 12, cx + w / 2 - 16, by - 18), (58, 50, 46, 255), w=3)
-    L.poly([(cx + w / 2 - 20, by - hh + 8), (cx + w / 2 + 70, by - hh - 90), (cx + w / 2 + 94, by - hh - 70),
-            (cx + w / 2 + 4, by - hh + 30)], (192, 192, 202, 255), w=4, seed=8)
-    for i in range(5):
-        L.line([(cx - w / 2 + 30 + i * 46, by - hh + 30), (cx - w / 2 + 40 + i * 46, by - 26)], (90, 84, 80, 120), 3, seed=i)
-    for k in range(3 if not mugs else 5):
-        x = cx - 80 + k * 38
-        L.poly([(x, by - 50), (x + 70, by - 72), (x + 74, by - 60), (x + 4, by - 38)], (232, 224, 208, 255), w=3, seed=50 + k)
-        L.poly([(x, by - 50), (x + 22, by - 57), (x + 26, by - 45), (x + 4, by - 38)], (200, 142, 82, 255), line=None)
-    # пачка (мятая, без марки — красная полоса)
-    px0 = 900
-    L.poly([(px0, top - 4), (px0 + 150, top - 22), (px0 + 160, top - 230), (px0 + 6, top - 214)], (232, 228, 220, 255), w=4, seed=9)
-    L.poly([(px0 + 3, top - 120), (px0 + 155, top - 138), (px0 + 157, top - 176), (px0 + 4, top - 160)], (170, 40, 52, 255), w=3, seed=10)
-    L.poly([(px0 + 6, top - 214), (px0 + 160, top - 230), (px0 + 150, top - 262), (px0 + 2, top - 246)], (210, 206, 198, 255), w=4, seed=11)
-    for k in range(3):
-        L.poly([(px0 + 30 + k * 34, top - 246), (px0 + 52 + k * 34, top - 248), (px0 + 54 + k * 34, top - 300 + k * 8),
-                (px0 + 32 + k * 34, top - 298 + k * 8)], (236, 232, 224, 255), w=3, seed=60 + k)
-        L.poly([(px0 + 30 + k * 34, top - 260), (px0 + 52 + k * 34, top - 262), (px0 + 53 + k * 34, top - 276 + k * 8 + 4),
-                (px0 + 31 + k * 34, top - 274 + k * 8 + 4)], (204, 146, 84, 255), line=None)
-    # зажигалка (розовая, полупрозрачная)
-    lx, ly = 300, top - 10
-    L.poly([(lx, ly), (lx + 78, ly - 8), (lx + 70, ly - 190), (lx - 6, ly - 182)], (236, 120, 160, 230), w=4, seed=12)
-    L.poly([(lx - 6, ly - 182), (lx + 70, ly - 190), (lx + 68, ly - 236), (lx - 4, ly - 228)], (170, 170, 180, 255), w=4, seed=13)
-    L.ell((lx + 10, ly - 262, lx + 50, ly - 222), (110, 104, 110, 255), w=3)
-    if mugs:
-        for k, (mx, col) in enumerate(((150, (220, 216, 206, 255)), (1180, (150, 40, 60, 255)))):
-            L.poly([(mx - 70, top - 4 - k * 18), (mx + 70, top - 10 - k * 18), (mx + 64, top - 180 - k * 18), (mx - 64, top - 174 - k * 18)], col, w=4, seed=70 + k)
-            L.ell((mx - 66, top - 194 - k * 18, mx + 66, top - 160 - k * 18), (90, 50, 30, 255), w=3)
-            L.d.arc([(mx + 50) * SS, (top - 150 - k * 18) * SS, (mx + 110) * SS, (top - 60 - k * 18) * SS], -90, 90, fill=INK, width=8 * SS)
-    im = Image.alpha_composite(v, L.done())
-    if not mugs:
-        im = glow(im, lx + 30, ly - 290, 70, (255, 170, 80), 170)
-        F = Layer()
-        F.poly([(lx + 30, ly - 340), (lx + 46, ly - 296), (lx + 30, ly - 262), (lx + 14, ly - 296)], (255, 220, 140, 255), line=(220, 110, 40, 255), w=2)
-        im = Image.alpha_composite(im, F.done())
-        for x in (cx - 80 + 74, cx - 42 + 74, cx - 4 + 74):
-            im = smoke(im, x, by - 76, seed=int(x), length=360, alpha=70)
-    else:
-        for mx in (150, 1180):
-            im = smoke(im, mx, top - 200, seed=mx, length=260, alpha=60, drift=0.4)
-    im = rain(im, seed, n=180, snow=snow)
-    return im
-
-
-def finish(im, seed, vignette=0.35):
-    im = grain(im, 6, seed)
-    a = np.asarray(im).astype(np.float32)
-    yy, xx = np.mgrid[0:H, 0:W]
-    d = np.sqrt(((xx - W / 2) / (W / 2)) ** 2 + ((yy - H / 2) / (H / 2)) ** 2)
-    k = 1 - vignette * np.clip(d - 0.55, 0, 1)
-    a[..., :3] *= k[..., None]
-    return Image.fromarray(np.clip(a, 0, 255).astype(np.uint8), "RGBA").convert("RGB")
-
-
-def scene(time="night", snow=False, people=None, seed=1, smoking=True):
-    v = view(time)
-    fg, top = balcony(time, snow, seed)
-    im = Image.alpha_composite(v, fg)
-    if time == "night":
-        im = glow(im, 70, 330, 230, (255, 190, 120), 70)
-    im = drips(im, top, seed)
-    if people:
-        im = compose_people(im, top, people, night=time == "night", snow=snow, seed=seed, smoking=smoking)
-    else:
-        L = Layer()
-        can_ashtray(L, 640, top - 4, 2)
-        im = Image.alpha_composite(im, L.done())
-    im = rain(im, seed + 9, n=260 if not snow else 200, snow=snow)
-    return finish(im, seed)
-
-
-def closeup(im, cx, cy, z, flame=None):
-    """Наезд на часть кадра (лица) + огонёк зажигалки, тёплый свет на лицах."""
-    w, h = W / z, H / z
-    x0, y0 = min(max(0, cx - w / 2), W - w), min(max(0, cy - h / 2), H - h)
-    im = im.convert("RGBA").crop((int(x0), int(y0), int(x0 + w), int(y0 + h))).resize((W, H), Image.LANCZOS)
-    if flame:
-        fx, fy = (flame[0] - x0) * z, (flame[1] - y0) * z
-        im = glow(im, fx, fy, 380, (255, 160, 80), 70)
-        im = glow(im, fx, fy, 90, (255, 190, 110), 170)
-        F = Layer()
-        F.poly([(fx, fy - 46), (fx + 15, fy - 6), (fx, fy + 14), (fx - 15, fy - 6)], (255, 226, 150, 255), line=(230, 120, 40, 255), w=2)
-        F.ell((fx - 6, fy - 2, fx + 6, fy + 12), (120, 170, 255, 220), line=None)
-        # сигарета, которую прикуривают: тянется к огоньку сверху
-        L = Layer()
-        cigarette(L, fx - 70, fy - 40, 0.42, 64, ember=False)
-        im = Image.alpha_composite(im, L.done(False))
-        im = Image.alpha_composite(im, F.done(False))
-    return finish(im, 9, 0.45)
-
-
-def save(im, name):
+def save(im, name, seed=1):
     os.makedirs(OUT, exist_ok=True)
-    im.save(os.path.join(OUT, name + ".webp"), "WEBP", quality=90, method=6)
-    print("ok", name)
+    post(im, seed).save(os.path.join(OUT, name + ".webp"), "WEBP", quality=88, method=6)
+
+
+def main():
+    bg = balcony_bg()
+    save(rain(bg, 1), "balcony", 1)
+    figs = cutouts()
+
+    def scene(sera="sera", kir="kir"):
+        return place(place(bg, figs[sera]), figs[kir], kir=True)
+
+    if os.environ.get("BAL_QUICK"):
+        save(rain(scene(), 3, 140, 0.16), "bal_s0", 3)
+        return
+
+    # ключевые точки в кадре (сняты по сетке с bal_s0)
+    s_hand0 = (716, 338)  # правая кисть Серы на плече
+    s_sh = (712, 352)  # её правое плечо
+    k_elb = (806, 396)  # конец рукава Кира / локоть
+    k_mouth = (812, 190)  # левый край лица Кира
+    s_mouth = (640, 238)
+    frames = {"bal_s0": scene()}
+    # край головы Кира на уровне рта — сигарета выходит ровно из-за щеки
+    M = np.float32([[K, 0, (KIR_SHIFT - CX0) * K], [0, K, -CY0 * K]])
+    ka = cv2.warpAffine(figs["kir"][..., 3], M, (W, H))
+    row = np.where(ka[k_mouth[1], 760:900] > 140)[0]
+    k_mouth = (760 + int(row[0]) + 3 if len(row) else k_mouth[0], k_mouth[1])
+
+    def kir_cig_mouth(ink, lit):
+        # локоть прижат, кисть у рта скрыта головой — из-за щеки виден кончик сигареты
+        cig(ink, (k_mouth[0], k_mouth[1]), (k_mouth[0] - 15, k_mouth[1] + 3), lit)
+        return (k_mouth[0] - 15, k_mouth[1] + 3)
+
+    # 1) достаёт пачку и передаёт сигарету
+    im = scene("sera_nohand")
+    ink = Ink()
+    limb(ink, [(722, 372), (744, 410), (742, 452)], 46, 40, JACKET)  # рука опущена к карману
+    frames["bal_p0"] = ink.comp(im)
+
+    im = scene("sera_nohand")
+    ink = Ink()
+    limb(ink, [(722, 372), (748, 414), (768, 446)], 46, 38, JACKET)
+    T = hand(ink, (776, 452), -0.6, 1.3)
+    ink.poly([T(0, -16), T(14, -18), T(16, 6), T(2, 8)], 1.4, fill=(228, 224, 216, 255))  # мятая пачка
+    ink.poly([T(0, -16), T(14, -18), T(14.5, -10), T(0.5, -8)], 1.0, fill=(158, 42, 52, 255))
+    frames["bal_p1"] = ink.comp(im)
+
+    im = scene("sera_nohand")
+    ink = Ink()
+    limb(ink, [(722, 372), (752, 410), (776, 432)], 46, 38, JACKET)
+    T = hand(ink, (784, 436), -0.35, 1.3, "pinch")
+    cig(ink, T(12, -1), T(34, -5))
+    frames["bal_p2"] = ink.comp(im)
+
+    im = scene("sera_nohand", "kir_noarm")
+    ink = Ink()
+    limb(ink, [(722, 372), (752, 410), (776, 432)], 46, 38, JACKET)
+    T = hand(ink, (784, 436), -0.35, 1.3, "pinch")
+    limb(ink, [k_elb, (812, 418), (812, 432)], 17, 15, SKIN, folds=False, shade=SKIN_SH)
+    hand(ink, (808, 434), math.pi - 0.2, 1.3, "pinch")
+    cig(ink, T(12, -1), T(34, -5))
+    frames["bal_p3"] = ink.comp(im)
+
+    im = scene("sera", "kir_noarm")
+    ink = Ink()
+    kir_cig_mouth(ink, 0.0)  # взял в зубы — рука у лица скрыта
+    st = (s_hand0[0] + 24, s_hand0[1] - 12)
+    cig(ink, (s_hand0[0] + 4, s_hand0[1] - 3), st)  # у Серы — своя, в руке на плече
+    frames["bal_p4"] = ink.comp(im)
+
+    # 2) зажигалка: Сера подносит огонь к лицу Кира, потом прикуривает себе
+    def lighter(stage):
+        im = scene("sera_nohand", "kir_noarm")
+        ink = Ink()
+        tip = kir_cig_mouth(ink, 0.0 if stage == 0 else 1.0)
+        if stage < 2:
+            fl = (tip[0] + 1, tip[1] + 1)
+            wr = (fl[0] - 22, fl[1] + 22)
+            limb(ink, [s_sh, (748, 318), (wr[0] - 20, wr[1] + 40), wr], 46, 34, JACKET)
+            hand(ink, (fl[0] - 12, fl[1] + 12), -0.75, 1.3, "cup")
+        else:
+            fl = (s_mouth[0] + 4, s_mouth[1] - 4)  # рука у её лица скрыта хвостиком, виден огонёк
+        im = ink.comp(im)
+        im = glow(im, [(fl, 1.0)], 40, amt=0.75 if stage != 1 else 0.6)
+        im = glow(im, [(fl, 1.0)], 9, col=(255, 200, 120), amt=0.5)
+        ink2 = Ink()
+        h = 13 if stage != 1 else 9
+        ink2.poly([(fl[0], fl[1] - h), (fl[0] + 4.5, fl[1] - 2), (fl[0], fl[1] + 3), (fl[0] - 4.5, fl[1] - 2)], 0.6,
+                  fill=(255, 214, 130, 255), col=(170, 80, 30))
+        ink2.poly([(fl[0], fl[1] - h * 0.5), (fl[0] + 2, fl[1] - 1), (fl[0], fl[1] + 2), (fl[0] - 2, fl[1] - 1)], 0.3,
+                  fill=(110, 170, 255, 255), col=(80, 120, 200))
+        return ink2.comp(im)
+
+    for i in range(3):
+        frames["bal_l%d" % i] = lighter(i)
+
+    # 3) затяжка (огонёк разгорается) и выдох — облака дыма у голов
+    def smoke_frame(stage):
+        im = scene("sera_nohand", "kir_noarm")
+        ink = Ink()
+        lit = 1.0 if stage <= 1 else 0.5
+        kt = kir_cig_mouth(ink, lit)
+        im = ink.comp(im)
+        im = glow(im, [(kt, 1.0)], 12 if stage <= 1 else 6, amt=0.6 if stage <= 1 else 0.3)
+        if stage >= 2:
+            k = stage - 2
+            im = smoke(im, [puff(k_mouth[0] - 18, k_mouth[1] + 10, 1.1 + 0.45 * k, 3, 34 * k),
+                            puff(s_mouth[0] + 16, s_mouth[1] + 8, 1.0 + 0.45 * k, 4, 34 * k)],
+                       10 + stage, alpha=0.8 - 0.18 * k)
+        return smoke(im, [trail(kt[0], kt[1], 50 + 20 * stage, 1, stage)], 30 + stage, 0.35)
+
+    for i in range(5):
+        frames["bal_i%d" % i] = smoke_frame(i)
+
+    # 4) стоят, курят и разговаривают (цикл): у Серы сигарета в руке на плече, у Кира — у кармана
+    def talk(ph):
+        im = scene("sera", "kir")
+        ink = Ink()
+        T = hand(ink, (830, 482), 0.9, 1.3, "pinch")
+        kt = T(30, -4)
+        cig(ink, T(12, -1), kt, 0.8)
+        st = (s_hand0[0] + 24, s_hand0[1] - 12)
+        cig(ink, (s_hand0[0] + 4, s_hand0[1] - 3), st, 0.8)
+        im = ink.comp(im)
+        im = glow(im, [(kt, 1.0), (st, 1.0)], 6, amt=0.35)
+        return smoke(im, [trail(kt[0], kt[1], 170, 1, ph), trail(st[0], st[1], 150, 2, ph + 1.3)], 50 + int(ph * 10), 0.42)
+
+    for i in range(4):
+        frames["bal_t%d" % i] = talk(i * math.pi / 2)
+
+    seeds = {k: i + 3 for i, k in enumerate(frames)}
+    for k, im in frames.items():
+        save(rain(im, seeds[k], 140, 0.16), k, seeds[k])
+    # концовка: курят / просто стоят / снег
+    save(rain(frames["bal_t1"], 90, 140, 0.16), "end_more1", 90)
+    save(rain(scene(), 91, 220, 0.2), "end_more2", 91)
+    sn = scene()
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(lay)
+    r = random.Random(9)
+    for _ in range(420):
+        x, y, s_ = r.uniform(0, W), r.uniform(0, H), r.uniform(1.2, 3.4)
+        d.ellipse((x - s_, y - s_, x + s_, y + s_), fill=(245, 245, 255, int(r.uniform(120, 230))))
+    save(Image.alpha_composite(sn, lay.filter(ImageFilter.GaussianBlur(0.6))), "end_more3", 92)
+    print("ok", len(frames) + 4)
 
 
 if __name__ == "__main__":
-    save(scene("night", people=None, seed=1), "balcony")
-    save(scene("night", people=("soft", "soft"), seed=2), "cg_balcony1")
-    raw = scene("night", people=("tease", "shy"), seed=3, smoking=False)
-    save(closeup(raw, 690, 330, 1.7, flame=(668, 420)), "cg_balcony2")
-    v = view("night")
-    fg, top = balcony("night")
-    im = Image.alpha_composite(v, fg)
-    im = drips(im, top, 4)
-    L = Layer()
-    can_ashtray(L, 640, top - 4, 2)
-    im = Image.alpha_composite(im, L.done())
-    for x in (560, 760):
-        C = Layer()
-        ex, ey = cigarette(C, x - 30, top - 4, -0.25, 34)
-        im = Image.alpha_composite(im, C.done(False))
-        im = glow(im, ex, ey, 26, (255, 120, 60), 140)
-        im = smoke(im, ex, ey - 4, seed=x, length=380, alpha=120)
-    save(closeup(rain(im, 14, 240), 690, 330, 1.3), "cg_balcony3")
-    save(scene("night", snow=True, people=("happy", "grin"), seed=5), "end_more1")
-    save(scene("dawn", snow=True, people=None, seed=6), "end_more2")
-    raw = scene("night", snow=True, people=("laugh", "soft"), seed=7)
-    save(closeup(raw, 700, 300, 1.45), "end_more3")
+    main()
