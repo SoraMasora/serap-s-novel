@@ -11,7 +11,7 @@ const scripts = [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map(m =>
 
 // ── 1. Сценарий ──
 const ctx = vm.createContext({ window: {}, console });
-for (const s of ['js/story.js', 'js/story3.js']) vm.runInContext(fs.readFileSync(path.join(ROOT, s), 'utf8'), ctx, { filename: s });
+for (const s of ['js/story.js', 'js/story3.js', 'js/story4.js']) vm.runInContext(fs.readFileSync(path.join(ROOT, s), 'utf8'), ctx, { filename: s });
 vm.runInContext('this.__o = { STORY, ENDINGS, pickEnding: pickEnding.toString() };', ctx);
 const { STORY, ENDINGS, pickEnding } = ctx.__o;
 

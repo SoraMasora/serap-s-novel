@@ -10,6 +10,17 @@ const PAT_FRAMES := ["sera_pat2", "sera_pat3", "sera_pat4", "sera_pat3"]
 const BG_ANIM := {
 	"bal_s0": {"frames": ["bal_l0", "bal_l1", "bal_l2", "bal_l3"], "fps": 6.0},
 	"bal_talk": {"frames": ["bal_t0", "bal_t1", "bal_t2", "bal_t3"], "fps": 2.5},
+	"m2_rs": {"frames": ["m2_rs0", "m2_rs1", "m2_rs2", "m2_rs3"], "fps": 2.5},
+	"m2_sn":
+	{
+		"frames": ["m2_sn0", "m2_sn1", "m2_sn2", "m2_sn3", "m2_sn4", "m2_sn5"],
+		"fps": 5.0,
+	},
+	"m2_hug":
+	{
+		"frames": ["m2_hug0", "m2_hug1", "m2_hug2", "m2_hug3", "m2_hug4", "m2_hug5"],
+		"fps": 5.0,
+	},
 }
 
 @export var bg_fade_sec := 1.2
