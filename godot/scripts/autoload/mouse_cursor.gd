@@ -37,6 +37,8 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	if DisplayServer.get_name() == "headless" or not ResourceLoader.exists(SHEET):
 		return
+	if OS.has_feature("mobile"):  # на телефоне курсора нет
+		return
 	_enabled = true
 	size_px = _pick_size()
 	_cut()

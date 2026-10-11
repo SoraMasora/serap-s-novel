@@ -122,6 +122,12 @@ func _load_seen() -> void:
 
 
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST:  # Android «назад» = Esc
+		var ev := InputEventAction.new()
+		ev.action = "vn_menu"
+		ev.pressed = true
+		Input.parse_input_event(ev)
+		return
 	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_PREDELETE:
 		save_seen()
 

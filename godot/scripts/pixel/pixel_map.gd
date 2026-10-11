@@ -16,6 +16,9 @@ var _msg := ""
 var _close_frames: Array[Texture2D] = []
 var _close_t := 0.0
 var _close_k := 0
+var _touch: HBoxContainer
+var _touch_act: Button
+var _touch_swing: Array[Button] = []
 
 @onready var view: SubViewportContainer = $View
 @onready var pworld: PixelWorld = $View/Viewport/World
@@ -58,8 +61,58 @@ func _ready() -> void:
 	move_child(closeup_rect, view.get_index() + 1)
 	view.gui_input.connect(_on_view_input)
 	resized.connect(_fit)
+	if OS.has_feature("mobile") or DisplayServer.is_touchscreen_available():
+		_make_touch()
 	for b: Button in $Hud/Buttons.get_children():
 		b.pressed.connect(func() -> void: button_pressed.emit(String(b.name).to_lower()))
+
+
+## Сенсорные кнопки (телефон): действие (E) и качели (W/A) — шлют те же input-actions.
+func _make_touch() -> void:
+	_touch = HBoxContainer.new()
+	_touch.name = "Touch"
+	_touch.add_theme_constant_override("separation", 18)
+	_touch.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	_touch.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	_touch.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	_touch.position = Vector2(-24, -24)
+	add_child(_touch)
+	for d: Array in [["◀ Назад", "map_left"], ["Вперёд ▶", "map_up"]]:
+		var b := _touch_btn(d[0], d[1])
+		_touch_swing.append(b)
+	_touch_act = _touch_btn("Действие", "map_interact")
+
+
+func _touch_btn(text: String, action: String) -> Button:
+	var b := Button.new()
+	b.text = text
+	b.focus_mode = Control.FOCUS_NONE
+	b.custom_minimum_size = Vector2(190, 96)
+	b.add_theme_font_size_override("font_size", 30)
+	b.button_down.connect(_send.bind(action, true))
+	b.button_up.connect(_send.bind(action, false))
+	_touch.add_child(b)
+	return b
+
+
+func _send(action: String, down: bool) -> void:
+	var ev := InputEventAction.new()
+	ev.action = action
+	ev.pressed = down
+	Input.parse_input_event(ev)
+
+
+func _upd_touch() -> void:
+	if _touch == null:
+		return
+	var sit := pworld.sitting and not is_closeup()
+	for b in _touch_swing:
+		b.visible = sit
+	_touch_act.text = "Встать" if sit else ("Назад" if is_closeup() else "Действие")
+	_touch_act.visible = sit or is_closeup() or pworld.near() != ""
+	var r := _touch.get_combined_minimum_size()
+	_touch.size = r
+	_touch.position = size - r - Vector2(24, 24)
 
 
 func open(m: Dictionary) -> void:
@@ -176,6 +229,7 @@ func _on_tick(s: int) -> void:
 func _process(delta: float) -> void:
 	if not visible:
 		return
+	_upd_touch()
 	if is_closeup():
 		_close_t += delta
 		if _close_t >= 0.22 and _close_frames.size() > 1:
