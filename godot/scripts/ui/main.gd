@@ -33,6 +33,8 @@ var _options: Array = []
 var _bg_front: TextureRect
 var _bg_back: TextureRect
 var _toast_tw: Tween
+var _ui_hidden := false
+var _line_key := ""
 
 @onready var stage: Control = $Stage
 @onready var gloom: ColorRect = $Stage/Gloom
@@ -44,7 +46,7 @@ var _toast_tw: Tween
 @onready var chapter_label: Label = $Hud/Chapter
 @onready var toast: Label = $Toast
 @onready var side: Control = $Side
-@onready var side_img: TextureRect = $Side/Img
+@onready var side_img: TextureRect = $Side/Clip/Img
 @onready var textbox: TextBox = $TextBox
 @onready var choices: Control = $Choices
 @onready var choice_list: VBoxContainer = $Choices/List
@@ -257,7 +259,15 @@ func _say(e: Dictionary) -> void:
 	textbox.set_side_padding(side.visible)
 	textbox.visible = true
 	waiting = false
+	_line_key = "%s:%d" % [runner.st.scene, runner.st.i]
+	if skip and not Game.is_seen(_line_key):
+		skip = false
+		_sync_btns()
+		show_toast("Новый текст — пропуск остановлен")
 	textbox.show_line(e.display, kind, e.text, thought, skip or Game.settings.speed <= 0)
+	var sv: CharacterView = _chars.get(who)
+	if sv and not skip and not thought and e.changes.is_empty():
+		sv.talk()
 
 
 ## Отложенный переход: только если реплика не сменилась (и авто ещё включено)
@@ -268,6 +278,8 @@ func _advance_if(g: int, need_auto: bool) -> void:
 
 func _on_typing_done() -> void:
 	waiting = true
+	if _line_key != "":
+		Game.mark_seen(_line_key)
 	autosave()
 	var g := _gen
 	if skip:
@@ -320,16 +332,26 @@ func _choose(options: Array) -> void:
 		var o: Dictionary = options[i]
 		var b: ChoiceButton = CHOICE.instantiate()
 		choice_list.add_child(b)
-		b.setup(runner.fmt(o.t), o.get("hint", ""))
+		b.setup(runner.fmt(o.t), i)
 		b.pressed.connect(_on_choice.bind(i))
 		b.hovered.connect(hover_lean)
 	choices.visible = true
 
 
 func _on_choice(i: int) -> void:
-	choices.visible = false
+	if not in_choice:
+		return
 	in_choice = false
 	hover_lean(false)
+	var last: Tween
+	var kids := choice_list.get_children()
+	for k in kids.size():
+		var b := kids[k] as ChoiceButton
+		if b:
+			last = b.play_chosen() if k == i else b.play_dismiss(k)
+	if last and not skip and is_inside_tree():
+		await get_tree().create_timer(0.36).timeout
+	choices.visible = false
 	var rk := runner.choose(_options, i)
 	if rk != "":
 		react(rk)
@@ -659,9 +681,14 @@ func _on_control(a: String) -> void:
 		"skip":
 			skip = not skip
 			auto = false
+			if skip and not waiting and not Game.is_seen(_line_key):
+				skip = false
+				show_toast("Пропуск — только по прочитанному")
 			_sync_btns()
 			if skip and (waiting or textbox.typing):
 				advance()
+		"hide":
+			set_ui_hidden(true)
 		"notes":
 			modal.open_notes(runner.st.notes, Game.db.notes_total)
 		"log":
@@ -687,6 +714,8 @@ func _on_menu(a: String) -> void:
 
 func _on_setting(k: String, v: float) -> void:
 	Game.set_setting(k, v)
+	if k == "fullscreen":
+		Game.apply_window()
 	textbox.speed = Game.settings.speed
 
 
@@ -705,8 +734,45 @@ func show_toast(t: String) -> void:
 	_toast_tw.tween_property(toast, "modulate:a", 0.0, 0.4)
 
 
+## Режим «Кадр»: прячет весь интерфейс, любой клик/клавиша возвращает
+func set_ui_hidden(on: bool) -> void:
+	_ui_hidden = on
+	if on:
+		auto = false
+		skip = false
+		_sync_btns()
+	var a := 0.0 if on else 1.0
+	for n: CanvasItem in [textbox, side, hud, choices]:
+		create_tween().tween_property(n, "modulate:a", a, 0.25)
+	textbox.mouse_filter = Control.MOUSE_FILTER_IGNORE if on else Control.MOUSE_FILTER_STOP
+	choices.mouse_filter = Control.MOUSE_FILTER_IGNORE if on else Control.MOUSE_FILTER_PASS
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		var k := event as InputEventKey
+		if k.keycode == KEY_F11 or (k.keycode == KEY_ENTER and k.alt_pressed):
+			Game.toggle_fullscreen()
+			get_viewport().set_input_as_handled()
+			return
+	if not _ui_hidden:
+		return
+	var press: bool = (
+		(event is InputEventKey and event.pressed)
+		or (event is InputEventMouseButton and event.pressed)
+	)
+	if press:
+		set_ui_hidden(false)
+		get_viewport().set_input_as_handled()
+
+
 # ── Клавиатура ──
 func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		if (event as InputEventKey).keycode == KEY_H and textbox.visible and playing:
+			if not modal.is_open() and not pixel_map.is_open():
+				set_ui_hidden(true)
+				return
 	if modal.is_open():
 		if event.is_action_pressed("vn_menu"):
 			modal.close()

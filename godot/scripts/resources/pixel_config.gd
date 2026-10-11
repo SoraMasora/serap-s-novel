@@ -6,6 +6,13 @@ extends Resource
 @export var world_width := 560
 @export var walk_y_min := 108.0
 @export var walk_y_max := 146.0
+## Проезжая часть во дворе: ниже road_y — дорога; можно дойти до road_y_max
+@export var road_y := 153.0
+@export var road_y_max := 174.0
+@export var road_car_after := 0.9
+@export var road_car_speed := 170.0
+@export var hit_delay := 0.7
+@export var road_warning := "Дорога. Машины тут не тормозят — даже ночью, даже под дождём."
 @export var walk_speed := 64.0
 @export var run_speed := 92.0
 @export var step_interval := 0.27
@@ -74,12 +81,12 @@ extends Resource
 @export var swing_lines := PackedStringArray(
 	[
 		(
-			"Сера сидит на качелях с альбомом и рисует котов. "
-			+ "Увидела меня — показала язык. Увидимся вечером."
+			"Сера качается под дождём — промокла до нитки и уходить не собирается. "
+			+ "Увидела меня — показала язык."
 		),
 		(
-			"Сера раскачивается, глядя в небо. "
-			+ "«Не мешай, я ловлю вдохновение», — говорит она, не оборачиваясь."
+			"Сера раскачивается, подставив лицо дождю. "
+			+ "«Не мешай, я ловлю вдохновение», — и показывает мне язык."
 		),
 	]
 )

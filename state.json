@@ -1,17 +1,38 @@
 {
   "project": "serap-s-novel",
   "route": "B",
-  "phase": "port-complete-verification",
+  "phase": "visual-polish",
   "status": "green-with-known-issues",
-  "next_task": "KI-007: запустить .github/workflows/godot.yml на GitHub и починить, если упадёт; затем KI-003 замер FPS на реальном GPU",
-  "blocked_by": ["нет GPU в среде агента (KI-003)", "CI не запускался (KI-007)"],
+  "next_task": "Проверить у пользователя на ПК: «Кадр» (H), полноэкранный (F11), пропуск прочитанного, крупные планы на карте, концовка «Обочина»; затем KI-007 (CI) и KI-003 (FPS на GPU)",
+  "blocked_by": [
+    "нет GPU в среде агента (KI-003)",
+    "CI не запускался (KI-007)"
+  ],
   "verification": [
-    {"cmd": "gdformat --check scripts tests && gdlint scripts tests", "result": "no problems", "status": "PASS", "date": "2026-10-09"},
-    {"cmd": "GUT -gdir=res://tests -ginclude_subdirs", "result": "28/28, 193 asserts", "status": "PASS", "date": "2026-10-09"},
-    {"cmd": "godot --headless --path godot -- --autoplay=42", "result": "home, steps 403, digest 9a1c118c", "status": "PASS", "date": "2026-10-09"},
-    {"cmd": "godot --export-release Web", "result": "68 MB", "status": "PASS", "date": "2026-10-09"},
-    {"cmd": "web_smoke.cjs", "result": "ERRORS none, boot 12.9 s", "status": "PASS (host)", "date": "2026-10-09"},
-    {"cmd": ".github/workflows/godot.yml", "result": "not run", "status": "UNVERIFIED", "date": "2026-10-09"}
+    {
+      "cmd": "gdformat --check scripts tests && gdlint scripts tests",
+      "result": "no problems",
+      "status": "PASS",
+      "date": "2026-10-10"
+    },
+    {
+      "cmd": "GUT -gdir=res://tests -ginclude_subdirs",
+      "result": "28/28, 211 asserts",
+      "status": "PASS",
+      "date": "2026-10-10"
+    },
+    {
+      "cmd": "node tools/godot/js_reference.cjs 200",
+      "result": "home 148, gone 11, neutral 19, good 13, bad 8, letters 1",
+      "status": "PASS",
+      "date": "2026-10-10"
+    },
+    {
+      "cmd": ".github/workflows/godot.yml",
+      "result": "not run",
+      "status": "UNVERIFIED",
+      "date": "2026-10-10"
+    }
   ],
   "pins": {
     "godot": "4.7.2-stable",
@@ -28,6 +49,17 @@
     "web_boot_s": 10,
     "web_size_mb": 50
   },
-  "todo": ["KI-001", "KI-002", "KI-003", "KI-004", "KI-005", "KI-006", "KI-007", "KI-008"],
+  "todo": [
+    "KI-001",
+    "KI-002",
+    "KI-003",
+    "KI-004",
+    "KI-005",
+    "KI-006",
+    "KI-007",
+    "KI-008",
+    "KI-009",
+    "KI-010"
+  ],
   "last_code_sha": "d5d9034"
 }

@@ -297,6 +297,11 @@ max_value = 4000
 step = 100
 value = 600
 
+[node name="Fullscreen" type="CheckButton" parent="Center/Panel/Panels/Settings"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Полноэкранный режим"
+
 [node name="Spacer" type="Control" parent="Center/Panel/Panels/Settings"]
 layout_mode = 2
 size_flags_vertical = 3

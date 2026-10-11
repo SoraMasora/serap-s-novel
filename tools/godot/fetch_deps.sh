@@ -27,7 +27,9 @@ fetch_font "grenzegotisch/GrenzeGotisch%5Bwght%5D.ttf" GrenzeGotisch.ttf 701b299
 fetch_font "cormorantsc/CormorantSC-Bold.ttf" CormorantSC-Bold.ttf 78f70c79b5c0a1e66641d4b4a2e2ed32e1a45774b3de94e56f8de68510219177
 fetch_font "lora/Lora%5Bwght%5D.ttf" Lora.ttf 822a6621ccbe8d97d20ac88c1c41f5615c9c2c202eaa75f272cd452aac6475a7
 fetch_font "lora/Lora-Italic%5Bwght%5D.ttf" Lora-Italic.ttf 22d8d8854b53807aa664ca34f2031a9ed57a1d0dea296b8b96cdd3aad937a2b3
+fetch_font "comfortaa/Comfortaa%5Bwght%5D.ttf" Comfortaa.ttf 0fc3f45dc48b614db9c39181502544b37217ecbf8bee2fb35886992bc96c5bd3
 curl -fsSL -o "$G/assets/fonts/OFL-GrenzeGotisch.txt" "https://raw.githubusercontent.com/google/fonts/$FONTS_REV/ofl/grenzegotisch/OFL.txt"
 curl -fsSL -o "$G/assets/fonts/OFL-CormorantSC.txt" "https://raw.githubusercontent.com/google/fonts/$FONTS_REV/ofl/cormorantsc/OFL.txt"
 curl -fsSL -o "$G/assets/fonts/OFL-Lora.txt" "https://raw.githubusercontent.com/google/fonts/$FONTS_REV/ofl/lora/OFL.txt"
+curl -fsSL -o "$G/assets/fonts/OFL-Comfortaa.txt" "https://raw.githubusercontent.com/google/fonts/$FONTS_REV/ofl/comfortaa/OFL.txt"
 echo "fonts ok"

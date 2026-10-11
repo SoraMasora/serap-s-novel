@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/name_screen.tscn" id="9"]
 [ext_resource type="PackedScene" path="res://scenes/ui/modal.tscn" id="10"]
 [ext_resource type="PackedScene" path="res://scenes/ui/ending_screen.tscn" id="11"]
+[ext_resource type="Script" path="res://scripts/ui/deco.gd" id="12_deco"]
 
 [sub_resource type="Gradient" id="vig_g"]
 offsets = PackedFloat32Array(0.55, 1)
@@ -189,31 +190,57 @@ grow_horizontal = 0
 theme_type_variation = &"ChapterLabel"
 horizontal_alignment = 2
 
-[node name="Side" type="Control" parent="."]
-visible = false
-clip_contents = true
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.01
-anchor_top = 0.54
-anchor_right = 0.17
-anchor_bottom = 1.0
-mouse_filter = 2
-
-[node name="Img" type="TextureRect" parent="Side"]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = -1.0
-anchor_top = 0.02
-anchor_right = 2.0
-anchor_bottom = 1.52
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
 [node name="TextBox" parent="." instance=ExtResource("3")]
 visible = false
 layout_mode = 1
+
+[node name="Side" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.055
+anchor_top = 1.0
+anchor_right = 0.055
+anchor_bottom = 1.0
+offset_left = 22.0
+offset_top = -214.0
+offset_right = 164.0
+offset_bottom = -30.0
+rotation = -0.05
+pivot_offset = Vector2(71, 92)
+mouse_filter = 2
+
+[node name="Card" type="Control" parent="Side"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("12_deco")
+kind = 3
+
+[node name="Clip" type="Control" parent="Side"]
+clip_contents = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 7.0
+offset_top = 7.0
+offset_right = -7.0
+offset_bottom = -23.0
+mouse_filter = 2
+
+[node name="Img" type="TextureRect" parent="Side/Clip"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.62
+anchor_top = -0.03
+anchor_right = 1.62
+anchor_bottom = 2.45
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
 
 [node name="Choices" type="Control" parent="."]
 layout_mode = 1

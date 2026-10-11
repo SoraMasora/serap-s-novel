@@ -1,9 +1,10 @@
-[gd_resource type="Theme" load_steps=21 format=3]
+[gd_resource type="Theme" load_steps=25 format=3]
 
 [ext_resource type="FontFile" path="res://assets/fonts/Lora.ttf" id="1_lora"]
 [ext_resource type="FontFile" path="res://assets/fonts/CormorantSC-Bold.ttf" id="2_corm"]
 [ext_resource type="FontFile" path="res://assets/fonts/GrenzeGotisch.ttf" id="3_grenze"]
 [ext_resource type="FontFile" path="res://assets/fonts/Lora-Italic.ttf" id="4_lora_i"]
+[ext_resource type="FontFile" path="res://assets/fonts/Comfortaa.ttf" id="5_comf"]
 
 [sub_resource type="FontVariation" id="lora"]
 base_font = ExtResource("1_lora")
@@ -12,6 +13,22 @@ variation_opentype = {2003265652: 420}
 [sub_resource type="FontVariation" id="lora_italic"]
 base_font = ExtResource("4_lora_i")
 variation_opentype = {2003265652: 420}
+
+[sub_resource type="FontVariation" id="comfortaa"]
+base_font = ExtResource("5_comf")
+variation_opentype = {2003265652: 500}
+fallbacks = Array[Font]([SubResource("lora")])
+
+[sub_resource type="FontVariation" id="comfortaa_bold"]
+base_font = ExtResource("5_comf")
+variation_opentype = {2003265652: 700}
+fallbacks = Array[Font]([SubResource("lora")])
+
+[sub_resource type="FontVariation" id="comfortaa_oblique"]
+base_font = ExtResource("5_comf")
+variation_opentype = {2003265652: 400}
+variation_transform = Transform2D(1, 0, 0.16, 1, 0, 0)
+fallbacks = Array[Font]([SubResource("lora_italic")])
 
 [sub_resource type="FontVariation" id="cormorant"]
 base_font = ExtResource("2_corm")
@@ -159,15 +176,15 @@ content_margin_right = 30.0
 content_margin_bottom = 12.0
 
 [resource]
-default_font = SubResource("lora")
+default_font = SubResource("comfortaa")
 default_font_size = 20
 Button/colors/font_color = Color(0.945, 0.875, 0.89, 1)
 Button/colors/font_hover_color = Color(1, 0.56, 0.72, 1)
 Button/colors/font_pressed_color = Color(1, 0.7, 0.8, 1)
 Button/colors/font_focus_color = Color(1, 0.8, 0.86, 1)
 Button/colors/font_disabled_color = Color(0.6, 0.55, 0.6, 0.45)
-Button/font_sizes/font_size = 20
-Button/fonts/font = SubResource("cormorant")
+Button/font_sizes/font_size = 18
+Button/fonts/font = SubResource("comfortaa_bold")
 Button/styles/disabled = SubResource("sb_btn")
 Button/styles/focus = SubResource("sb_focus")
 Button/styles/hover = SubResource("sb_btn_hover")
@@ -200,7 +217,7 @@ ChoiceVine/constants/shadow_offset_x = 0
 ChoiceVine/constants/shadow_offset_y = 0
 ChoiceVine/constants/shadow_outline_size = 10
 ChoiceVine/font_sizes/font_size = 18
-ChoiceVine/fonts/font = SubResource("lora")
+ChoiceVine/fonts/font = SubResource("comfortaa_bold")
 ChoiceVine/styles/disabled = SubResource("sb_choice")
 ChoiceVine/styles/focus = SubResource("sb_empty")
 ChoiceVine/styles/hover = SubResource("sb_choice")
@@ -213,11 +230,12 @@ ControlButton/colors/font_hover_color = Color(1, 0.56, 0.72, 1)
 ControlButton/colors/font_pressed_color = Color(1, 0.56, 0.72, 1)
 ControlButton/colors/font_hover_pressed_color = Color(1, 0.56, 0.72, 1)
 ControlButton/colors/font_focus_color = Color(0.863, 0.745, 0.804, 0.55)
-ControlButton/font_sizes/font_size = 12
+ControlButton/font_sizes/font_size = 13
+ControlButton/fonts/font = SubResource("comfortaa_bold")
 ControlDot/base_type = &"Label"
 ControlDot/colors/font_color = Color(0.784, 0.118, 0.275, 0.6)
 ControlDot/font_sizes/font_size = 12
-ControlDot/fonts/font = SubResource("cormorant")
+ControlDot/fonts/font = SubResource("comfortaa")
 ControlButton/styles/focus = SubResource("sb_empty")
 ControlButton/styles/hover = SubResource("sb_empty")
 ControlButton/styles/hover_pressed = SubResource("sb_empty")
@@ -226,18 +244,20 @@ ControlButton/styles/pressed = SubResource("sb_empty")
 DialogueText/base_type = &"RichTextLabel"
 DialogueText/colors/default_color = Color(0.957, 0.925, 0.941, 1)
 DialogueText/colors/font_shadow_color = Color(0, 0, 0, 0.9)
-DialogueText/constants/line_separation = 7
+DialogueText/constants/line_separation = 9
 DialogueText/constants/shadow_offset_x = 0
 DialogueText/constants/shadow_offset_y = 1
-DialogueText/font_sizes/normal_font_size = 21
-DialogueText/font_sizes/italics_font_size = 21
-DialogueText/fonts/italics_font = SubResource("lora_italic")
-DialogueText/fonts/normal_font = SubResource("lora")
+DialogueText/font_sizes/normal_font_size = 20
+DialogueText/font_sizes/bold_font_size = 20
+DialogueText/font_sizes/italics_font_size = 20
+DialogueText/fonts/italics_font = SubResource("comfortaa_oblique")
+DialogueText/fonts/normal_font = SubResource("comfortaa")
+DialogueText/fonts/bold_font = SubResource("comfortaa_bold")
 Hint/base_type = &"Label"
 Hint/colors/font_color = Color(0.8, 0.72, 0.78, 0.7)
 Hint/font_sizes/font_size = 14
-Hint/fonts/font = SubResource("lora_italic")
-LineEdit/fonts/font = SubResource("lora")
+Hint/fonts/font = SubResource("comfortaa_oblique")
+LineEdit/fonts/font = SubResource("comfortaa")
 LineEdit/font_sizes/font_size = 22
 LineEdit/styles/normal = SubResource("sb_line")
 LineEdit/styles/focus = SubResource("sb_line")
@@ -255,8 +275,8 @@ NameBox/constants/outline_size = 4
 NameBox/constants/shadow_offset_x = 0
 NameBox/constants/shadow_offset_y = 0
 NameBox/constants/shadow_outline_size = 12
-NameBox/font_sizes/font_size = 24
-NameBox/fonts/font = SubResource("cormorant")
+NameBox/font_sizes/font_size = 19
+NameBox/fonts/font = SubResource("comfortaa_bold")
 NameBox/styles/normal = SubResource("sb_empty")
 PanelContainer/styles/panel = SubResource("sb_panel")
 PanelTitle/base_type = &"Label"

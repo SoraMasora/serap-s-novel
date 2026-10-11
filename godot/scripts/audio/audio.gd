@@ -123,11 +123,19 @@ func rain(on: bool) -> void:
 
 
 func sfx(k: String) -> void:
+	# новый звук из godot/art/sfx (например, brake/siren) — в обход запечённого набора
+	var art := "res://art/sfx/%s.ogg" % k
+	if ResourceLoader.exists(art):
+		_play_sfx(_stream(art, false))
+		return
 	if not config.sfx_keys.has(k):
 		push_warning("Неизвестный SFX: " + k)
 		return
 	var key := "door_shop" if k == "door" and config.shop_locs.has(loc) else k
-	var s := _stream(config.sfx_dir + key + ".ogg", false)
+	_play_sfx(_stream(config.sfx_dir + key + ".ogg", false))
+
+
+func _play_sfx(s: AudioStream) -> void:
 	if s == null:
 		return
 	var p: AudioStreamPlayer = sfx_pool.get_child(_sfx_i % sfx_pool.get_child_count())

@@ -6,13 +6,17 @@ signal settings_changed
 const CONFIG_PATH := "res://data/game_config.tres"
 const MANIFEST_PATH := "res://data/assets_manifest.json"
 const SETTINGS_PATH := "user://settings.cfg"
+const SEEN_PATH := "user://seen.json"
 
 var config: GameConfig
 var db: StoryDB
 ## group → {key → res-путь}
 var manifest: Dictionary = {}
-var settings := {"speed": 28.0, "music": 0.6, "auto_delay": 1800.0}
+var settings := {"speed": 28.0, "music": 0.6, "auto_delay": 1800.0, "fullscreen": 1.0}
+## Прочитанные реплики («сцена:индекс») — «Пропуск» листает только их
+var seen: Dictionary = {}
 var _tex_cache: Dictionary = {}
+var _seen_dirty := 0
 
 
 func _ready() -> void:
@@ -22,9 +26,12 @@ func _ready() -> void:
 		"speed": config.default_text_speed,
 		"music": config.default_music_volume,
 		"auto_delay": config.default_auto_delay_ms,
+		"fullscreen": 1.0,
 	}
 	_load_manifest()
 	_load_settings()
+	_load_seen()
+	apply_window()
 
 
 func _load_manifest() -> void:
@@ -39,9 +46,12 @@ func _load_manifest() -> void:
 		push_error("Битый " + MANIFEST_PATH)
 
 
-## Текстура по группе и ключу (bg/sprites/title/ui); null, если нет
+## Текстура по группе и ключу (bg/sprites/title/ui); null, если нет.
+## Новый арт из res://art/<group>/ (в git) перекрывает сгенерированные ассеты.
 func tex(group: String, key: String) -> Texture2D:
-	var path: String = manifest.get(group, {}).get(key, "")
+	var path := _art_path(group, key)
+	if path == "":
+		path = manifest.get(group, {}).get(key, "")
 	if path == "":
 		return null
 	if not _tex_cache.has(path):
@@ -50,7 +60,70 @@ func tex(group: String, key: String) -> Texture2D:
 
 
 func has_tex(group: String, key: String) -> bool:
-	return manifest.get(group, {}).has(key)
+	return _art_path(group, key) != "" or manifest.get(group, {}).has(key)
+
+
+func _art_path(group: String, key: String) -> String:
+	for ext: String in [".webp", ".png", ".jpg"]:
+		var p := "res://art/%s/%s%s" % [group, key, ext]
+		if ResourceLoader.exists(p):
+			return p
+	return ""
+
+
+## Полный экран без чёрных полос (stretch aspect = expand) или окно
+func apply_window() -> void:
+	if DisplayServer.get_name() == "headless":
+		return
+	var fs := float(settings.get("fullscreen", 1.0)) > 0.5
+	var mode := DisplayServer.WINDOW_MODE_FULLSCREEN if fs else DisplayServer.WINDOW_MODE_WINDOWED
+	if DisplayServer.window_get_mode() != mode:
+		DisplayServer.window_set_mode(mode)
+
+
+func toggle_fullscreen() -> void:
+	set_setting("fullscreen", 0.0 if float(settings.get("fullscreen", 1.0)) > 0.5 else 1.0)
+	apply_window()
+
+
+func is_seen(key: String) -> bool:
+	return seen.has(key)
+
+
+func mark_seen(key: String) -> void:
+	if seen.has(key):
+		return
+	seen[key] = 1
+	_seen_dirty += 1
+	if _seen_dirty >= 8:
+		save_seen()
+
+
+func save_seen() -> void:
+	if _seen_dirty == 0:
+		return
+	_seen_dirty = 0
+	var f := FileAccess.open(SEEN_PATH + ".tmp", FileAccess.WRITE)
+	if f == null:
+		push_error("Не удалось записать прочитанное: " + error_string(FileAccess.get_open_error()))
+		return
+	f.store_string(JSON.stringify(seen.keys()))
+	f.close()
+	DirAccess.rename_absolute(SEEN_PATH + ".tmp", SEEN_PATH)
+
+
+func _load_seen() -> void:
+	if not FileAccess.file_exists(SEEN_PATH):
+		return
+	var d: Variant = JSON.parse_string(FileAccess.get_file_as_string(SEEN_PATH))
+	if d is Array:
+		for k: Variant in d:
+			seen[str(k)] = 1
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_PREDELETE:
+		save_seen()
 
 
 func _load_settings() -> void:

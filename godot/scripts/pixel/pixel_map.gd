@@ -10,8 +10,12 @@ const SIGN := preload("res://scenes/pixel/pixel_sign.tscn")
 const CONFIG_PATH := "res://data/pixel_config.tres"
 
 var pc: PixelConfig
+var closeup_rect: TextureRect
 var _base_task := ""
 var _msg := ""
+var _close_frames: Array[Texture2D] = []
+var _close_t := 0.0
+var _close_k := 0
 
 @onready var view: SubViewportContainer = $View
 @onready var pworld: PixelWorld = $View/Viewport/World
@@ -36,7 +40,23 @@ func _ready() -> void:
 			item_picked.emit()
 	)
 	pworld.ticked.connect(_on_tick)
+	pworld.closeup.connect(show_closeup)
+	closeup_rect = TextureRect.new()
+	closeup_rect.name = "Closeup"
+	closeup_rect.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	closeup_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	closeup_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	closeup_rect.mouse_filter = Control.MOUSE_FILTER_STOP
+	closeup_rect.visible = false
+	closeup_rect.gui_input.connect(
+		func(e: InputEvent) -> void:
+			if e is InputEventMouseButton and e.pressed:
+				hide_closeup()
+	)
+	add_child(closeup_rect)
+	move_child(closeup_rect, view.get_index() + 1)
 	view.gui_input.connect(_on_view_input)
+	resized.connect(_fit)
 	for b: Button in $Hud/Buttons.get_children():
 		b.pressed.connect(func() -> void: button_pressed.emit(String(b.name).to_lower()))
 
@@ -63,12 +83,71 @@ func open(m: Dictionary) -> void:
 		var l: Label = SIGN.instantiate()
 		l.text = s[0]
 		l.set_meta("wx", float(s[1]))
-		l.position.y = float(s[2]) / pc.screen.y * size.y
+		l.set_meta("wy", float(s[2]))
 		signs.add_child(l)
+	_fit()
 	mini.setup(pworld)
 
 
+## Пиксельный кадр 320×180 растягивается «с обрезкой», без чёрных полос на любом экране
+func _fit() -> void:
+	if pc == null:
+		return
+	var scr := Vector2(pc.screen)
+	var k := maxf(size.x / scr.x, size.y / scr.y)
+	view.size = scr
+	view.scale = Vector2(k, k)
+	view.position = ((size - scr * k) / 2.0).floor()
+
+
+## Пиксельный крупный план: кадры closeup_<key>_0..N из godot/art/pixel, мир на паузе
+func show_closeup(key: String, _text: String) -> void:
+	_close_frames.clear()
+	for i in 8:
+		var t := Game.tex("pixel", "closeup_%s_%d" % [key, i])
+		if t == null:
+			break
+		_close_frames.append(t)
+	if _close_frames.is_empty():
+		return
+	_close_k = 0
+	_close_t = 0.0
+	closeup_rect.texture = _close_frames[0]
+	closeup_rect.position = view.position
+	closeup_rect.size = Vector2(pc.screen) * view.scale.x
+	closeup_rect.visible = true
+	closeup_rect.modulate.a = 0.0
+	create_tween().tween_property(closeup_rect, "modulate:a", 1.0, 0.25)
+	pworld.set_process(false)
+	pworld.msg_t = maxf(pworld.msg_t, pc.say_seconds)
+	signs.visible = false
+	mini.visible = false
+	help.visible = false
+
+
+func hide_closeup() -> void:
+	if not closeup_rect.visible:
+		return
+	var tw := create_tween()
+	tw.tween_property(closeup_rect, "modulate:a", 0.0, 0.2)
+	tw.tween_callback(func() -> void: closeup_rect.visible = false)
+	pworld.set_process(true)
+	signs.visible = true
+	mini.visible = true
+	help.visible = true
+
+
+func is_closeup() -> bool:
+	return closeup_rect != null and closeup_rect.visible
+
+
 func close() -> void:
+	if closeup_rect:
+		closeup_rect.visible = false
+	signs.visible = true
+	mini.visible = true
+	help.visible = true
+	pworld.set_process(true)
 	pworld.stop()
 	visible = false
 
@@ -93,13 +172,23 @@ func _on_tick(s: int) -> void:
 		task_label.add_theme_color_override("font_color", Color("#ff6b6b"))
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if not visible:
 		return
-	var k := size.x / pc.screen.x
+	if is_closeup():
+		_close_t += delta
+		if _close_t >= 0.22 and _close_frames.size() > 1:
+			_close_t = 0.0
+			_close_k = (_close_k + 1) % _close_frames.size()
+			closeup_rect.texture = _close_frames[_close_k]
+		prompt.text = _msg + "   ·   E — назад"
+		prompt.visible = true
+		return
+	var k := view.scale.x
 	for l: Label in signs.get_children():
 		var x: float = l.get_meta("wx") - pworld.cam_x
-		l.position.x = x * k - l.size.x / 2.0
+		l.position.x = view.position.x + x * k - l.size.x / 2.0
+		l.position.y = view.position.y + float(l.get_meta("wy")) * k
 		l.visible = x > -30 and x < pc.screen.x + 30
 	if pworld.msg_t > 0:
 		prompt.text = _msg
@@ -125,6 +214,11 @@ func _on_view_input(event: InputEvent) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not is_open():
+		return
+	if is_closeup():
+		if event.is_action_pressed("map_interact") or event.is_action_pressed("vn_menu"):
+			get_viewport().set_input_as_handled()
+			hide_closeup()
 		return
 	if event.is_action_pressed("map_interact"):
 		get_viewport().set_input_as_handled()

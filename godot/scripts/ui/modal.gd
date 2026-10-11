@@ -33,6 +33,7 @@ var _rb_index := -1
 @onready var s_speed: HSlider = $Center/Panel/Panels/Settings/Speed/Slider
 @onready var s_music: HSlider = $Center/Panel/Panels/Settings/Music/Slider
 @onready var s_auto: HSlider = $Center/Panel/Panels/Settings/Auto/Slider
+@onready var s_full: CheckButton = $Center/Panel/Panels/Settings/Fullscreen
 @onready var endings_panel: Control = $Center/Panel/Panels/Endings
 @onready var endings_list: VBoxContainer = $Center/Panel/Panels/Endings/List
 @onready var menu_panel: Control = $Center/Panel/Panels/Menu
@@ -51,6 +52,9 @@ func _ready() -> void:
 	s_speed.value_changed.connect(func(v: float) -> void: setting_changed.emit("speed", v))
 	s_music.value_changed.connect(func(v: float) -> void: setting_changed.emit("music", v))
 	s_auto.value_changed.connect(func(v: float) -> void: setting_changed.emit("auto_delay", v))
+	s_full.toggled.connect(
+		func(on: bool) -> void: setting_changed.emit("fullscreen", 1.0 if on else 0.0)
+	)
 	$Center/Panel/Panels/Confirm/Buttons/Yes.pressed.connect(
 		func() -> void: rollback_confirmed.emit(_rb_index)
 	)
@@ -143,6 +147,7 @@ func open_settings(s: Dictionary) -> void:
 	s_speed.set_value_no_signal(s.speed)
 	s_music.set_value_no_signal(s.music)
 	s_auto.set_value_no_signal(s.auto_delay)
+	s_full.set_pressed_no_signal(float(s.get("fullscreen", 1.0)) > 0.5)
 	_show(settings_panel)
 
 
