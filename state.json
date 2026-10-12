@@ -1,9 +1,9 @@
 {
   "project": "serap-s-novel",
   "route": "B",
-  "phase": "content-0.6.0",
+  "phase": "content-0.6.1",
   "status": "green-with-known-issues",
-  "next_task": "Проверить у пользователя на ПК: реакции Серы на выбор (хлопает/сердится), Тимур/Матвей, развилка «отдать чай», некурящий маршрут месяца 2 (ответить «Не курю» в месяце 1); затем KI-007, KI-003",
+  "next_task": "Проверить у пользователя: новый Тимур (store_1/store_2/месяц 2), затем реакции Серы, развилка «отдать чай», некурящий маршрут; потом KI-007, KI-003",
   "blocked_by": [
     "нет GPU в среде агента (KI-003)",
     "CI не запускался (KI-007)"
@@ -13,25 +13,25 @@
       "cmd": "gdformat --check scripts tests && gdlint scripts tests",
       "result": "no problems",
       "status": "PASS",
-      "date": "2026-10-12"
+      "date": "2026-10-13"
     },
     {
       "cmd": "GUT -gdir=res://tests -ginclude_subdirs",
       "result": "31/31, 286 asserts",
       "status": "PASS",
-      "date": "2026-10-12"
+      "date": "2026-10-13"
     },
     {
       "cmd": "node tools/godot/js_reference.cjs 200",
       "result": "home 130, more 32, neutral 17, good 8, gone 7, bad 6",
       "status": "PASS",
-      "date": "2026-10-12"
+      "date": "2026-10-13"
     },
     {
       "cmd": ".github/workflows/godot.yml",
       "result": "not run",
       "status": "UNVERIFIED",
-      "date": "2026-10-11"
+      "date": "2026-10-13"
     }
   ],
   "pins": {
