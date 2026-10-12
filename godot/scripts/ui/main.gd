@@ -11,6 +11,9 @@ const BG_ANIM := {
 	"bal_s0": {"frames": ["bal_l0", "bal_l1", "bal_l2", "bal_l3"], "fps": 6.0},
 	"bal_talk": {"frames": ["bal_t0", "bal_t1", "bal_t2", "bal_t3"], "fps": 2.5},
 	"m2_rs": {"frames": ["m2_rs0", "m2_rs1", "m2_rs2", "m2_rs3"], "fps": 2.5},
+	# 0.6: крыша заново — дым от кончиков сигарет (m2_rx) / некурящий вариант с чаем (m2_rt)
+	"m2_rx": {"frames": ["m2_rx0", "m2_rx1", "m2_rx2", "m2_rx3"], "fps": 2.5},
+	"m2_rt": {"frames": ["m2_rt0", "m2_rt1", "m2_rt2", "m2_rt3"], "fps": 2.0},
 	"m2_sn":
 	{
 		"frames": ["m2_sn0", "m2_sn1", "m2_sn2", "m2_sn3", "m2_sn4", "m2_sn5"],

@@ -305,14 +305,10 @@ func choose(options: Array, idx: int) -> String:
 	var f: float = float(o.get("feel", 0))
 	var rk: String = o.get("react", "")
 	if rk == "":
-		if f >= 10:
-			rk = "shy"
-		elif f >= 5:
-			rk = "hop"
-		elif f <= -12:
-			rk = "shake"
+		if f >= 3:
+			rk = "clap"
 		elif f < 0:
-			rk = "shiver"
+			rk = "angry"
 	log_push({"n": "→", "t": fmt(o.t), "ch": true, "s": _choice_snap})
 	if f != 0:
 		change_feel(f)

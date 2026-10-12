@@ -321,6 +321,13 @@ func _play_motion(kind: String, ms: float) -> void:
 			_react_tw.tween_property(motion, "scale", Vector2(1.03, 1.03), 0.35)
 			_react_tw.tween_interval(maxf(0.1, ms / 1000.0 - 0.7))
 			_react_tw.tween_property(motion, "scale", Vector2.ONE, 0.35)
+		"clap":
+			for _k in 3:
+				_react_tw.tween_property(motion, "position:y", -0.012 * h, 0.13)
+				_react_tw.tween_property(motion, "position:y", 0.0, 0.17)
+		"angry":
+			for x: float in [-0.006, 0.006, -0.006, 0.006, -0.004, 0.004, 0.0]:
+				_react_tw.tween_property(motion, "position:x", x * w, 0.07)
 		"giggle", "shout":
 			for _k in 4:
 				_react_tw.tween_property(motion, "position:y", -0.008 * h, 0.12)

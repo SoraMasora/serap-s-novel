@@ -246,3 +246,10 @@ GitHub MCP `push_files` с `arguments_file_path` (JSON `{owner, repo, branch, me
 - Сюжет НЕ дублируется: `node tools/godot/export_data.cjs` переводит `js/story*.js` в `godot/data/story.json` (лямбды `when` → Expression). После правки сюжета в вебе — перегенерировать story.json и эталон `node tools/godot/js_reference.cjs 200`, прогнать GUT.
 - Ассеты Godot не в git: `export_data.cjs --assets` (из assets/*.js и маркеры из css), `bake_web.cjs` (пиксельные слои js/pixel.js и звуки js/audio.js через Chromium), `fetch_deps.sh` (GUT, шрифты).
 - Вёрстка повторяет последние переопределения css: #textbox v4/v4.1/v5, #namebox, #controls, #side, #choices .vbtn с лозами. Приближения — `docs/PORTING_CONTRACT.md`.
+
+## godot-0.6.0 (2026-10-12)
+- Реакции на выбор: `clap` (feel ≥ 3) / `angry` (feel < 0) — `js/engine.js` (ANIM, CRY_MAP), `godot/scripts/core/story_runner.gd::choose`, `game_config.gd::reactions/cry_map`, движение — `character_view.gd::_play_motion`. Кадры `sera_clap1/2`, `sera_angry1/2` — `assets/anim5.js`.
+- Флаги: `c3nosmoke` (месяц 1, «Не курю») → ветки `*_ns` в `js/story4.js`; `m2cherry` (купил вишнёвый чай) → `m2_tea_q` → `m2_tea` (`m2tea`).
+- Анимированные фоны крыши: `BG_ANIM.m2_rx` (курят), `BG_ANIM.m2_rt` (чай) в `godot/scripts/ui/main.gd`; веб показывает первый кадр (`setBg`: `A.bg[k] || A.bg[k+'0']`).
+- Арт: Тимур 1007×1500 (`npc1.js`), Матвей 1120×1494 (`npc2.js`), `cg_shift` (`cg2.js`), `cg_store_help` (`cg9.js`), `m2_tea` (`cg11.js`), `m2_rx*` (`x7.js`), `m2_rt*` (`x8.js`). Генератор крыши — `tools/art/roof_v06.py` (исходники `tools/art/src/m2/roofsit2.jpg`, `rooftea.jpg`, `teagift.jpg` — не в git).
+

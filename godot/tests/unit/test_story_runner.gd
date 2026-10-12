@@ -14,8 +14,8 @@ func before_each() -> void:
 
 func test_story_loaded() -> void:
 	assert_eq(db.load_error, "")
-	assert_eq(db.scenes.size(), 330, "число сцен как в веб-версии")
-	assert_eq(db.notes_total, 60)
+	assert_eq(db.scenes.size(), 350, "число сцен как в веб-версии")
+	assert_eq(db.notes_total, 61)
 
 
 func test_all_targets_exist() -> void:
@@ -36,7 +36,7 @@ func test_all_conditions_parse_and_run() -> void:
 				e.execute([50.0, 0.0], r, true)
 				assert_false(e.has_execute_failed(), c.when)
 				n += 1
-	assert_eq(n, 76)
+	assert_eq(n, 88)
 
 
 func test_tier_thresholds() -> void:
@@ -96,11 +96,12 @@ func test_name_substitution() -> void:
 func test_choice_applies_effects_and_react() -> void:
 	var opts := [{"t": "a", "feel": 10, "set": {"x": true}, "go": "c1_store"}]
 	r.mark_choice_shown()
-	assert_eq(r.choose(opts, 0), "shy")
+	assert_eq(r.choose(opts, 0), "clap")
 	assert_eq(r.st.feel, 60.0)
 	assert_true(r.flag("x"))
 	assert_eq(r.st.scene, "c1_store")
-	assert_eq(r.choose([{"t": "b", "feel": -12, "go": "start"}], 0), "shake")
+	assert_eq(r.choose([{"t": "b", "feel": -12, "go": "start"}], 0), "angry")
+	assert_eq(r.choose([{"t": "c", "feel": 1, "go": "start"}], 0), "")
 
 
 func test_map_visits_counter() -> void:
@@ -147,3 +148,34 @@ func test_months_and_m2_dialogue() -> void:
 		assert_false(str(db.scenes[key]).contains("не уронил"), key)
 	assert_false(str(db.scenes["m2_door"]).contains("shout"), "без плачущего крика")
 	assert_false(str(db.scenes["m2_door_quiet"]).contains("мышь"), "клички появляются позже")
+
+
+## 0.6: «Не курю» в Месяце 1 → в Месяце 2 на крыше чай, а не сигареты
+func test_m2_nosmoke_roof_is_tea() -> void:
+	r.st.flags = {"c3nosmoke": true}
+	r.jump("m2_roof")
+	r.step()
+	assert_eq(r.st.bg, "m2_rt")
+	r.st.flags = {}
+	r.jump("m2_roof")
+	r.step()
+	assert_eq(r.st.bg, "bal_s0", "сначала прикуривание")
+	r.step()
+	assert_eq(r.st.bg, "m2_rx")
+
+
+## 0.6: купленный вишнёвый чай можно отдать Сере ночью — отдельный CG m2_tea
+func test_m2_cherry_tea_can_be_given() -> void:
+	r.st.flags = {"m2cherry": true}
+	r.jump("m2_tea_q")
+	var ev := r.step()
+	ev = r.step()
+	assert_eq(ev[-1].type, "choice")
+	r.mark_choice_shown()
+	var f: float = r.st.feel
+	r.choose(ev[-1].options, 0)
+	assert_true(r.flag("m2tea"))
+	assert_eq(r.st.feel, f + 4.0)
+	assert_eq(r.st.scene, "m2_tea")
+	r.step()
+	assert_eq(r.st.bg, "m2_tea")

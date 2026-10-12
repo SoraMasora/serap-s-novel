@@ -105,7 +105,7 @@ function playCut(frames) {
   c.onclick = e => { e.stopPropagation(); next(); }; next();
 }
 function setBg(k, instant) {
-  camTo(null); st.bg = k; if (typeof applyRain === 'function') applyRain(); Sound.loc(k); const url = `url(${A.bg[k]})`;
+  camTo(null); st.bg = k; if (typeof applyRain === 'function') applyRain(); Sound.loc(k); const url = `url(${A.bg[k] || A.bg[k + '0']})`; // m2_rx/m2_rt: в вебе — первый кадр (анимация в Godot)
   if (instant) { bgFront.style.backgroundImage = url; bgFront.style.opacity = 1; bgBack.style.opacity = 0; return; }
   bgBack.style.backgroundImage = url; bgBack.style.opacity = 1; bgFront.style.opacity = 0;
   [bgFront, bgBack] = [bgBack, bgFront];
@@ -313,7 +313,7 @@ function choose(list) {
     b.onmouseenter = () => hoverLean(true); b.onmouseleave = () => hoverLean(false);
     b.onclick = e => {
       e.stopPropagation(); box.classList.add('hidden'); inChoice = false; hoverLean(false);
-      const rk = o.react || (o.feel >= 10 ? 'shy' : o.feel >= 5 ? 'hop' : o.feel <= -12 ? 'shake' : o.feel < 0 ? 'shiver' : null);
+      const rk = o.react || (o.feel >= 3 ? 'clap' : o.feel < 0 ? 'angry' : null);
       if (rk) react(rk);
       logPush({ n: '→', t: fmt(o.t), s: chSnap, ch: 1 });
       if (o.feel) changeFeel(o.feel);
@@ -340,7 +340,7 @@ let reactT = null, leanOn = false;
 const seraEl = () => document.querySelector('.char[data-who="sera"]:not([data-dying])');
 const isCrying = () => st.chars.sera && /^sad/.test(st.chars.sera.expr);
 // когда Сера плачет — никаких языков и поглаживаний: вытирает слёзы, хмурится, опускает голову
-const CRY_MAP = { pat: 'wipe', hop: 'wipe', shy: 'wipe', tongue: 'frown', shake: 'frown', shiver: 'down' };
+const CRY_MAP = { pat: 'wipe', hop: 'wipe', shy: 'wipe', tongue: 'frown', shake: 'frown', shiver: 'down', clap: 'wipe', angry: 'frown' };
 function hoverLean(on) {
   const el = seraEl(); if (!el || el.dataset.reacting) return;
   const crying = isCrying();
@@ -380,6 +380,9 @@ const ANIM = {
   chain:  [['chain1', 520], ['chain2', 760], ['chain1', 520], ['chain2', 900]],
   shout:  [['shout1', 420], ['shout2', 700], ['shout1', 520], ['shout2', 800]],
   vsign:  [['vsign1', 650], ['vsign2', 1000]],
+  // godot-0.6: отклик на выбор — хлопает в ладоши (хороший) / сердится (плохой) вместо сердечек
+  clap:   [['clap1', 200], ['clap2', 180], ['clap1', 170], ['clap2', 180], ['clap1', 170], ['clap2', 500]],
+  angry:  [['angry1', 450], ['angry2', 260], ['angry1', 220], ['angry2', 320], ['angry1', 550]],
 };
 for (const k in ANIM) REACT[k] = { seq: ANIM[k], ms: ANIM[k].reduce((a, f) => a + f[1], 0), fx: k === 'cover' ? () => hearts(2) : null };
 function seqAnim(el, seq) {

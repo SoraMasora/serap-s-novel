@@ -65,6 +65,21 @@ extends Resource
 	"chain": {"seq": [["chain1", 520], ["chain2", 760], ["chain1", 520], ["chain2", 900]]},
 	"shout": {"seq": [["shout1", 420], ["shout2", 700], ["shout1", 520], ["shout2", 800]]},
 	"vsign": {"seq": [["vsign1", 650], ["vsign2", 1000]]},
+	# 0.6: отклик на выбор вместо сердечек — хлопает (хороший) / сердится (плохой)
+	"clap":
+	{
+		"seq":
+		[
+			["clap1", 200],
+			["clap2", 180],
+			["clap1", 170],
+			["clap2", 180],
+			["clap1", 170],
+			["clap2", 500]
+		]
+	},
+	"angry":
+	{"seq": [["angry1", 450], ["angry2", 260], ["angry1", 220], ["angry2", 320], ["angry1", 550]]},
 }
 ## Когда Сера плачет — CRY_MAP
 @export var cry_map := {
@@ -73,7 +88,9 @@ extends Resource
 	"shy": "wipe",
 	"tongue": "frown",
 	"shake": "frown",
-	"shiver": "down"
+	"shiver": "down",
+	"clap": "wipe",
+	"angry": "frown"
 }
 
 @export_group("Мир")

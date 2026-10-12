@@ -245,7 +245,7 @@ c3_smoke_ask: [
   [S, 'Слушай… а ты куришь вообще?', 'thinking'],
   {choice:[
     {t:'«Курю. Но не сказать, что много».', feel:+2, set:{c3smoke:true}, go:'c3_smoke'},
-    {t:'«Не курю. И тебе бы не стоило».', feel:-2, go:'c3_smoke_no'},
+    {t:'«Не курю. И тебе бы не стоило».', feel:-2, set:{c3nosmoke:true}, go:'c3_smoke_no'},
   ]},
 ],
 c3_smoke_no: [
