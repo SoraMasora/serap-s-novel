@@ -1,7 +1,7 @@
 {
   "project": "serap-s-novel",
   "route": "B",
-  "phase": "content-0.5.1",
+  "phase": "content-0.5.3",
   "status": "green-with-known-issues",
   "next_task": "Проверить у пользователя на ПК: Месяц 2 (вход в магазин покадрово, выборы на крыше, Лиза, первый снег); затем KI-007, KI-003",
   "blocked_by": [
