@@ -1,9 +1,9 @@
 {
   "project": "serap-s-novel",
   "route": "B",
-  "phase": "content-0.4.0",
+  "phase": "content-0.5.0",
   "status": "green-with-known-issues",
-  "next_task": "Проверить у пользователя на ПК «2 месяц»: дедлайн (катсцена с часами), магазин (тёплый/холодный/без Серы), ночной стук и крыша, неделя на карте двора (Валя/Лиза/смена/портрет), первый снег; затем KI-007, KI-003",
+  "next_task": "Проверить у пользователя на ПК: Месяц 2 (вход в магазин покадрово, выборы на крыше, Лиза, первый снег); затем KI-007, KI-003",
   "blocked_by": [
     "нет GPU в среде агента (KI-003)",
     "CI не запускался (KI-007)"
@@ -13,19 +13,19 @@
       "cmd": "gdformat --check scripts tests && gdlint scripts tests",
       "result": "no problems",
       "status": "PASS",
-      "date": "2026-10-11"
+      "date": "2026-10-12"
     },
     {
       "cmd": "GUT -gdir=res://tests -ginclude_subdirs",
-      "result": "28/28, 243 asserts",
+      "result": "29/29, 253 asserts",
       "status": "PASS",
-      "date": "2026-10-11"
+      "date": "2026-10-12"
     },
     {
       "cmd": "node tools/godot/js_reference.cjs 200",
       "result": "home 130, more 32, neutral 17, good 8, gone 7, bad 6",
       "status": "PASS",
-      "date": "2026-10-11"
+      "date": "2026-10-12"
     },
     {
       "cmd": ".github/workflows/godot.yml",
