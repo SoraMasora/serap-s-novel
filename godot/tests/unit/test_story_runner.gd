@@ -14,8 +14,8 @@ func before_each() -> void:
 
 func test_story_loaded() -> void:
 	assert_eq(db.load_error, "")
-	assert_eq(db.scenes.size(), 327, "число сцен как в веб-версии")
-	assert_eq(db.notes_total, 59)
+	assert_eq(db.scenes.size(), 330, "число сцен как в веб-версии")
+	assert_eq(db.notes_total, 60)
 
 
 func test_all_targets_exist() -> void:
@@ -36,7 +36,7 @@ func test_all_conditions_parse_and_run() -> void:
 				e.execute([50.0, 0.0], r, true)
 				assert_false(e.has_execute_failed(), c.when)
 				n += 1
-	assert_eq(n, 74)
+	assert_eq(n, 76)
 
 
 func test_tier_thresholds() -> void:
@@ -131,3 +131,19 @@ func test_breath_result() -> void:
 	r.breath_result(b, 0.2)
 	assert_false(r.flag("plBreath"))
 	assert_eq(r.st.scene, "c1_store")
+
+
+## v20: главы → месяцы; во 2 месяце нет «ни разу не уронил», Сера в магазине злится, а не плачет.
+func test_months_and_m2_dialogue() -> void:
+	var bad: Array = []
+	for key: String in db.scenes:
+		for c: Dictionary in db.scenes[key]:
+			if c.has("chapter"):
+				var ch := str(c.chapter)
+				if not (ch.begins_with("Месяц ") or ch.begins_with("Концовка")):
+					bad.append(ch)
+	assert_eq(bad, [], "все главы названы «Месяц N · …» или «Концовка · …»")
+	for key: String in ["m2_roof_a", "m2_roof_b", "m2_roof_c"]:
+		assert_false(str(db.scenes[key]).contains("не уронил"), key)
+	assert_false(str(db.scenes["m2_door"]).contains("shout"), "без плачущего крика")
+	assert_false(str(db.scenes["m2_door_quiet"]).contains("мышь"), "клички появляются позже")
