@@ -19,6 +19,7 @@ var _close_k := 0
 var _touch: HBoxContainer
 var _touch_act: Button
 var _touch_swing: Array[Button] = []
+var _stick: TouchStick
 
 @onready var view: SubViewportContainer = $View
 @onready var pworld: PixelWorld = $View/Viewport/World
@@ -61,10 +62,16 @@ func _ready() -> void:
 	move_child(closeup_rect, view.get_index() + 1)
 	view.gui_input.connect(_on_view_input)
 	resized.connect(_fit)
-	if OS.has_feature("mobile") or DisplayServer.is_touchscreen_available():
+	if _is_touch():
 		_make_touch()
 	for b: Button in $Hud/Buttons.get_children():
 		b.pressed.connect(func() -> void: button_pressed.emit(String(b.name).to_lower()))
+
+
+func _is_touch() -> bool:
+	if OS.get_environment("SERA_TOUCH") == "1":  # для проверки на ПК
+		return true
+	return OS.has_feature("mobile") or DisplayServer.is_touchscreen_available()
 
 
 ## Сенсорные кнопки (телефон): действие (E) и качели (W/A) — шлют те же input-actions.
@@ -81,6 +88,10 @@ func _make_touch() -> void:
 		var b := _touch_btn(d[0], d[1])
 		_touch_swing.append(b)
 	_touch_act = _touch_btn("Действие", "map_interact")
+	_stick = TouchStick.new()
+	_stick.name = "Stick"
+	add_child(_stick)
+	help.text = "Джойстик — идти (до края — бег) · касание — идти к месту · «Действие» — войти"
 
 
 func _touch_btn(text: String, action: String) -> Button:
@@ -113,6 +124,8 @@ func _upd_touch() -> void:
 	var r := _touch.get_combined_minimum_size()
 	_touch.size = r
 	_touch.position = size - r - Vector2(24, 24)
+	_stick.visible = not sit and not is_closeup()
+	_stick.position = Vector2(24.0, size.y - _stick.size.y - 24.0)
 
 
 func open(m: Dictionary) -> void:
@@ -196,6 +209,8 @@ func is_closeup() -> bool:
 
 
 func close() -> void:
+	if _stick != null:
+		_stick.release()
 	if closeup_rect:
 		closeup_rect.visible = false
 	signs.visible = true
