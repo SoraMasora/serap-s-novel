@@ -35,3 +35,4 @@ GUT 31/31 (286 asserts) · gdlint/gdformat чисто · js_reference 200 · с�
 
 ## Последний SHA
 См. `git log -1` ветки `godot-update`.
+- Бинарные ассеты Godot не лежат в git напрямую: после клонирования запусти `bash tools/restore_assets.sh` (из `backup/godot_assets`). Ассеты v0.6.0 (m2_tea, m2_rt, m2_rx и др.) в этот бэкап НЕ входят — их не было в песочнице (UNVERIFIED, где они хранятся).
