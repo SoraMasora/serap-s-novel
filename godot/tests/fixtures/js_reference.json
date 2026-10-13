@@ -391,12 +391,12 @@
   },
   {
    "seed": 340518,
-   "ending": "neutral",
-   "steps": 552,
+   "ending": "closed",
+   "steps": 547,
    "feel": 88,
    "press": 3,
    "notes": 28,
-   "digest": "de50979d5b8ffcfe99ce1e334b10fe11398ab47a01139fc74b4ed946aa2301d2"
+   "digest": "897dc36f0b4f8563084a8195cfd7f0f1a75d0b448c86229237fc8a8e71afc032"
   },
   {
    "seed": 348437,
@@ -490,12 +490,12 @@
   },
   {
    "seed": 427627,
-   "ending": "neutral",
-   "steps": 538,
+   "ending": "closed",
+   "steps": 533,
    "feel": 88,
    "press": 3,
    "notes": 30,
-   "digest": "030c92d66b9e15f0bedd3517e29ef28d1beca615253ae8e011908c2f97a2d66e"
+   "digest": "a43e0c609ecc4c52a14702ba1be59af635873668c2b7377753107af85c548493"
   },
   {
    "seed": 435546,
@@ -1048,12 +1048,12 @@
   },
   {
    "seed": 918605,
-   "ending": "bad",
-   "steps": 481,
+   "ending": "closed",
+   "steps": 478,
    "feel": 73,
    "press": 3,
    "notes": 27,
-   "digest": "ba5a1f277bfc1c85f9860246551b104dc49d8250be56939ed51aed36960aeb27"
+   "digest": "820725faa661c121e1d0f7c8b0d49015ab1b7f5c925debcccb0249c7a9c93f80"
   },
   {
    "seed": 926524,
@@ -1183,12 +1183,12 @@
   },
   {
    "seed": 1037390,
-   "ending": "bad",
-   "steps": 443,
+   "ending": "closed",
+   "steps": 440,
    "feel": 51,
    "press": 3,
    "notes": 18,
-   "digest": "8c50022a93e77f53d71de72bfb24af08a2bad778659cec3798e211ce0100069b"
+   "digest": "fd7ffa9aebd06f08347e72681bec7f27683c6711b1b2fe128f52d488b2cdab07"
   },
   {
    "seed": 1045309,
@@ -1570,12 +1570,12 @@
   },
   {
    "seed": 1377907,
-   "ending": "bad",
-   "steps": 406,
+   "ending": "closed",
+   "steps": 403,
    "feel": 38,
    "press": 2,
    "notes": 18,
-   "digest": "0871cf9b1474fd45be52fcb6c8eeeb6b72250532f1a17395ce13c89775911d90"
+   "digest": "4e601530f38b3e3b10c2051ff44c85e5ae7abb4ba6f796a63b9c91286d26bd23"
   },
   {
    "seed": 1385826,

@@ -1,0 +1,36 @@
+{
+  "disabled": [
+    "c1_gift_hang",
+    "c1_gift_joke",
+    "c1_gift_keep",
+    "c1_shift_joke",
+    "c1_shift_honest",
+    "c1_guests_ignore",
+    "c1_roof_under",
+    "c1_roof_aggr",
+    "c3_ms_def",
+    "c3_ms_stand",
+    "c3_ms_doubt",
+    "c3_q_soft",
+    "c3_q_silent",
+    "c3_panic_leave",
+    "ch3_force",
+    "m2_cold_knock"
+  ],
+  "screenshots": {
+    "3": "c1_roof_aggr",
+    "6": "c3_ms_def",
+    "7": "c3_ms_stand",
+    "8": "c3_ms_doubt",
+    "9": "c3_q_soft",
+    "10": "c3_q_silent",
+    "11": "c3_panic_leave",
+    "12": "ch3_force",
+    "13": "m2_cold_knock"
+  },
+  "redrawn": [
+    "cg_c1_guests_push",
+    "cg_c1_hand_ok",
+    "cg_c1_hug_ok"
+  ]
+}

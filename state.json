@@ -1,14 +1,26 @@
 {
   "project": "serap-s-novel",
   "route": "B",
-  "phase": "content-0.7.1",
+  "phase": "content-0.7.2",
   "status": "green-with-known-issues",
-  "next_task": "Получить отзыв на ответные кадры 0.7.1; не расширять CG на обычные сцены и взаимодействия. KI-007/003 остаются.",
+  "next_task": "Проверить правки кадров 0.7.2 и отдельную концовку после холодного стука на ПК.",
   "blocked_by": [
     "нет GPU в среде агента (KI-003)",
     "CI не запускался (KI-007)"
   ],
   "verification": [
+    {
+      "cmd": "GUT unit + integration + parity",
+      "result": "38/38, 326 asserts; 73 reply scenes preserve story state; disabled choices and closed ending tested",
+      "status": "PASS",
+      "date": "2026-10-13"
+    },
+    {
+      "cmd": "check_scripts.sh; gdformat --check scripts tests; gdlint scripts tests",
+      "result": "CHECK OK; 41 files unchanged; no problems",
+      "status": "PASS",
+      "date": "2026-10-13"
+    },
     {
       "cmd": "Full story.json comparison against 0.6.3",
       "result": "all 350 scenes exactly identical, including bg/show/hide/cam and dialogue",

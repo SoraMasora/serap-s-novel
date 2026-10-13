@@ -14,7 +14,7 @@ func before_each() -> void:
 
 func test_story_loaded() -> void:
 	assert_eq(db.load_error, "")
-	assert_eq(db.scenes.size(), 350, "число сцен как в веб-версии")
+	assert_eq(db.scenes.size(), 351, "число сцен как в веб-версии")
 	assert_eq(db.notes_total, 61)
 
 
@@ -193,7 +193,7 @@ func test_choice_cg_assets_and_scene_coverage() -> void:
 			missing.append(scene_id)
 		elif not FileAccess.file_exists(manifest.bg[key]):
 			missing.append(key)
-	assert_eq(cg.catalog.size(), 89)
+	assert_eq(cg.catalog.size(), 73)
 	assert_eq(missing, [], "reply frames are available; story presentation unchanged")
 
 
@@ -228,3 +228,45 @@ func test_choice_cg_keeps_original_guarded_routes_and_stage() -> void:
 	cg.arm()
 	r.step()
 	assert_eq(cg.response(r.st.scene), "cg_m2_roof_b_ns", "no-smoking route unchanged")
+
+
+func test_reviewed_choices_have_no_frame() -> void:
+	var cg := ChoiceCGState.new()
+	var removed := [
+		"c1_gift_hang",
+		"c1_gift_joke",
+		"c1_gift_keep",
+		"c1_shift_joke",
+		"c1_shift_honest",
+		"c1_guests_ignore",
+		"c1_roof_under",
+		"c1_roof_aggr",
+		"c3_ms_def",
+		"c3_ms_stand",
+		"c3_ms_doubt",
+		"c3_q_soft",
+		"c3_q_silent",
+		"c3_panic_leave",
+		"ch3_force",
+		"m2_cold_knock"
+	]
+	for scene_id: String in removed:
+		cg.arm()
+		assert_eq(cg.response(scene_id), "", scene_id)
+	cg.arm()
+	assert_eq(cg.response("c1_guests_push"), "cg_c1_guests_push")
+
+
+func test_cold_knock_has_separate_ending() -> void:
+	r.st.scene = "m2_cold_knock"
+	r.st.i = 0
+	r.st.feel = 10.0
+	var final_kind := ""
+	for i in range(40):
+		var events := r.step()
+		if events[-1].type == "final":
+			final_kind = events[-1].kind
+			break
+	assert_true(r.flag("m2closed"))
+	assert_eq(final_kind, "closed", "closed door does not jump to father ending")
+	assert_eq(r.pick_ending(), "end_closed")
