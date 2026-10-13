@@ -8,6 +8,8 @@ const ROOT = path.resolve(__dirname, '..', '..');
 const OUT = path.join(ROOT, 'godot');
 const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
 const scripts = [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map(m => m[1]);
+// CG coverage catalog is source-controlled alongside art documentation.
+fs.copyFileSync(path.join(ROOT, 'docs/art/choice-cg.json'), path.join(OUT, 'data/choice_cg.json')); 
 
 // ── 1. Сценарий ──
 const ctx = vm.createContext({ window: {}, console });

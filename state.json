@@ -1,36 +1,48 @@
 {
   "project": "serap-s-novel",
   "route": "B",
-  "phase": "art-stage-0.7.0",
+  "phase": "content-0.7.0",
   "status": "green-with-known-issues",
-  "next_task": "CG ассеты 18/18 сохранены; допушить оставшиеся и интеграционный коммит. Локальная сборка уже проверена 34/34.",
+  "next_task": "Получить отзыв по CG из архива 0.7.0; затем точечная правка кадров, KI-007 и KI-003",
   "blocked_by": [
     "нет GPU в среде агента (KI-003)",
     "CI не запускался (KI-007)"
   ],
   "verification": [
     {
+      "cmd": "Godot import; tools/godot/check_scripts.sh",
+      "result": "PASS, CHECK OK",
+      "status": "PASS",
+      "date": "2026-10-13"
+    },
+    {
       "cmd": "gdformat --check scripts tests && gdlint scripts tests",
-      "result": "no problems",
+      "result": "40 files unchanged; no problems",
       "status": "PASS",
       "date": "2026-10-13"
     },
     {
       "cmd": "GUT -gdir=res://tests -ginclude_subdirs",
-      "result": "31/31, 286 asserts",
+      "result": "34/34, 292 asserts",
       "status": "PASS",
       "date": "2026-10-13"
     },
     {
       "cmd": "node tools/godot/js_reference.cjs 200",
-      "result": "home 130, more 32, neutral 17, good 8, gone 7, bad 6",
+      "result": "200 runs; parity GUT PASS",
       "status": "PASS",
       "date": "2026-10-13"
     },
     {
-      "cmd": ".github/workflows/godot.yml",
-      "result": "not run",
-      "status": "UNVERIFIED",
+      "cmd": "Compare all nonvisual story command fields to 0.6.3",
+      "result": "350 scenes identical except bg/show/hide/cam/who/pos",
+      "status": "PASS",
+      "date": "2026-10-13"
+    },
+    {
+      "cmd": "tools_dev/shot.gd Xvfb opengl3",
+      "result": "9 representative states rerendered and inspected after recovery; room restore and door framing verified",
+      "status": "PASS",
       "date": "2026-10-13"
     }
   ],

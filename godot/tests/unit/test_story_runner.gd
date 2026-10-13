@@ -179,3 +179,58 @@ func test_m2_cherry_tea_can_be_given() -> void:
 	assert_eq(r.st.scene, "m2_tea")
 	r.step()
 	assert_eq(r.st.bg, "m2_tea")
+
+
+func test_choice_cg_assets_and_scene_coverage() -> void:
+	var catalog: Dictionary = JSON.parse_string(
+		FileAccess.get_file_as_string("res://data/choice_cg.json")
+	)
+	var manifest: Dictionary = JSON.parse_string(
+		FileAccess.get_file_as_string("res://data/assets_manifest.json")
+	)
+	var missing: Array = []
+	for scene_id: String in catalog:
+		var key: String = catalog[scene_id]
+		if not db.has_scene(scene_id) or not manifest.bg.has(key):
+			missing.append(scene_id)
+		elif not FileAccess.file_exists(manifest.bg[key]):
+			missing.append(key)
+	assert_eq(catalog.size(), 89, "86 targets, tea variant, accepted hand/hug")
+	assert_eq(missing, [], "each CG scene has an exported image")
+
+
+func test_choice_cg_first_dialogue_hides_stage_sprites() -> void:
+	var catalog: Dictionary = JSON.parse_string(
+		FileAccess.get_file_as_string("res://data/choice_cg.json")
+	)
+	var failures: Array = []
+	for scene_id: String in catalog:
+		r.new_game("Кир")
+		r.st.scene = scene_id
+		r.st.feel = 0.0 if scene_id in ["c1_hand", "c1_hug"] else 60.0
+		r.st.chars = {"sera": {"expr": "neutral", "pos": "center"}}
+		if scene_id == "m2_roof_b_ns":
+			r.st.flags.c3nosmoke = true
+		var events := r.step()
+		if events.is_empty() or events.back().type != "say":
+			failures.append(scene_id + ": no dialogue")
+		elif r.st.bg != catalog[scene_id] or not r.st.chars.is_empty():
+			failures.append(scene_id + ": CG or sprites")
+	assert_eq(failures, [], "CG is visible without duplicate stage sprites")
+
+
+func test_choice_cg_keeps_guarded_and_nosmoke_routes() -> void:
+	r.st.scene = "c1_hand"
+	r.st.feel = 90.0
+	r.step()
+	assert_eq(r.st.bg, "cg_c1_hand_ok", "accepted hand gets its own CG")
+	r.new_game("Кир")
+	r.st.scene = "c1_hug"
+	r.st.feel = 90.0
+	r.step()
+	assert_eq(r.st.bg, "cg_c1_hug_ok", "accepted hug gets its own CG")
+	r.new_game("Кир")
+	r.st.scene = "m2_roof_b"
+	r.st.flags.c3nosmoke = true
+	r.step()
+	assert_eq(r.st.bg, "cg_m2_roof_b_ns", "tea replaces cigarette")
