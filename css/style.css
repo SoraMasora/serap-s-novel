@@ -346,3 +346,6 @@ ul.notes li.empty{border-color:#555;color:#9a8aa6}ul.notes li.empty:before{conte
 #gloom{pointer-events:none;opacity:0;transition:opacity 1.5s ease;
   background:radial-gradient(ellipse 75% 70% at 50% 45%,rgba(10,12,28,0) 45%,rgba(6,6,16,.55) 100%),linear-gradient(180deg,rgba(40,55,90,.16),rgba(20,10,30,.18))}
 #game.gloom #gloom{opacity:1}
+
+/* A single reply illustration; original background/sprites remain underneath. */
+#choiceCGFrame{background-size:cover;background-position:center;pointer-events:none}

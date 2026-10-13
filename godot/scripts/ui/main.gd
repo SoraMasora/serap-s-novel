@@ -55,7 +55,9 @@ var _toast_tw: Tween
 var _ui_hidden := false
 var _bg_anim: Dictionary = {}
 var _line_key := ""
+var _choice_cg := ChoiceCGState.new()
 
+@onready var choice_cg_frame: TextureRect = $ChoiceCGFrame
 @onready var stage: Control = $Stage
 @onready var gloom: ColorRect = $Stage/Gloom
 @onready var rain_fx: RainFx = $Stage/Rain
@@ -135,6 +137,8 @@ func _cli_autoplay() -> bool:
 
 # ── Экраны ──
 func to_title() -> void:
+	_choice_cg.reset()
+	choice_cg_frame.visible = false
 	playing = false
 	auto = false
 	skip = false
@@ -189,6 +193,8 @@ func _on_name(n: String) -> void:
 func run() -> void:
 	if not playing:
 		return
+	_choice_cg.clear()
+	choice_cg_frame.visible = false
 	for e: Dictionary in runner.step():
 		_apply(e)
 
@@ -253,6 +259,9 @@ func _resume_after_overlay() -> void:
 
 # ── Реплики ──
 func _say(e: Dictionary) -> void:
+	var cg_key := _choice_cg.response(str(runner.st.scene))
+	choice_cg_frame.texture = Game.tex("bg", cg_key) if cg_key != "" else null
+	choice_cg_frame.visible = choice_cg_frame.texture != null
 	for ch: Dictionary in e.changes:
 		_show_view(ch.who, ch.expr, ch.pos)
 	var speaker: String = e.name
@@ -413,6 +422,7 @@ func _on_choice(i: int) -> void:
 	if last and not skip and is_inside_tree():
 		await get_tree().create_timer(0.36).timeout
 	choices.visible = false
+	_choice_cg.arm()
 	var rk := runner.choose(_options, i)
 	if rk != "":
 		react(rk)
@@ -666,6 +676,7 @@ func autosave() -> void:
 
 func save_to(slot: String) -> void:
 	var s := runner.save_snapshot()
+	s["presentation_cg"] = _choice_cg.key
 	if runner.st.mode == "map" and pixel_map.is_open():
 		s.map.pos = pixel_map.current_pos()
 	SaveSystem.save_slot(slot, s, runner.log.slice(-save_log_tail))
@@ -682,11 +693,16 @@ func load_slot(slot: String) -> void:
 
 func _restore(s: Dictionary) -> void:
 	_reset_presentation()
-	runner.restore(s)
+	_choice_cg.restore_next = str(s.get("presentation_cg", ""))
+	var story_state := s.duplicate(true)
+	story_state.erase("presentation_cg")
+	runner.restore(story_state)
 	_present_state()
 
 
 func _reset_presentation() -> void:
+	_choice_cg.reset()
+	choice_cg_frame.visible = false
 	auto = false
 	skip = false
 	_sync_btns()

@@ -53,6 +53,7 @@ refreshContinue();
 
 $('#btnNew').onclick = () => { Sound.init(); titleAnim(false); $('#title').classList.add('hidden'); $('#nameScreen').classList.remove('hidden'); $('#nameInput').focus(); };
 $('#nameOk').onclick = () => {
+  ChoiceCG.reset();
   const n = $('#nameInput').value.trim(); Object.assign(st, { scene:'start', i:0, feel:50, press:0, flags:{}, notes:[], name: n || 'Кирилл', bg:null, chars:{}, music:null, rain:false, chapter:'', mode:'', map:null });
   log.length = 0; $('#nameScreen').classList.add('hidden'); begin();
 };
@@ -64,6 +65,7 @@ $('#endBack').onclick = toTitle;
 
 function begin(noRun) { titleAnim(false); $('#title').classList.add('hidden'); $('#hud').classList.remove('hidden'); if (st.mode === 'map') { openMap(); return; } $('#textbox').classList.remove('hidden'); if (!noRun) run(); }
 function toTitle() {
+  ChoiceCG.reset();
   auto = skip = false; syncBtns(); clearTimeout(tTimer);
   ['#ending','#modal','#textbox','#hud','#choices','#card'].forEach(s => $(s).classList.add('hidden')); PixelMap.close();
   $('#chars').innerHTML = ''; Sound.loc('title'); Sound.music('calm'); Sound.rain(false); setRain(false);
@@ -204,6 +206,7 @@ function tier(s = st) { if (s.feel < 40 || s.press >= 3) return 'cold'; if (s.fe
 // реплика/эмоция/заметка может быть объектом {warm, mid, cold}; null — строку пропустить
 const TV = v => (v && typeof v === 'object' && !Array.isArray(v) && ('mid' in v || 'warm' in v || 'cold' in v)) ? (tier() in v ? v[tier()] : v.mid) : v;
 function run() {
+  ChoiceCG.clear();
   while (true) {
     const scene = STORY[st.scene]; const c = scene[st.i];
     if (!c) return;
@@ -273,6 +276,7 @@ function breath(o) {
 }
 
 function say(name, text, expr) {
+  ChoiceCG.response(st.scene);
   const nb = $('#namebox'), tx = $('#text');
   const thought = name === THOUGHT;
   const disp = thought ? '' : name === 'P' ? st.name : name;
@@ -319,7 +323,7 @@ function choose(list) {
       if (o.feel) changeFeel(o.feel);
       if (o.set) Object.assign(st.flags, o.set);
       if (o.add) st.press += o.add.press || 0;
-      jump(o.go); run();
+      ChoiceCG.arm(); jump(o.go); run();
     };
     box.appendChild(b);
   });
@@ -405,16 +409,17 @@ function react(kind) {
   reactT = setTimeout(() => { clearInterval(patT); clearTimeout(patT); el.classList.remove('react-' + (kind === 'shy' ? 'hop' : kind)); delete el.dataset.reacting; if (st.chars.sera) setImg(el, 'sera_' + st.chars.sera.expr); }, R.ms);
 }
 // ── Сохранения ──
-function snapshot(nlog = 0) { if (st.mode === 'map' && st.map && PixelMap.isOpen()) st.map.pos = PixelMap.pos(); return JSON.stringify({ st: { ...st, i: st.mode === 'map' ? st.i : Math.max(0, st.i - 1) }, date: new Date().toLocaleString('ru-RU'), log: nlog ? log.slice(-nlog) : undefined }); }
+function snapshot(nlog = 0) { if (st.mode === 'map' && st.map && PixelMap.isOpen()) st.map.pos = PixelMap.pos(); return JSON.stringify({ st: { ...st, i: st.mode === 'map' ? st.i : Math.max(0, st.i - 1) }, date: new Date().toLocaleString('ru-RU'), choiceCG: ChoiceCG.key(), log: nlog ? log.slice(-nlog) : undefined }); }
 function saveSlot(n, silent) {
   // журнал (с точками отката) сохраняется вместе со слотом; при нехватке места — короче
   for (const nl of n === 'auto' ? [500, 200, 50, 0] : [200, 60, 0]) { try { localStorage.setItem('serap_save_' + n, snapshot(nl)); break; } catch (e) { if (!nl) console.warn('save failed', e); } }
   if (!silent) toast('Сохранено'); }
 function loadSlot(n) {
   const raw = localStorage.getItem('serap_save_' + n); if (!raw) return;
-  const d = JSON.parse(raw); log.length = 0; if (d.log) d.log.forEach(e => log.push(e)); restoreState(d.st);
+  const d = JSON.parse(raw); log.length = 0; if (d.log) d.log.forEach(e => log.push(e)); restoreState(d.st, d.choiceCG);
 }
-function restoreState(s) {
+function restoreState(s, cgKey = '') {
+  ChoiceCG.reset(); ChoiceCG.restore(cgKey);
   auto = skip = false; syncBtns(); clearTimeout(tTimer); typing = waiting = false; if (cutKill) cutKill();
   Object.assign(st, { notes: [], mode: '', map: null }, s); delete st.nc; closeModal(); PixelMap.close(); $('#card').classList.add('hidden'); $('#cut').classList.add('hidden'); $('#side').classList.add('hidden');
   $('#chars').innerHTML = ''; const chars = st.chars; st.chars = {};

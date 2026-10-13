@@ -182,55 +182,49 @@ func test_m2_cherry_tea_can_be_given() -> void:
 
 
 func test_choice_cg_assets_and_scene_coverage() -> void:
-	var catalog: Dictionary = JSON.parse_string(
-		FileAccess.get_file_as_string("res://data/choice_cg.json")
-	)
+	var cg := ChoiceCGState.new()
 	var manifest: Dictionary = JSON.parse_string(
 		FileAccess.get_file_as_string("res://data/assets_manifest.json")
 	)
 	var missing: Array = []
-	for scene_id: String in catalog:
-		var key: String = catalog[scene_id]
+	for scene_id: String in cg.catalog:
+		var key: String = cg.catalog[scene_id]
 		if not db.has_scene(scene_id) or not manifest.bg.has(key):
 			missing.append(scene_id)
 		elif not FileAccess.file_exists(manifest.bg[key]):
 			missing.append(key)
-	assert_eq(catalog.size(), 89, "86 targets, tea variant, accepted hand/hug")
-	assert_eq(missing, [], "each CG scene has an exported image")
+	assert_eq(cg.catalog.size(), 89)
+	assert_eq(missing, [], "reply frames are available; story presentation unchanged")
 
 
-func test_choice_cg_first_dialogue_hides_stage_sprites() -> void:
-	var catalog: Dictionary = JSON.parse_string(
-		FileAccess.get_file_as_string("res://data/choice_cg.json")
-	)
-	var failures: Array = []
-	for scene_id: String in catalog:
-		r.new_game("Кир")
-		r.st.scene = scene_id
-		r.st.feel = 0.0 if scene_id in ["c1_hand", "c1_hug"] else 60.0
-		r.st.chars = {"sera": {"expr": "neutral", "pos": "center"}}
-		if scene_id == "m2_roof_b_ns":
-			r.st.flags.c3nosmoke = true
-		var events := r.step()
-		if events.is_empty() or events.back().type != "say":
-			failures.append(scene_id + ": no dialogue")
-		elif r.st.bg != catalog[scene_id] or not r.st.chars.is_empty():
-			failures.append(scene_id + ": CG or sprites")
-	assert_eq(failures, [], "CG is visible without duplicate stage sprites")
+func test_choice_cg_only_one_reply_after_choice() -> void:
+	var cg := ChoiceCGState.new()
+	assert_eq(cg.response("c1_room_good"), "", "ordinary dialogue has no frame")
+	cg.arm()
+	assert_eq(cg.response("c1_room_good"), "cg_c1_room_good")
+	cg.clear()
+	assert_eq(cg.key, "", "advance removes the temporary overlay")
+	assert_eq(cg.response("c1_room_good"), "", "second line uses original scene")
+	cg.arm()
+	assert_eq(cg.response("start"), "", "location/router choices do not replace scenes")
+	cg.restore_next = "cg_c1_room_good"
+	assert_eq(cg.response("c1_room_good"), "cg_c1_room_good", "save restores reply frame")
 
 
-func test_choice_cg_keeps_guarded_and_nosmoke_routes() -> void:
+func test_choice_cg_keeps_original_guarded_routes_and_stage() -> void:
+	var cg := ChoiceCGState.new()
 	r.st.scene = "c1_hand"
 	r.st.feel = 90.0
+	r.st.bg = "roof"
+	r.st.chars = {"sera": {"expr": "soft", "pos": "center"}}
+	cg.arm()
 	r.step()
-	assert_eq(r.st.bg, "cg_c1_hand_ok", "accepted hand gets its own CG")
-	r.new_game("Кир")
-	r.st.scene = "c1_hug"
-	r.st.feel = 90.0
-	r.step()
-	assert_eq(r.st.bg, "cg_c1_hug_ok", "accepted hug gets its own CG")
+	assert_eq(cg.response(r.st.scene), "cg_c1_hand_ok")
+	assert_eq(r.st.bg, "roof", "CG does not overwrite original background")
+	assert_true(r.st.chars.has("sera"), "CG does not remove the original sprite")
 	r.new_game("Кир")
 	r.st.scene = "m2_roof_b"
 	r.st.flags.c3nosmoke = true
+	cg.arm()
 	r.step()
-	assert_eq(r.st.bg, "cg_m2_roof_b_ns", "tea replaces cigarette")
+	assert_eq(cg.response(r.st.scene), "cg_m2_roof_b_ns", "no-smoking route unchanged")

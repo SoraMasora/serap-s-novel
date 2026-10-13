@@ -1,47 +1,41 @@
 {
   "project": "serap-s-novel",
   "route": "B",
-  "phase": "content-0.7.0",
+  "phase": "content-0.7.1",
   "status": "green-with-known-issues",
-  "next_task": "Получить отзыв по CG из архива 0.7.0; затем точечная правка кадров, KI-007 и KI-003",
+  "next_task": "Получить отзыв на ответные кадры 0.7.1; не расширять CG на обычные сцены и взаимодействия. KI-007/003 остаются.",
   "blocked_by": [
     "нет GPU в среде агента (KI-003)",
     "CI не запускался (KI-007)"
   ],
   "verification": [
     {
-      "cmd": "Godot import; tools/godot/check_scripts.sh",
-      "result": "PASS, CHECK OK",
+      "cmd": "Full story.json comparison against 0.6.3",
+      "result": "all 350 scenes exactly identical, including bg/show/hide/cam and dialogue",
       "status": "PASS",
       "date": "2026-10-13"
     },
     {
-      "cmd": "gdformat --check scripts tests && gdlint scripts tests",
-      "result": "40 files unchanged; no problems",
+      "cmd": "check_scripts.sh; gdformat --check scripts tests; gdlint scripts tests",
+      "result": "CHECK OK; 41 files unchanged; no problems",
       "status": "PASS",
       "date": "2026-10-13"
     },
     {
-      "cmd": "GUT -gdir=res://tests -ginclude_subdirs",
-      "result": "34/34, 292 asserts",
+      "cmd": "GUT unit + integration + parity",
+      "result": "36/36, 306 asserts; all 89 reply scenes preserve exact original state",
       "status": "PASS",
       "date": "2026-10-13"
     },
     {
-      "cmd": "node tools/godot/js_reference.cjs 200",
-      "result": "200 runs; parity GUT PASS",
+      "cmd": "js_reference.cjs 200",
+      "result": "200 reference runs, parity PASS",
       "status": "PASS",
       "date": "2026-10-13"
     },
     {
-      "cmd": "Compare all nonvisual story command fields to 0.6.3",
-      "result": "350 scenes identical except bg/show/hide/cam/who/pos",
-      "status": "PASS",
-      "date": "2026-10-13"
-    },
-    {
-      "cmd": "tools_dev/shot.gd Xvfb opengl3",
-      "result": "9 representative states rerendered and inspected after recovery; room restore and door framing verified",
+      "cmd": "Godot Xvfb/X11 screenshots + local Chromium web smoke",
+      "result": "ordinary scene -> one reply frame -> original next line; save/load verified",
       "status": "PASS",
       "date": "2026-10-13"
     }

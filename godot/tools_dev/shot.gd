@@ -33,6 +33,8 @@ func _go() -> void:
 			main.runner.show_char("sera", sh, "center") if main.runner.has_method("show_char") else null
 			main._show_view("sera", sh, "center")
 			main.runner.st.chars["sera"] = {"expr": sh, "pos": "center"}
+		if _arg("choice", "false") == "true":
+			main._choice_cg.arm()
 		main.begin()
 	var steps := int(_arg("steps", "0"))
 	for k in steps:
