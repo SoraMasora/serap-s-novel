@@ -1,14 +1,26 @@
 {
   "project": "serap-s-novel",
   "route": "B",
-  "phase": "content-0.7.2",
+  "phase": "content-0.7.3",
   "status": "green-with-known-issues",
-  "next_task": "Проверить правки кадров 0.7.2 и отдельную концовку после холодного стука на ПК.",
+  "next_task": "Проверить 0.7.3: все показанные ответы про ангела и молчаливое ожидание на платформе без новых CG.",
   "blocked_by": [
     "нет GPU в среде агента (KI-003)",
     "CI не запускался (KI-007)"
   ],
   "verification": [
+    {
+      "cmd": "GUT + compilation + lint + web response smoke",
+      "result": "38/38, 332 asserts; CHECK OK; 41 files unchanged; no problems; six disabled responses return empty CG, 0 page errors",
+      "status": "PASS",
+      "date": "2026-10-13"
+    },
+    {
+      "cmd": "SHA256 story.json before/after export; catalog comparison",
+      "result": "story.json identical to 0.7.2; 67 identical catalog entries in web/Godot",
+      "status": "PASS",
+      "date": "2026-10-13"
+    },
     {
       "cmd": "GUT unit + integration + parity",
       "result": "38/38, 326 asserts; 73 reply scenes preserve story state; disabled choices and closed ending tested",

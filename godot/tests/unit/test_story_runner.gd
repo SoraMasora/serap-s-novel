@@ -193,7 +193,7 @@ func test_choice_cg_assets_and_scene_coverage() -> void:
 			missing.append(scene_id)
 		elif not FileAccess.file_exists(manifest.bg[key]):
 			missing.append(key)
-	assert_eq(cg.catalog.size(), 73)
+	assert_eq(cg.catalog.size(), 67)
 	assert_eq(missing, [], "reply frames are available; story presentation unchanged")
 
 
@@ -248,7 +248,13 @@ func test_reviewed_choices_have_no_frame() -> void:
 		"c3_q_silent",
 		"c3_panic_leave",
 		"ch3_force",
-		"m2_cold_knock"
+		"m2_cold_knock",
+		"c3_calm_wings",
+		"c3_calm_notyou",
+		"c3_calm_photo",
+		"c3_pl_wait",
+		"c3_angel_a",
+		"c3_angel_b"
 	]
 	for scene_id: String in removed:
 		cg.arm()

@@ -115,7 +115,7 @@ func test_reply_frame_never_changes_original_story_state() -> void:
 		if not main.choice_cg_frame.visible or main.runner.st != baseline.st:
 			failures.append(scene_id)
 	assert_eq(
-		failures, [], "89 frames do not change bg, camera commands, characters or story state"
+		failures, [], "Active frames do not change bg, camera commands, characters or story state"
 	)
 
 
