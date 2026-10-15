@@ -21,5 +21,5 @@
 GUT 28/28 · gdlint/gdformat чисто · импорт чистый · web_smoke ERRORS none — 2026-10-09.
 
 ## Последний SHA
-Веб v18 — ветка `feat/seraph-loop` → main (см. `git log -3`: ассеты loop1-3 отдельными коммитами, затем `feat(loop)`).
+Веб v18: код `b1a24b5` (feat(loop)), ассеты `0da125c`/`6dea932`/`9f56212`, слияние PR #1 — `97a28e5`.
 Код: `d5d9034` (fix(godot-ui)). Документация — следующий коммит `docs(godot)` (см. `git log -1`).
