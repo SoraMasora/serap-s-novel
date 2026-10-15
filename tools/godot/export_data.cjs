@@ -11,9 +11,9 @@ const scripts = [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map(m =>
 
 // ── 1. Сценарий ──
 const ctx = vm.createContext({ window: {}, console });
-for (const s of ['js/story.js', 'js/story3.js']) vm.runInContext(fs.readFileSync(path.join(ROOT, s), 'utf8'), ctx, { filename: s });
-vm.runInContext('this.__o = { STORY, ENDINGS, pickEnding: pickEnding.toString() };', ctx);
-const { STORY, ENDINGS, pickEnding } = ctx.__o;
+for (const s of ['js/story.js', 'js/story3.js', 'js/story_loop.js']) vm.runInContext(fs.readFileSync(path.join(ROOT, s), 'utf8'), ctx, { filename: s });
+vm.runInContext('this.__o = { STORY, ENDINGS, LOOP, pickEnding: pickEnding.toString() };', ctx);
+const { STORY, ENDINGS, LOOP, pickEnding } = ctx.__o;
 
 // JS-лямбда условия → выражение Godot Expression (база — StoryRunner: flag(), num(), notes_count(); входы feel, press)
 function convCond(src, sVar, fVar) {
@@ -33,11 +33,32 @@ function condFromFn(fn) {
   if (!m) throw new Error('Неизвестная форма when: ' + fn);
   return convCond(m[2], m[1], null);
 }
+// Dynamic JS dialogue is evaluated at build time, not re-written in GDScript.
+// 8 loop levels × cross/train/ending flags. History-dependent fragments remain tokens.
+function dynamicText(fn) {
+  const texts = [], lookup = [];
+  const saved = {mem: LOOP.mem, list: LOOP.list, flash: LOOP.flash, word: LOOP.word};
+  Object.assign(LOOP, {
+    mem: (_s, k) => `{{mem:${k}}}`, list: (_s, cur) => cur ? '{{list:current}}' : '{{list}}',
+    flash: (_s, salt) => `{{flash:${salt}}}`, word: id => `{{word:${id}}}`
+  });
+  try {
+    for (let n=0;n<8;n++) for (let cross=0;cross<2;cross++) for (let train=0;train<2;train++) for (let good=0;good<2;good++) {
+      const text = fn({flags:{loop:n,d_cross:!!cross,d_train:!!train,lend:good?'good':'other',dord:['first'],dth:'current'}});
+      let i=texts.indexOf(text); if(i<0) {i=texts.length; texts.push(text);} lookup.push(i);
+    }
+  } finally { Object.assign(LOOP,saved); }
+  return {loop_text:texts,lookup};
+}
+function value(v) {
+  if (typeof v === 'function') return dynamicText(v);
+  if (Array.isArray(v)) return v.map(value);
+  if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v).map(([k,x])=>[k,value(x)]));
+  return v;
+}
 function conv(c) {
-  if (Array.isArray(c)) { const o = { say: [c[0], c[1] === undefined ? null : c[1]] }; if (c.length > 2) o.say.push(c[2]); return o; }
-  const o = {};
-  for (const [k, v] of Object.entries(c)) o[k] = (k === 'when') ? condFromFn(v) : v;
-  return o;
+  if (Array.isArray(c)) { const o = { say: [c[0], c[1] === undefined ? null : value(c[1])] }; if (c.length > 2) o.say.push(value(c[2])); return o; }
+  return Object.fromEntries(Object.entries(c).map(([k,v])=>[k,k==='when'?condFromFn(v):value(v)]));
 }
 const scenes = {};
 for (const [k, sc] of Object.entries(STORY)) scenes[k] = sc.map(conv);
@@ -59,7 +80,7 @@ for (const [k, sc] of Object.entries(scenes)) sc.forEach((c, i) => {
 for (const r of rules) if (!scenes[r.go]) missing.push('ending ' + r.go);
 if (missing.length) { console.error('MISSING', missing); process.exit(1); }
 const notes = new Set(); Object.values(STORY).forEach(sc => sc.forEach(c => { if (c && c.note) notes.add(c.note); }));
-const story = { version: 1, source: 'js/story.js + js/story3.js', start: 'start', notes_total: notes.size, ending_rules: rules, endings: ENDINGS, scenes };
+const story = { version: 2, source: 'js/story.js + js/story3.js + js/story_loop.js', loop: Object.fromEntries(Object.entries(LOOP).filter(([,v]) => typeof v !== 'function')), start: 'start', notes_total: notes.size, ending_rules: rules, endings: ENDINGS, scenes };
 fs.mkdirSync(path.join(OUT, 'data'), { recursive: true });
 fs.writeFileSync(path.join(OUT, 'data', 'story.json'), JSON.stringify(story, null, 1) + '\n');
 console.log('story.json: scenes', Object.keys(scenes).length, 'rules', rules.length, 'notes', notes.size);

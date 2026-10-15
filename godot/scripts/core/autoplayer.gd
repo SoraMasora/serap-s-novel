@@ -28,7 +28,7 @@ func play(seed: int, max_events: int = 5000) -> Dictionary:
 		var e: Dictionary = events[-1]
 		var at := "%s:%d" % [runner.st.scene, runner.st.i]
 		match e.type:
-			"say", "card", "cut":
+			"say", "card", "cut", "sms", "omen", "montage":
 				trace.append("%s@%s" % [e.type, at])
 			"choice":
 				var k := _pick(e.options.size())

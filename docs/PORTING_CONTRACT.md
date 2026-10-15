@@ -1,11 +1,15 @@
 # Porting Contract — веб-оригинал → Godot 4.7.2 (Route B)
 
-Эталон: веб-версия v17.2 (`index.html`, `js/engine.js`, `js/story*.js`, `js/pixel.js`, `js/audio.js`, `css/style.css`, `assets/*.js`).
+Эталон: веб-версия v18 (основа v17.2 сохранена) (`index.html`, `js/engine.js`, `js/story*.js`, `js/pixel.js`, `js/audio.js`, `css/style.css`, `assets/*.js`).
 
 ## Ядро
 - `run()`/`next()` из engine.js → `StoryRunner.step()`; шаги say/think/show/hide/bg/music/sfx/flag/stat/note/choice/jump/breath/map/cut/card/final/fx/react/cam/zoom → события.
 - Концовки: 6 правил `pickEnding()` → `story.json.endings` (порядок сохранён).
 - Формулы: `feel`, `press`, заметки (48), флаги и числа (`num`), `tier()`/`tv()`/`fmt()` — как в JS.
+
+## Добавочная петля v18
+
+См. `GODOT_LOOP.md`: +88 сцен, независимая память смертей, эхо/крен, новый набор оверлеев, снег и звуки, истинная восьмая петля. Все 234 старые сцены и дизайн кнопок меню сохранены.
 
 ## Состояния и ввод
 | Веб | Godot (InputMap) |

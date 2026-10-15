@@ -11,6 +11,7 @@ signal action(name: String)
 @export var blink_ms := 140.0
 @export var crossfade_sec := 0.35
 
+var _haunted := false
 var _step := 0
 var _timer := 0.0
 var _cur := "t0"
@@ -37,7 +38,23 @@ func _ready() -> void:
 
 
 func refresh(can_continue: bool) -> void:
-	btn_continue.disabled = not can_continue
+	_haunted = Game.memory.haunted()
+	$Bar/New.disabled = _haunted
+	$Bar/New.tooltip_text = "Начать заново нельзя. Я всё помню." if _haunted else ""
+	btn_continue.text = "ПРОДОЛЖИТЬ!" if _haunted else "Продолжить"
+	# Keep the original VineButton background/border/hover; only the loop label is red.
+	for color_key: String in [
+		"font_color", "font_hover_color", "font_pressed_color", "font_focus_color"
+	]:
+		if _haunted:
+			btn_continue.add_theme_color_override(color_key, Color(1.0, 0.12, 0.16))
+		else:
+			btn_continue.remove_theme_color_override(color_key)
+	btn_continue.disabled = not (can_continue or _haunted)
+	$Frames/te.texture = Game.tex("title", "te")
+	$Frames/te.visible = _haunted
+	$Frames/te.modulate.a = 1.0 if _haunted else 0.0
+	$Dust.set("snowing", _haunted)
 	frames.pivot_offset = Vector2(size.x * 0.5, size.y * 0.6)
 
 
@@ -45,6 +62,14 @@ func _process(delta: float) -> void:
 	if not visible:
 		return
 	_timer -= delta * 1000.0
+	if _haunted:
+		if _timer <= 0.0:
+			_timer = randf_range(3.5, 10.0) * 1000.0
+			$Frames/te.modulate.a = 0.0
+			get_tree().create_timer(0.09).timeout.connect(
+				func() -> void: $Frames/te.modulate.a = 1.0 if _haunted else 0.0
+			)
+		return
 	if _timer > 0.0:
 		return
 	var k := frame_sequence[_step % frame_sequence.size()]

@@ -63,7 +63,24 @@
   "end_bad3": "res://assets/bg/end_bad3.webp",
   "end_neutral1": "res://assets/bg/end_neutral1.webp",
   "end_neutral2": "res://assets/bg/end_neutral2.webp",
-  "end_neutral3": "res://assets/bg/end_neutral3.webp"
+  "end_neutral3": "res://assets/bg/end_neutral3.webp",
+  "d_room": "res://assets/bg/d_room.webp",
+  "d_store": "res://assets/bg/d_store.webp",
+  "d_road": "res://assets/bg/d_road.webp",
+  "d_train": "res://assets/bg/d_train.webp",
+  "d_cross": "res://assets/bg/d_cross.webp",
+  "d_cliff": "res://assets/bg/d_cliff.webp",
+  "d_neck": "res://assets/bg/d_neck.webp",
+  "x_scream": "res://assets/bg/x_scream.webp",
+  "c_sketch": "res://assets/bg/c_sketch.webp",
+  "c_icon": "res://assets/bg/c_icon.webp",
+  "h_snow": "res://assets/bg/h_snow.webp",
+  "t_roof": "res://assets/bg/t_roof.webp",
+  "t_sky": "res://assets/bg/t_sky.webp",
+  "t_hand": "res://assets/bg/t_hand.webp",
+  "t_sky2": "res://assets/bg/t_sky2.webp",
+  "t_landing": "res://assets/bg/t_landing.webp",
+  "t_angel": "res://assets/bg/t_angel.webp"
  },
  "sprites": {
   "sera_angry": "res://assets/sprites/sera_angry.webp",
@@ -139,7 +156,8 @@
   "t0": "res://assets/title/t0.webp",
   "t1": "res://assets/title/t1.webp",
   "t2": "res://assets/title/t2.webp",
-  "tb": "res://assets/title/tb.webp"
+  "tb": "res://assets/title/tb.webp",
+  "te": "res://assets/title/te.webp"
  },
  "ui": {
   "logo": "res://assets/ui/logo.webp",
