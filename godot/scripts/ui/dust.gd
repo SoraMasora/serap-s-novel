@@ -3,6 +3,8 @@ extends Control
 
 @export var count := 45
 
+@export var snowing := false
+
 var _motes: Array = []
 var _t := 0.0
 
@@ -29,8 +31,10 @@ func _process(delta: float) -> void:
 	_t += delta * 1000.0
 	var k := delta * 60.0
 	for m: Dictionary in _motes:
-		m.y -= m.v * k
+		m.y += m.v * k * (3.0 if snowing else -1.0)
 		m.x += sin(_t / 2000.0 + m.p) * 0.0003 * k
+		if snowing and m.y > 1.0:
+			m.y = 0.0
 		if m.y < 0.0:
 			m.y = 1.0
 	queue_redraw()
@@ -44,4 +48,6 @@ func _draw() -> void:
 			200.0 / 255.0,
 			0.25 + 0.25 * sin(_t / 700.0 + m.p)
 		)
+		if snowing:
+			c = Color(0.88, 0.91, 1.0, 0.65)
 		draw_circle(Vector2(m.x * size.x, m.y * size.y), m.r * 1.5, c)

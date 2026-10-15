@@ -9,10 +9,12 @@ const MAX_STEPS := 100000
 
 var db: StoryDB
 var config: GameConfig
+var memory: LoopMemory
 ## Состояние игры (сохраняется целиком) — аналог st из engine.js
 var st: Dictionary = {}
 ## Журнал: {n, t, th, ch, s(снимок для отката)}
 var log: Array[Dictionary] = []
+var _hooks: Dictionary = {}
 var _expr_cache: Dictionary = {}
 var _choice_snap: Dictionary = {}
 
@@ -20,6 +22,13 @@ var _choice_snap: Dictionary = {}
 func _init(p_db: StoryDB, p_config: GameConfig) -> void:
 	db = p_db
 	config = p_config
+	memory = LoopMemory.new(db.loop)
+	for hook: Dictionary in db.loop.get("HOOKS", []):
+		var sc := db.scene(hook.scene)
+		for i in sc.size():
+			if sc[i].has("say") and JSON.stringify(sc[i].say[1]).contains(hook.after):
+				_hooks["%s:%d" % [hook.scene, i + 1]] = hook.echo
+				break
 	new_game(config.default_name)
 
 
@@ -40,8 +49,13 @@ func new_game(player_name: String) -> void:
 		"chapter": "",
 		"mode": "",
 		"map": null,
+		"snow": false,
+		"stack": [],
+		"hk": {},
+		"flk": "",
 	}
 	log.clear()
+	memory.sync(st)
 
 
 # ── Тон маршрута ──
@@ -111,7 +125,7 @@ func eval_cond(src: String) -> bool:
 func pick_ending() -> String:
 	for r: Dictionary in db.ending_rules:
 		if eval_cond(r.when):
-			return r.go
+			return "L_truth" if memory.truth() else r.go
 	push_error("Ни одно правило концовки не сработало")
 	return db.ending_rules[-1].go if db.ending_rules.size() else db.start
 
@@ -173,6 +187,12 @@ func log_push(e: Dictionary) -> void:
 func step() -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	for _guard in MAX_STEPS:
+		memory.sync(st)
+		var hk := "%s:%d" % [st.scene, int(st.i)]
+		if memory.level() > 0 and _hooks.has(hk) and not st.hk.has(hk):
+			st.hk[hk] = true
+			st.stack.append([st.scene, st.i])
+			jump(_hooks[hk] + "_" + memory.band())
 		var scene := db.scene(st.scene)
 		if st.i >= scene.size():
 			out.append({"type": "stall", "scene": st.scene})
@@ -180,12 +200,29 @@ func step() -> Array[Dictionary]:
 		var c: Dictionary = scene[st.i]
 		st.i += 1
 		if c.has("say"):
-			var t: Variant = tv(c.say[1])
+			var t: Variant = memory.text(tv(c.say[1]), st)
 			if t == null:
 				continue
 			var expr: Variant = tv(c.say[2]) if c.say.size() > 2 else null
-			out.append(_say(c.say[0], fmt(t), expr))
+			if _memory_flash_due():
+				st.i -= 1
+				out.append({"type": "subl", "id": "last"})
+				out.append(_say("!", memory.flash_text(st, str(st.scene) + ":" + str(st.i)), null))
+			else:
+				out.append(_say(c.say[0], fmt(_tilt(c.say[0], t)), expr))
 			return out
+		if c.get("ret", false):
+			if not st.stack.is_empty():
+				var back: Array = st.stack.pop_back()
+				st.scene = back[0]
+				st.i = int(back[1])
+			continue
+		if c.has("lgo"):
+			jump(c.lgo + str(mini(6, memory.level())))
+			continue
+		if c.has("dgo"):
+			jump(c.dgo + str(st.flags.get("dth", "room")))
+			continue
 		if c.has("tier"):
 			var g: Variant = tv(c.tier)
 			if g:
@@ -216,6 +253,11 @@ func step() -> Array[Dictionary]:
 		if c.has("music"):
 			st.music = c.music
 			out.append({"type": "music", "mode": c.music})
+		if c.has("snow"):
+			st.snow = bool(c.snow)
+			out.append({"type": "snow", "on": st.snow})
+		if c.has("subl"):
+			out.append({"type": "subl", "id": c.subl})
 		if c.has("rain"):
 			st.rain = bool(c.rain)
 			out.append({"type": "rain", "on": st.rain})
@@ -250,12 +292,22 @@ func step() -> Array[Dictionary]:
 		if is_choice:
 			out.append({"type": "choice", "options": c.choice})
 			return out
+		var overlay := false
+		for kind: String in ["sms", "omen", "montage", "scream"]:
+			if c.has(kind):
+				out.append({"type": kind, "data": c[kind]})
+				overlay = true
+				break
+		if overlay:
+			return out
 		if c.get("ending"):
 			jump(pick_ending())
 			continue
 		if c.has("map"):
 			var m: Dictionary = {"done": [], "pos": null}
 			m.merge(c.map.duplicate(true), true)
+			if memory.truth():
+				m.erase("timer")
 			st.map = m
 			st.mode = "map"
 			out.append({"type": "map"})
@@ -301,6 +353,11 @@ func _say(speaker: String, text: String, expr: Variant) -> Dictionary:
 
 ## Выбор варианта: возвращает ключ реакции Серы (или "")
 func choose(options: Array, idx: int) -> String:
+	if memory.truth():
+		var best_idx := memory.best(options, str(st.scene))
+		if idx != best_idx:
+			log_push({"n": "→", "t": "Нет. Я знаю, чем это кончается.", "ch": true})
+		idx = best_idx
 	var o: Dictionary = options[idx]
 	var f: float = float(o.get("feel", 0))
 	var rk: String = o.get("react", "")
@@ -331,6 +388,8 @@ func mark_choice_shown() -> void:
 
 ## Итог мини-игры дыхания
 func breath_result(cfg: Dictionary, score: float) -> void:
+	if memory.truth():
+		score = 1.0
 	var ok := score >= config.breath_ok_ratio
 	st.flags[cfg.get("flag", "breathOk")] = ok
 	st.flags.breathScore = roundi(score * 100)
@@ -377,7 +436,9 @@ func save_snapshot() -> Dictionary:
 
 
 func restore(s: Dictionary) -> void:
-	var base := {"notes": [], "mode": "", "map": null}
+	var base := {
+		"notes": [], "mode": "", "map": null, "snow": false, "stack": [], "hk": {}, "flk": ""
+	}
 	base.merge(s.duplicate(true), true)
 	base.erase("nc")
 	# числа из JSON — float; индексы и счётчики приводим к int
@@ -385,6 +446,7 @@ func restore(s: Dictionary) -> void:
 	base.press = int(base.get("press", 0))
 	base.feel = float(base.get("feel", config.start_feel))
 	st = base
+	memory.sync(st)
 	if not db.has_scene(str(st.get("scene", ""))):
 		push_error("Сохранение ссылается на неизвестную сцену: " + str(st.get("scene")))
 		st.scene = config.start_scene
@@ -402,3 +464,65 @@ func rollback(k: int) -> bool:
 	s.notes = notes
 	restore(s)
 	return true
+
+
+func _base_scene() -> bool:
+	return not str(st.scene).begins_with("L_") and not str(st.scene).begins_with("e_")
+
+
+func _memory_flash_due() -> bool:
+	var n := memory.level()
+	if n < 2 or memory.truth() or not _base_scene():
+		return false
+	var key := "%s:%d" % [st.scene, int(st.i) - 1]
+	var chance := [0.0, 0.0, 0.025, 0.035, 0.045, 0.06, 0.075]
+	if st.flk == key or LoopMemory.hash_text(key + "f" + str(n)) >= chance[n]:
+		return false
+	st.flk = key
+	return true
+
+
+func _tilt(speaker: String, text: String) -> String:
+	var n := memory.level()
+	if n == 0 or memory.truth() or not _base_scene() or text.length() < 8:
+		return text
+	if speaker != "P" and speaker != config.thought_marker:
+		return text
+	var key := "%s:%d" % [st.scene, int(st.i) - 1]
+	var chance := [0.0, 0.1, 0.15, 0.22, 0.3, 0.4, 0.5]
+	var out := text
+	if LoopMemory.hash_text(key + "g" + str(n)) < chance[n]:
+		var count := 1 + int(n >= 2) + int(n >= 3) + int(n >= 4)
+		out = _tilt_op(out, int(LoopMemory.hash_text(key + "m") * count))
+		if n >= 5 and LoopMemory.hash_text(key + "x") < 0.4:
+			out = _tilt_op(out, int(LoopMemory.hash_text(key + "y") * count))
+	var tails := [0.0, 0.08, 0.1, 0.14, 0.18, 0.25, 0.32]
+	if speaker == config.thought_marker and LoopMemory.hash_text(key + "t" + str(n)) < tails[n]:
+		var lines: Array = db.loop.TAILS[memory.band()]
+		out += " " + str(lines[int(LoopMemory.hash_text(key + "u") * lines.size())])
+	return out
+
+
+func _tilt_op(text: String, op: int) -> String:
+	if op == 0:
+		return text if text.left(1) in ["…", "«", '"', "("] else "…" + text
+	if op == 1:
+		var pos := text.find(", ")
+		return text.substr(0, pos) + "… " + text.substr(pos + 2) if pos >= 0 else "…" + text
+	var re := RegEx.new()
+	if op == 2:
+		re.compile('^([«"(…]?)([А-ЯЁа-яё])([а-яё]*)')
+	else:
+		re.compile("(?i)(^|\\s)(не|я|она|мне|это|ты)(\\s)")
+	var hit := re.search(text)
+	if hit == null:
+		return text if op == 2 else "…" + text
+	var word := hit.get_string(2)
+	var change := word + "… " + word.to_lower() if op == 3 else word + "-" + word.to_lower()
+	return (
+		text.substr(0, hit.get_start())
+		+ hit.get_string(1)
+		+ change
+		+ hit.get_string(3)
+		+ text.substr(hit.get_end())
+	)

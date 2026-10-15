@@ -46,7 +46,7 @@ jobs:
         working-directory: godot
         run: godot --headless --path . --import --quit || true; godot --headless --path . --import --quit
       - name: Parity reference
-        run: node tools/godot/js_reference.cjs 200 && git diff --exit-code godot/tests/fixtures/js_reference.json
+        run: node tools/godot/js_reference.cjs 200 && node tools/godot/loop_reference.cjs && git diff --exit-code godot/tests/fixtures/
       - name: GUT
         working-directory: godot
         env: { GODOT_DISABLE_LEAK_CHECKS: "1" }

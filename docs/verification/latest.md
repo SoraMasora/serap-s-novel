@@ -1,23 +1,25 @@
-# Verification — latest (2026-10-09, commit d5d9034 + docs)
+# Verification — Godot v18.1 (2026-10-15)
 
-Платформа: Linux (Amazon Linux 2023), Godot 4.7.2.stable.official.ed1daf0bf, headless; Chromium 153 (SwiftShader). GitHub Actions — не запускался.
+Godot 4.7.2.stable.official.ed1daf0bf (архив проверен по закреплённому SHA256), GUT v9.7.1, gdtoolkit 4.5.0; Amazon Linux 2023. Прежний веб-runtime не менялся.
 
-| # | Команда | Результат | Статус |
-|---|---|---|---|
-| 1 | `node tools/godot/export_data.cjs --assets` | `story.json: scenes 234 rules 6 notes 48` · `assets: 155 files, 18.5 MB` | PASS |
-| 2 | `node tools/godot/bake_web.cjs` | `pixel: ok` · `audio: ok 23` | PASS |
-| 3 | `bash tools/godot/fetch_deps.sh` | `GUT v9.7.1 ok` · `fonts ok` (sha256 сверены) | PASS |
-| 4 | `godot --headless --path . --import --quit` (2-й проход) | без ошибок/предупреждений (1-й проход на чистом клоне — KI-004) | PASS |
-| 5 | `bash tools/godot/check_scripts.sh` | `CHECK OK` | PASS |
-| 6 | `gdformat --check scripts tests && gdlint scripts tests` | `Success: no problems found` | PASS |
-| 7 | GUT (`-gdir=res://tests -ginclude_subdirs`) | Tests 28, Passing 28, Asserts 193, 23.6 s | PASS |
-| 8 | `godot --headless --path . -- --autoplay=42` | `ending home, steps 403, digest 9a1c118c…` | PASS |
-| 9 | `godot --headless --path . --quit-after 200` | запуск ок; при выходе KI-001 (ObjectDB leak аудио) | PASS с предупреждением |
-| 10 | `godot --headless --path . --export-release "Web" build/web/index.html` | 68 МБ (wasm 39.5, pck 30.6) | PASS |
-| 11 | `web_smoke.cjs`: титул → «Новая игра» → имя → глава → магазин → выбор → наведение | ERRORS none, boot 12.9 с; скриншоты сверены с `shots/t_store.png` | PASS (host) |
-| 12 | perf: `tests/perf/perf_pixel_map.tscn` | см. PERF_TARGETS M-001 | PASS |
+| Проверка | Результат |
+|---|---|
+| Экспорт | 322 сцены, 6 правил, 48 заметок; 173 ассета |
+| Сохранность старого контента | все 234 прежние сцены идентичны данным `64f440b` |
+| Дизайн меню | `VineButton`, тема и исходные узлы кнопок не менялись; отдельный UI-тест |
+| Запекание | pixel: ok; audio: ok 33 |
+| Зависимости | закреплённые GUT/шрифты, SHA256 сверены |
+| Импорт | повторный импорт чистый (первый — известный KI-004) |
+| Компиляция и линт | check_scripts.sh; gdformat/gdlint — чисто |
+| GUT | **42/42**, 1405 assertions |
+| Старый паритет JS | 200 сидов совпали по digest/статам/концовке/заметкам |
+| Новый текст | 552 случая совпали с исходными JS-функциями |
+| Смерти | 49 сочетаний концовки/уровня до скримера |
+| Истинная ветка | 200 сидов восьмой петли → truth; дыхание не проваливается, таймер платформы снят |
+| UI | предупреждение, продолжение, перезапуск pending, скример/меню, soft, отмена оверлеев, ручные сейвы, исходный дизайн кнопок |
+| Визуально | Xvfb + OpenGL llvmpipe: обычный/изменённый титул, настройки, предупреждение, телефон, скример; снимки просмотрены |
 
-## Не проверялось
-- CI на GitHub Actions (`.github/workflows/godot.yml`) — UNVERIFIED; ожидается зелёный job `test` с теми же выводами.
-- Открытие сцен в редакторе с GUI и правка мышью — UNVERIFIED (`godot -e --path godot`, ожидается: сцены открываются без ошибок).
-- Звук на слух, ручной ввод дыхания, пиксельная карта в браузере, FPS на реальном GPU, десктоп-экспорт.
+GUT завершился успешно; при завершении процесса остаётся известное предупреждение об аудиоресурсе KI-001 (не скрывалось). Xvfb также сообщает неподдерживаемый VSync.
+
+## UNVERIFIED
+Звук на слух (KI-010), FPS на реальном GPU, открытие редактора мышью, экспорт новой ревизии для Web/desktop, выполнение GitHub Actions этой ревизии. Старые результаты веб-экспорта v17.2 не выдаются за проверку новой сборки.
