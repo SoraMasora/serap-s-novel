@@ -14,7 +14,7 @@ func before_each() -> void:
 
 func test_story_loaded() -> void:
 	assert_eq(db.load_error, "")
-	assert_eq(db.scenes.size(), 351, "число сцен как в веб-версии")
+	assert_eq(db.scenes.size(), 443, "число сцен как в веб-версии")
 	assert_eq(db.notes_total, 61)
 
 

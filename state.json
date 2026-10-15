@@ -1,14 +1,19 @@
 {
   "project": "serap-s-novel",
   "route": "B",
-  "phase": "content-0.7.3",
+  "phase": "content-0.7.3-gated-memory-loop",
   "status": "green-with-known-issues",
-  "next_task": "Проверить 0.7.3: все показанные ответы про ангела и молчаливое ожидание на платформе без новых CG.",
+  "next_task": "Прослушать новые звуки на устройстве; проверить экспорт и прохождение вручную. Основа 0.7.3 полностью сохранена.",
   "blocked_by": [
     "нет GPU в среде агента (KI-003)",
     "CI не запускался (KI-007)"
   ],
   "verification": [
+    {
+      "cmd": "GUT + original JS parity + preservation + check_scripts + gdformat/gdlint + real completion/cold reopen",
+      "result": "61/61; 1832 asserts; 351 old scenes,11 old endings,520 files unchanged; CHECK OK; no lint issues; real exit/reopen peaceful",
+      "status": "PASS"
+    },
     {
       "cmd": "GUT + compilation + lint + web response smoke",
       "result": "38/38, 332 asserts; CHECK OK; 41 files unchanged; no problems; six disabled responses return empty CG, 0 page errors",

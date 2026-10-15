@@ -9,6 +9,7 @@ var notes_total := 0
 var scenes: Dictionary = {}
 var endings: Dictionary = {}
 var ending_rules: Array = []
+var loop: Dictionary = {}
 var load_error := ""
 
 
@@ -26,6 +27,7 @@ static func load_from(path: String = DEFAULT_PATH) -> StoryDB:
 		db.load_error = "битый JSON сценария: " + path
 		push_error(db.load_error)
 		return db
+	db.loop = data.get("loop", {})
 	db.start = data.get("start", "start")
 	db.notes_total = int(data.get("notes_total", 0))
 	db.scenes = data.get("scenes", {})
