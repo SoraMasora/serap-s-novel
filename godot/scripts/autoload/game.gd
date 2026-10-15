@@ -10,9 +10,12 @@ const SEEN_PATH := "user://seen.json"
 
 var config: GameConfig
 var db: StoryDB
+var memory: LoopMemory
 ## group → {key → res-путь}
 var manifest: Dictionary = {}
-var settings := {"speed": 28.0, "music": 0.6, "auto_delay": 1800.0, "fullscreen": 1.0}
+var settings := {
+	"speed": 28.0, "music": 0.6, "auto_delay": 1800.0, "fullscreen": 1.0, "soft": 0.0, "cw": 0.0
+}
 ## Прочитанные реплики («сцена:индекс») — «Пропуск» листает только их
 var seen: Dictionary = {}
 var _tex_cache: Dictionary = {}
@@ -22,11 +25,15 @@ var _seen_dirty := 0
 func _ready() -> void:
 	config = load(CONFIG_PATH)
 	db = StoryDB.load_from()
+	memory = LoopMemory.new(db.loop)
+	memory.data.merge(SaveSystem.read_json(LoopMemory.PATH), true)
 	settings = {
 		"speed": config.default_text_speed,
 		"music": config.default_music_volume,
 		"auto_delay": config.default_auto_delay_ms,
 		"fullscreen": 1.0,
+		"soft": 0.0,
+		"cw": 0.0,
 	}
 	_load_manifest()
 	_load_settings()
@@ -155,3 +162,13 @@ func set_setting(k: String, v: float) -> void:
 	if err != OK:
 		push_error("Не удалось сохранить настройки: " + error_string(err))
 	settings_changed.emit()
+
+
+func save_memory() -> void:
+	SaveSystem.write_atomic(LoopMemory.PATH, JSON.stringify(memory.data))
+
+
+func forget_memory() -> void:
+	memory.data = {"deaths": [], "name": "", "freed": false, "pending": null}
+	save_memory()
+	SaveSystem.delete_slot("auto")

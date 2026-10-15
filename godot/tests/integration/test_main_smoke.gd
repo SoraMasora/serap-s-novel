@@ -5,9 +5,16 @@ extends GutTest
 const MAIN := preload("res://scenes/main/main.tscn")
 
 var main: Control
+var _memory_backup: Dictionary
+var _settings_backup: Dictionary
 
 
 func before_each() -> void:
+	_memory_backup = Game.memory.data.duplicate(true)
+	_settings_backup = Game.settings.duplicate(true)
+	Game.settings.cw = 1.0
+	Game.settings.speed = 0.0
+	Game.memory.data = {"deaths": [], "name": "", "freed": false, "pending": null}
 	Engine.time_scale = 8.0
 	SaveSystem.delete_slot("auto")
 	main = MAIN.instantiate()
@@ -16,6 +23,8 @@ func before_each() -> void:
 
 
 func after_each() -> void:
+	Game.memory.data = _memory_backup
+	Game.settings = _settings_backup
 	Engine.time_scale = 1.0
 
 

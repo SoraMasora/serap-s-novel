@@ -1,9 +1,9 @@
 {
   "project": "serap-s-novel",
   "route": "B",
-  "phase": "content-0.7.1",
+  "phase": "0.7.1-additive-loop-restored",
   "status": "green-with-known-issues",
-  "next_task": "Получить отзыв на ответные кадры 0.7.1; не расширять CG на обычные сцены и взаимодействия. KI-007/003 остаются.",
+  "next_task": "Пользовательская проверка именно исправленной 0.7.1: интерфейс, старые маршруты и звук; не брать устаревший main-порт за основу.",
   "blocked_by": [
     "нет GPU в среде агента (KI-003)",
     "CI не запускался (KI-007)"
@@ -69,5 +69,14 @@
     "KI-011",
     "KI-012"
   ],
-  "last_code_sha": "d5d9034"
+  "last_code_sha": "d5d9034",
+  "basis": "SERAPS-Godot-0.7.1-reply-only.zip; backup/v0.7.1-before-cg-review @ 4b34e433",
+  "preservation": {
+    "protected_files_byte_identical": 520,
+    "old_scenes_unchanged": 350,
+    "old_endings_unchanged": 10,
+    "new_scenes": 91,
+    "project_godot_byte_identical": true,
+    "tests": "50/50, 1687 assertions"
+  }
 }

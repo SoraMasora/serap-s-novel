@@ -1,6 +1,6 @@
-[gd_scene load_steps=18 format=3]
+[gd_scene load_steps=20 format=3]
 
-[ext_resource type="Script" path="res://scripts/ui/main.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/ui/loop_main.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/ui/rain_fx.gd" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/ui/text_box.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/pixel/pixel_map.tscn" id="4"]
@@ -12,6 +12,9 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/modal.tscn" id="10"]
 [ext_resource type="PackedScene" path="res://scenes/ui/ending_screen.tscn" id="11"]
 [ext_resource type="Script" path="res://scripts/ui/deco.gd" id="12_deco"]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/loop_overlay.tscn" id="loop_overlay"]
+[ext_resource type="Script" path="res://scripts/ui/loop_snow.gd" id="loop_snow"]
 
 [sub_resource type="Gradient" id="vig_g"]
 offsets = PackedFloat32Array(0.55, 1)
@@ -312,6 +315,16 @@ theme_override_font_sizes/font_size = 17
 theme_override_styles/normal = SubResource("toast_sb")
 horizontal_alignment = 1
 
+[node name="LoopSnow" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("loop_snow")
+count = 200
+
 [node name="TitleScreen" parent="." instance=ExtResource("8")]
 layout_mode = 1
 
@@ -322,4 +335,7 @@ layout_mode = 1
 layout_mode = 1
 
 [node name="EndingScreen" parent="." instance=ExtResource("11")]
+layout_mode = 1
+
+[node name="LoopOverlay" parent="." instance=ExtResource("loop_overlay")]
 layout_mode = 1
