@@ -2,7 +2,7 @@
 const fs=require('fs'),path=require('path'),vm=require('vm');
 const root=path.resolve(__dirname,'../..'),out=path.join(root,'godot');
 const ctx=vm.createContext({window:{}});ctx.window=ctx;
-for(const f of ['loop1.js','loop2.js','loop3.js'])vm.runInContext(fs.readFileSync(path.join(root,'assets',f),'utf8'),ctx);
+for(const f of ['loop1.js','loop2.js','loop3.js','loop4.js','loop5.js','loop6.js'])vm.runInContext(fs.readFileSync(path.join(root,'assets',f),'utf8'),ctx);
 const manifest=JSON.parse(fs.readFileSync(path.join(out,'data/assets_manifest.json'),'utf8'));
 let count=0;
 for(const [group,items] of Object.entries(ctx.ASSETS)) for(const [key,value] of Object.entries(items)){

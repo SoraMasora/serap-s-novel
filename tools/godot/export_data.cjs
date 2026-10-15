@@ -93,7 +93,7 @@ console.log('story.json: scenes', Object.keys(scenes).length, 'rules', rules.len
 if (process.argv.includes('--assets')) {
   const actx = vm.createContext({ window: {}, console }); actx.window = actx;
   for (const s of scripts.filter(s => s.startsWith('assets/'))) vm.runInContext(fs.readFileSync(path.join(ROOT, s), 'utf8'), actx, { filename: s });
-  for(const s of ['assets/loop1.js','assets/loop2.js','assets/loop3.js']) vm.runInContext(fs.readFileSync(path.join(ROOT,s),'utf8'),actx,{filename:s});
+  for(const s of ['assets/loop1.js','assets/loop2.js','assets/loop3.js','assets/loop4.js','assets/loop5.js','assets/loop6.js']) vm.runInContext(fs.readFileSync(path.join(ROOT,s),'utf8'),actx,{filename:s});
   const A = actx.ASSETS; const manifest = {}; let n = 0, bytes = 0;
   const EXT = { 'image/webp': 'webp', 'image/png': 'png', 'image/jpeg': 'jpg' };
   for (const [group, items] of Object.entries(A)) {
