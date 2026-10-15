@@ -246,3 +246,12 @@ GitHub MCP `push_files` с `arguments_file_path` (JSON `{owner, repo, branch, me
 - Сюжет НЕ дублируется: `node tools/godot/export_data.cjs` переводит `js/story*.js` в `godot/data/story.json` (лямбды `when` → Expression). После правки сюжета в вебе — перегенерировать story.json и эталон `node tools/godot/js_reference.cjs 200`, прогнать GUT.
 - Ассеты Godot не в git: `export_data.cjs --assets` (из assets/*.js и маркеры из css), `bake_web.cjs` (пиксельные слои js/pixel.js и звуки js/audio.js через Chromium), `fetch_deps.sh` (GUT, шрифты).
 - Вёрстка повторяет последние переопределения css: #textbox v4/v4.1/v5, #namebox, #controls, #side, #choices .vbtn с лозами. Приближения — `docs/PORTING_CONTRACT.md`.
+
+## v18 (петля «Это не конец», только веб)
+- Идея пользователя: после любой концовки Сера всё равно умирает; скример серафима с перевёрнутым «это не конец!»; меню без «Новой игры» с красным «ПРОДОЛЖИТЬ!»; герой помнит смерти и меняется; после 7-й — без плохих выборов, признание, истинная концовка. Полная схема — `docs/LOOP_DESIGN.md`.
+- Код: `js/story_loop.js` (константы `LOOP` + 88 сцен `L_*`/`e_*`, подключён после story3.js), новые шаги в `run()` движка, оверлеи `#subl #sms #omen #scream` создаются лениво в `#game`, стили — блок `/* ═══ v18 ═══ */` в конце css. Звук: `Sound.wind/hush`, режим музыки `drone`, SFX scream/glitch/whisper/brake/toll/thud/wings/gust.
+- Память героя — `localStorage.serap_meta` (не слоты!). `lvl()` 0–7, `truthOn()` при 7, `haunted()` — меню после смерти. Флаги `loop/truth/dord/d_*/lend/dth` выставляет `syncLoop()` в `begin()`.
+- Эхо-крючки ищутся по тексту строки (`LOOP.HOOKS.after`) — если править эти строки в story.js/story3.js, крючок молча пропадёт (в консоли будет `loop hook not found`).
+- Арт: `tools/loop_art.py` → `assets/loop1-3.js` (≤1 МБ каждый); `title.te` — пустая комната для меню после смерти.
+- Godot-порт не тронут: `export_data.cjs` читает только story.js/story3.js (KI-009). ENDINGS.truth и правка текста expo живут в story_loop.js.
+- Отладка: `__pix.setMeta / meta / lvl / play / scream`.
