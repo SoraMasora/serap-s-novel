@@ -4,5 +4,5 @@
 - PASS: `bash tools/godot/check_scripts.sh` → CHECK OK; `gdformat --check scripts tests` → 52 files unchanged; `gdlint scripts tests` → no problems.
 - PASS: `node tools/godot/verify_preservation.cjs` — исходные сцены, концовки и защищённые файлы не изменились.
 - PASS: импорт Godot 4.7.2 без ошибок (новые webp, ogg, шейдер).
-- PASS: Xvfb/OpenGL llvmpipe, реальные прохождения сцен смерти dev-скриптом `play_loop.gd` (не в git): room/burst, store/lull, road/title, train/whisper, cross/false, cliff/мягкий режим, neck/lull после шести смертей. Кадры `dm_*` → `d_*`, скример и возврат в меню с заблокированной «Новой игрой» на скриншотах.
+- PASS: Xvfb/OpenGL llvmpipe, реальные прохождения сцен смерти dev-скриптом `godot/tools_dev/play_loop.gd`; он же проверен на восстановление профиля игрока (md5 памяти, концовок, прочитанного и автосейва совпали после запуска): room/burst, store/lull, road/title, train/whisper, cross/false, cliff/мягкий режим, neck/lull после шести смертей. Кадры `dm_*` → `d_*`, скример и возврат в меню с заблокированной «Новой игрой» на скриншотах.
 - UNVERIFIED: звук на слух (`loop_shriek`, `loop_ring`, `loop_breath`; ожидаемо — резкий визг, звон после обрыва, дыхание слева), аппаратный GPU, экспорт EXE/APK, GitHub CI.

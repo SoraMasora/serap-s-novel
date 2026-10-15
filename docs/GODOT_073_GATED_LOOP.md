@@ -67,6 +67,11 @@
 
 Подстройка в инспекторе: `LoopOverlay` — `scare_override` (принудительный вариант для проверки), `shake_px`, `lull_wait_sec`, `ambush_wait_sec`, `dead_air_sec`; `LoopMain` — `whisper_pause_sec`, `whisper_timeout_sec`. Порядок, реплика и надписи — `LOOP.SCARE` в `js/story_loop.js` (затем `export_data.cjs`).
 
+Быстрый просмотр смерти и варианта без семи концовок (dev-скрипт, сам щёлкает реплики и сохраняет PNG в `user://loop_shots`; профиль игрока — память петли, концовки, прочитанное, автосейв — копируется до запуска и восстанавливается после):
+```bash
+cd godot && godot --path . -s res://tools_dev/play_loop.gd -- --force=room --scare=title --dt=2.5
+```
+
 ### Проверки 0.7.4
 - GUT **70/70, 1981 проверка**: +2 юнит-теста (кадр `dm_*` в каждой смерти раньше `d_*`; состав и ротация `SCARE`) и +7 интеграционных (`tests/integration/test_loop_scare.gd`: ротация и мягкий режим, все 5 вариантов завершаются, глитч/тряска/зум/серафим, мягкий режим без строба, ложное меню, клик по ложному меню, шёпот вне журнала и сейвов → меню).
 - CHECK OK; gdformat — 52 файла без изменений; gdlint — no problems; `verify_preservation.cjs` PASS; 552 варианта текста петли совпадают с JS.
