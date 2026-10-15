@@ -1,11 +1,8 @@
-# Проверка v0.7.3
+# Проверка v0.7.4 (death-cg + скример)
 
-- PASS: отключены 6 новых CG: c3_calm_wings, c3_calm_notyou, c3_calm_photo, c3_pl_wait, c3_angel_a, c3_angel_b.
-- PASS: после экспорта SHA256 story.json идентичен 0.7.2. Сюжет, выборы, флаги и обычная постановка не менялись.
-- PASS: 67 активных кадров; каталоги веб и Godot совпадают.
-- PASS: импорт Godot 4.7.2, CHECK OK, gdformat 41 files unchanged, gdlint no problems.
-- PASS: GUT 38/38, 332 asserts (включая паритет по существующим 200 эталонным прогонам и все 22 исключения CG).
-- PASS: локальный Chromium проверил каждый из шести ответов: пустой ключ кадра, 0 page errors.
-- UNVERIFIED: ручное прохождение всех веток, физический GPU, Android и GitHub CI.
-
-Бэкап перед правками: backup/v0.7.2-before-extra-cg-removal (563cad02).
+- PASS: GUT 70/70, 1981 asserts (`GODOT_DISABLE_LEAK_CHECKS=1 godot --headless -d --audio-driver Dummy --path . -s res://addons/gut/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit`). Новые: `test_every_death_shows_her_last_moment_before_aftermath`, `test_screamer_variants_are_known_and_rotate`, `tests/integration/test_loop_scare.gd` (7 тестов).
+- PASS: `bash tools/godot/check_scripts.sh` → CHECK OK; `gdformat --check scripts tests` → 52 files unchanged; `gdlint scripts tests` → no problems.
+- PASS: `node tools/godot/verify_preservation.cjs` — исходные сцены, концовки и защищённые файлы не изменились.
+- PASS: импорт Godot 4.7.2 без ошибок (новые webp, ogg, шейдер).
+- PASS: Xvfb/OpenGL llvmpipe, реальные прохождения сцен смерти dev-скриптом `play_loop.gd` (не в git): room/burst, store/lull, road/title, train/whisper, cross/false, cliff/мягкий режим, neck/lull после шести смертей. Кадры `dm_*` → `d_*`, скример и возврат в меню с заблокированной «Новой игрой» на скриншотах.
+- UNVERIFIED: звук на слух (`loop_shriek`, `loop_ring`, `loop_breath`; ожидаемо — резкий визг, звон после обрыва, дыхание слева), аппаратный GPU, экспорт EXE/APK, GitHub CI.

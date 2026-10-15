@@ -1,14 +1,26 @@
 {
   "project": "serap-s-novel",
   "route": "B",
-  "phase": "content-0.7.3-gated-memory-loop",
+  "phase": "content-0.7.4-death-cg-screamer",
   "status": "green-with-known-issues",
-  "next_task": "Прослушать новые звуки на устройстве; проверить экспорт и прохождение вручную. Основа 0.7.3 полностью сохранена.",
+  "next_task": "Прослушать новый визг/звон/дыхание скримера и пройти смерти на ПК (F5); при желании заменить dm_* своими кадрами в godot/art/bg/. Основа 0.7.3 сохранена.",
   "blocked_by": [
     "нет GPU в среде агента (KI-003)",
     "CI не запускался (KI-007)"
   ],
   "verification": [
+    {
+      "cmd": "GUT + check_scripts + gdformat/gdlint + verify_preservation + Xvfb playthrough of 7 deaths (play_loop dev script)",
+      "result": "70/70; 1981 asserts; CHECK OK; 52 files unchanged, no lint problems; preservation PASS; room/burst, store/lull, road/title, train/whisper, cross/false, cliff/soft, neck/lull reached the locked title",
+      "status": "PASS",
+      "date": "2026-10-15"
+    },
+    {
+      "cmd": "listen to loop_shriek / loop_ring / loop_breath on a device",
+      "result": "not done: no audio output in the agent sandbox (KI-017)",
+      "status": "UNVERIFIED",
+      "date": "2026-10-15"
+    },
     {
       "cmd": "GUT + original JS parity + preservation + check_scripts + gdformat/gdlint + real completion/cold reopen",
       "result": "61/61; 1832 asserts; 351 old scenes,11 old endings,520 files unchanged; CHECK OK; no lint issues; real exit/reopen peaceful",

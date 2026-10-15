@@ -257,6 +257,47 @@ const Sound = (() => {
   SFX.thud = t => { thump(t, 1, 90, 30, 0.4); nz(t, 0.15, 0.4, 300, 0.8, 'lowpass'); };
   SFX.wings = t => { for (let i = 0; i < 4; i++) swell(t + i * 0.42, 0.38, 0.22, 600 + i * 50, 'lowpass', 0.8); };
   SFX.gust = t => swell(t, 2.4, 0.3, 700, 'bandpass', 0.7);
+  // ── 0.7.4: новый скример ──
+  // крик: три «голоса» (пила → форманты «а» на крике), вибрато и дребезг, обрывы плёнки на 1.15 с,
+  // диссонансный кластер, металлический FM-скрежет, суб-удар; мимо master — как SFX.scream
+  SFX.shriek = t => {
+    const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -14; comp.knee.value = 6; comp.ratio.value = 12; comp.attack.value = 0.002; comp.release.value = 0.2;
+    const out = ctx.createGain(); out.gain.value = 0.95; comp.connect(out); out.connect(ctx.destination);
+    const sh = ctx.createWaveShaper(), c = new Float32Array(2048); for (let i = 0; i < 2048; i++) c[i] = Math.tanh((i / 1024 - 1) * 2.6); sh.curve = c; sh.connect(comp);
+    const gate = ctx.createGain(); gate.gain.setValueAtTime(1, t); for (let k = 0; k < 6; k++) { const a = t + 1.15 + k * 0.05; gate.gain.setValueAtTime(0.06, a); gate.gain.setValueAtTime(1, a + 0.025); } gate.connect(sh);
+    const env = ctx.createGain(); env.gain.setValueAtTime(0.0001, t); env.gain.exponentialRampToValueAtTime(1, t + 0.012); env.gain.setValueAtTime(1, t + 2.3); env.gain.exponentialRampToValueAtTime(0.0001, t + 3.3); env.connect(gate);
+    const formants = [[950, 7, 1], [1550, 9, 0.75], [2900, 11, 0.5], [4100, 13, 0.28]].map(([f, q, v]) => { const bp = ctx.createBiquadFilter(), g = ctx.createGain();
+      bp.type = 'bandpass'; bp.frequency.value = f; bp.Q.value = q; g.gain.value = v * 2.2; bp.connect(g); g.connect(env); return bp; });
+    const vib = ctx.createOscillator(), vg = ctx.createGain(); vib.frequency.setValueAtTime(5.5, t); vib.frequency.linearRampToValueAtTime(9, t + 2.5); vg.gain.value = 26; vib.connect(vg);
+    const jit = ctx.createOscillator(), jg = ctx.createGain(); jit.type = 'square'; jit.frequency.value = 23; jg.gain.value = 11; jit.connect(jg);
+    [[1, 0, 0.5], [1.059, 0.03, 0.34], [0.943, 0.06, 0.3]].forEach(([m, d, v]) => { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sawtooth';
+      o.frequency.setValueAtTime(620 * m, t + d); o.frequency.exponentialRampToValueAtTime(1180 * m, t + d + 0.07); o.frequency.linearRampToValueAtTime(1320 * m, t + 0.9);
+      o.frequency.linearRampToValueAtTime(1040 * m, t + 2.1); o.frequency.exponentialRampToValueAtTime(380 * m, t + 3.2); vg.connect(o.frequency); jg.connect(o.frequency);
+      g.gain.setValueAtTime(0.0001, t + d); g.gain.exponentialRampToValueAtTime(v, t + d + 0.01); formants.forEach(bp => g.connect(bp)); o.connect(g); o.start(t + d); o.stop(t + 3.35); });
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1800; const cl = ctx.createGain(); cl.gain.setValueAtTime(0.0001, t); cl.gain.exponentialRampToValueAtTime(1, t + 0.02); cl.gain.exponentialRampToValueAtTime(0.0001, t + 3.0); lp.connect(cl); cl.connect(comp);
+    [110, 116.5, 164.8, 174.6, 246.9].forEach(f => { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sawtooth'; o.frequency.value = f; g.gain.value = 0.07; o.connect(g); g.connect(lp); o.start(t); o.stop(t + 3.1); });
+    const br = ctx.createBufferSource(); br.buffer = noiseBuf(3.4); const bf = ctx.createBiquadFilter(); bf.type = 'bandpass'; bf.frequency.value = 2600; bf.Q.value = 1.2;
+    const bgn = ctx.createGain(); bgn.gain.value = 0.32; br.connect(bf); bf.connect(bgn); bgn.connect(env);
+    const car = ctx.createOscillator(), mod = ctx.createOscillator(), mg = ctx.createGain(), cg = ctx.createGain(); car.frequency.setValueAtTime(2700, t); car.frequency.linearRampToValueAtTime(3400, t + 2.6);
+    mod.frequency.value = 431; mg.gain.value = 1600; mod.connect(mg); mg.connect(car.frequency);
+    cg.gain.setValueAtTime(0.0001, t); cg.gain.exponentialRampToValueAtTime(0.09, t + 0.05); cg.gain.setValueAtTime(0.09, t + 2.2); cg.gain.exponentialRampToValueAtTime(0.0001, t + 3.0); car.connect(cg); cg.connect(gate);
+    const b = ctx.createOscillator(), bg = ctx.createGain(); b.frequency.setValueAtTime(110, t); b.frequency.exponentialRampToValueAtTime(32, t + 0.7);
+    bg.gain.setValueAtTime(1.2, t); bg.gain.exponentialRampToValueAtTime(0.0001, t + 1.1); b.connect(bg); bg.connect(comp);
+    const bn = ctx.createBufferSource(); bn.buffer = noiseBuf(0.4); const bl = ctx.createBiquadFilter(); bl.type = 'lowpass'; bl.frequency.value = 900; const bng = ctx.createGain();
+    bng.gain.setValueAtTime(0.9, t); bng.gain.exponentialRampToValueAtTime(0.0001, t + 0.35); bn.connect(bl); bl.connect(bng); bng.connect(comp);
+    [vib, jit, br, car, mod, b, bn].forEach(n => n.start(t)); [vib, jit, br, car, mod].forEach(n => n.stop(t + 3.4)); b.stop(t + 1.2); bn.stop(t + 0.4);
+  };
+  // звон в ушах после удара (тихо, биения 7350/7420 Гц)
+  SFX.ring = t => { [[7350, 0.035], [7420, 0.02]].forEach(([f, v]) => { const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.value = f;
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + 0.08); g.gain.setValueAtTime(v, t + 0.6); g.gain.exponentialRampToValueAtTime(0.0001, t + 3.1);
+    o.connect(g); g.connect(sfxOut()); o.start(t); o.stop(t + 3.2); }); };
+  // вдох и выдох у самого левого уха
+  SFX.breath = t => { [[0, 0.75, 1000, 1500, 0.22], [0.95, 0.6, 1300, 800, 0.3]].forEach(([d, dur, f0, f1, v]) => {
+    const s = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), g = ctx.createGain(); s.buffer = noiseBuf(dur + 0.1); bp.type = 'bandpass'; bp.Q.value = 2.2;
+    bp.frequency.setValueAtTime(f0, t + d); bp.frequency.linearRampToValueAtTime(f1, t + d + dur);
+    g.gain.setValueAtTime(0.0001, t + d); g.gain.linearRampToValueAtTime(v, t + d + dur * 0.6); g.gain.exponentialRampToValueAtTime(0.0001, t + d + dur);
+    let last = g; if (ctx.createStereoPanner) { const p = ctx.createStereoPanner(); p.pan.value = -0.75; g.connect(p); last = p; }
+    s.connect(bp); bp.connect(g); last.connect(sfxOut()); s.start(t + d); s.stop(t + d + dur + 0.1); }); };
   function sfx(k) { if (!ctx) return; if (ctx.state === 'suspended') ctx.resume(); const f = SFX[k]; if (f) f(ctx.currentTime + 0.02); }
   function blip() { if (!ctx || mode === null && !rainSrc) return; }
   function setVol(k, v) { vol[k] = v; if (ctx) { if (k === 'music') { musicGain.gain.value = v; trackBus.gain.value = v * TRK; } } }

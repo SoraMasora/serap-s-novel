@@ -104,14 +104,16 @@ async function renderAudio(page, job) {
   }, { src, sfxJs, job });
   return res;
 }
-async function bakeAudio(page) {
+async function bakeAudio(page, only) {
   const dir = path.join(OUT, 'assets', 'sfx_baked'); fs.mkdirSync(dir, { recursive: true });
-  const SFX = ['scream','glitch','whisper','toll','thud','wings','gust'];
-  const DUR = {scream:3,toll:6.2,gust:2.8,wings:2.0};
-  const jobs=SFX.map(k=>({kind:'sfx',key:k,dur:DUR[k]||1.6,name:'loop_'+k})).concat([
+  const SFX = ['scream','glitch','whisper','toll','thud','wings','gust','shriek','ring','breath'];
+  const DUR = {scream:3,toll:6.2,gust:2.8,wings:2.0,shriek:3.6,ring:3.4,breath:1.9};
+  let jobs=SFX.map(k=>({kind:'sfx',key:k,dur:DUR[k]||1.6,name:'loop_'+k})).concat([
     {kind:'drone',dur:16,name:'loop_music_drone'},
     {kind:'wind',dur:12,name:'loop_wind_loop'}
   ]);
+  // node tools/godot/bake_loop.cjs shriek,ring,breath — запечь только перечисленные (остальные файлы не трогать)
+  if (only) { const keep = new Set(only.split(',')); jobs = jobs.filter(j => keep.has(j.key || j.kind)); }
   for (const j of jobs) {
     const chs = await renderAudio(page, j);
     // обрезаем хвостовую тишину у SFX
@@ -126,7 +128,7 @@ async function bakeAudio(page) {
   const b = await chromium.launch({ executablePath: process.env.CHR || (require('fs').existsSync('/usr/local/bin/chromium') ? '/usr/local/bin/chromium' : undefined), args: ['--autoplay-policy=no-user-gesture-required'] });
   const page = await b.newPage();
   page.on('pageerror', e => { console.error('PAGEERROR', e.message); process.exitCode = 1; });
-  try { const only = process.argv[2]; await bakeAudio(page); }
+  try { const only = process.argv[2]; await bakeAudio(page, only); }
   catch (e) { console.error(e); process.exitCode = 1; }
   await page.close(); await b.close(); process.exit(process.exitCode || 0);
 })();

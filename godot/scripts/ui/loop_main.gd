@@ -4,8 +4,28 @@ extends "res://scripts/ui/main.gd"
 signal truth_exit_requested
 
 @export var truth_exit_delay_sec := 6.0
+## 0.7.4 · «whisper» screamer: silence before her line, and how long it waits for a click.
+@export var whisper_pause_sec := 2.2
+@export var whisper_timeout_sec := 9.0
+## Outdoor loop CGs (snow + wind on top).
+@export var loop_outdoor_bgs := PackedStringArray(
+	[
+		"d_road",
+		"d_train",
+		"d_cliff",
+		"dm_road",
+		"dm_train",
+		"dm_cliff",
+		"t_roof",
+		"t_sky",
+		"t_sky2",
+		"t_hand",
+		"t_angel"
+	]
+)
 
 var _truth_closing := false
+var _whisper_armed := false
 
 @onready var loop_overlay: LoopOverlay = $LoopOverlay
 
@@ -17,6 +37,7 @@ func _connect_signals() -> void:
 	ending.back.connect(_ending_back)
 	loop_overlay.finished.connect(_resume_after_overlay)
 	loop_overlay.death_finished.connect(_death_done)
+	loop_overlay.ambush_finished.connect(_ambush_done)
 	loop_overlay.warning_accepted.connect(_warning_accepted)
 
 
@@ -27,6 +48,7 @@ func to_title() -> void:
 	if Game.ensure_loop_entry():
 		Game.save_memory()
 	loop_overlay.kill()
+	_disarm_whisper()
 	$LoopSnow.visible = false
 	in_choice = false
 	runner.memory = Game.memory
@@ -86,7 +108,11 @@ func _apply(event: Dictionary) -> void:
 			auto = false
 			skip = false
 			_sync_btns()
-			loop_overlay.scream()
+			var kind := loop_overlay.pick_scare()
+			if kind == "whisper":
+				_whisper()
+			else:
+				loop_overlay.scream(kind)
 		_:
 			super._apply(event)
 
@@ -100,8 +126,48 @@ func _say(event: Dictionary) -> void:
 
 
 func advance() -> void:
-	if not loop_overlay.visible:
+	if _whisper_armed:
+		_whisper_hit()
+	elif not loop_overlay.visible:
 		super.advance()
+
+
+## Her line in the ordinary dialogue box after the death — a line that is not in the log or saves.
+func _whisper() -> void:
+	var generation := _gen
+	Audio.hush()
+	await get_tree().create_timer(whisper_pause_sec).timeout
+	if generation != _gen or not playing:
+		return
+	var scare: Dictionary = Game.db.loop.get("SCARE", {})
+	_whisper_armed = true
+	Audio.sfx("whisper")
+	side.visible = false
+	textbox.set_side_padding(false)
+	textbox.controls.visible = false
+	textbox.visible = true
+	var line := runner.fmt(str(scare.get("whisper", "…Обернись.")))
+	textbox.show_line("Сера", "sera", line, false, false)
+	await get_tree().create_timer(whisper_timeout_sec).timeout
+	if generation == _gen and _whisper_armed:
+		_whisper_hit()
+
+
+func _whisper_hit() -> void:
+	_disarm_whisper()
+	_hide_loop_text()
+	loop_overlay.scream("whisper")
+
+
+func _disarm_whisper() -> void:
+	_whisper_armed = false
+	textbox.controls.visible = true
+
+
+func _on_typing_done() -> void:
+	if _whisper_armed:
+		return
+	super._on_typing_done()
 
 
 func _on_choice(index: int) -> void:
@@ -196,6 +262,7 @@ func _restore(snapshot: Dictionary) -> void:
 
 func _reset_presentation() -> void:
 	loop_overlay.kill()
+	_disarm_whisper()
 	super._reset_presentation()
 
 
@@ -221,8 +288,15 @@ func _on_menu(action: String) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not loop_overlay.visible:
-		super._unhandled_input(event)
+	if loop_overlay.visible:
+		return
+	if _whisper_armed:
+		# her line is not an ordinary line: no menu, notes or hidden UI — any advance lets her in
+		if event.is_action_pressed("vn_advance") or event.is_action_pressed("vn_skip_hold"):
+			get_viewport().set_input_as_handled()
+			_whisper_hit()
+		return
+	super._unhandled_input(event)
 
 
 func _hide_loop_text() -> void:
@@ -290,21 +364,23 @@ func _start_death(fresh: bool) -> void:
 
 
 func _death_done() -> void:
+	var ambush := loop_overlay.take_ambush()
 	Game.memory.commit_death(runner.st.name)
 	Game.save_memory()
 	SaveSystem.delete_slot("auto")
 	runner.st.snow = false
 	to_title()
+	if ambush:
+		loop_overlay.ambush()
+
+
+func _ambush_done() -> void:
+	if title.visible:
+		Audio.music("drone" if Game.memory.haunted() else "calm")
 
 
 func _update_snow() -> void:
-	var snowy := cfg.outdoor_bgs.has(str(runner.st.bg))
-	snowy = (
-		snowy
-		or (
-			runner.st.bg
-			in ["d_road", "d_train", "d_cliff", "t_roof", "t_sky", "t_sky2", "t_hand", "t_angel"]
-		)
-	)
+	var bg := str(runner.st.bg)
+	var snowy := cfg.outdoor_bgs.has(bg) or loop_outdoor_bgs.has(bg)
 	$LoopSnow.visible = bool(runner.st.get("snow", false)) and snowy
 	Audio.wind($LoopSnow.visible)

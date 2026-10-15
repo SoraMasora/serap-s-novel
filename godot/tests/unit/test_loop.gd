@@ -59,6 +59,36 @@ func test_each_bridge_and_death_reaches_screamer() -> void:
 			assert_eq(r.memory.level(), n + 1)
 
 
+func test_every_death_shows_her_last_moment_before_aftermath() -> void:
+	for id: String in db.loop.ORDER:
+		var death: Dictionary = db.loop.DEATHS[id]
+		var cg := str(death.get("cg", ""))
+		assert_true(cg.begins_with("dm_"), id)
+		assert_true(Game.has_tex("bg", cg), cg)
+		var bgs: Array = []
+		for e: Dictionary in db.scene("L_d_" + id):
+			if e.has("bg"):
+				bgs.append(e.bg)
+		assert_has(bgs, cg, id)
+		assert_gt(
+			bgs.rfind(death.img), bgs.find(cg), id + ": aftermath comes after the last moment"
+		)
+
+
+func test_screamer_variants_are_known_and_rotate() -> void:
+	var scare: Dictionary = db.loop.SCARE
+	var kinds := ["burst", "lull", "title", "whisper", "false"]
+	assert_eq(scare.order.size(), db.loop.ORDER.size())
+	for kind: String in kinds:
+		assert_has(scare.order, kind)
+	for kind: String in scare.order:
+		assert_has(kinds, kind)
+	assert_eq(scare.order[0], "burst", "the first death keeps the classic hit")
+	assert_string_contains(str(scare.whisper), "{P}")
+	for key: String in ["x_face", "x_smile", "x_scream"]:
+		assert_true(Game.has_tex("bg", key), key)
+
+
 func test_memory_survives_restore_and_rollback() -> void:
 	var saved := r.save_snapshot()
 	r.memory.data.deaths = ["room", "train", "cross"]

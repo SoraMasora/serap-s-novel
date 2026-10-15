@@ -1,7 +1,9 @@
 extends "res://scripts/audio/audio.gd"
 ## Extends 0.7.3 audio; all original samples, volume/pitch and art overrides remain.
 
-const LOOP_SFX := ["scream", "glitch", "whisper", "toll", "thud", "wings", "gust"]
+const LOOP_SFX := [
+	"scream", "glitch", "whisper", "toll", "thud", "wings", "gust", "shriek", "ring", "breath"
+]
 
 @onready var drone: AudioStreamPlayer = $LoopDrone
 @onready var wind_player: AudioStreamPlayer = $LoopWind
