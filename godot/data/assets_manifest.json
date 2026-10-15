@@ -178,7 +178,16 @@
   "t_hand": "res://assets/bg/t_hand.webp",
   "t_sky2": "res://assets/bg/t_sky2.webp",
   "t_landing": "res://assets/bg/t_landing.webp",
-  "t_angel": "res://assets/bg/t_angel.webp"
+  "t_angel": "res://assets/bg/t_angel.webp",
+  "dm_room": "res://assets/bg/dm_room.webp",
+  "dm_store": "res://assets/bg/dm_store.webp",
+  "dm_road": "res://assets/bg/dm_road.webp",
+  "dm_train": "res://assets/bg/dm_train.webp",
+  "dm_cross": "res://assets/bg/dm_cross.webp",
+  "dm_cliff": "res://assets/bg/dm_cliff.webp",
+  "dm_neck": "res://assets/bg/dm_neck.webp",
+  "x_face": "res://assets/bg/x_face.webp",
+  "x_smile": "res://assets/bg/x_smile.webp"
  },
  "sprites": {
   "sera_angry": "res://assets/sprites/sera_angry.webp",
