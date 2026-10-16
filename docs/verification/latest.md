@@ -1,8 +1,25 @@
-# Проверка v0.7.4 (death-cg + скример)
+# Android 0.7.4-android.1 — проверка
 
-- PASS: GUT 70/70, 1981 asserts (`GODOT_DISABLE_LEAK_CHECKS=1 godot --headless -d --audio-driver Dummy --path . -s res://addons/gut/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit`). Новые: `test_every_death_shows_her_last_moment_before_aftermath`, `test_screamer_variants_are_known_and_rotate`, `tests/integration/test_loop_scare.gd` (7 тестов).
-- PASS: `bash tools/godot/check_scripts.sh` → CHECK OK; `gdformat --check scripts tests` → 52 files unchanged; `gdlint scripts tests` → no problems.
-- PASS: `node tools/godot/verify_preservation.cjs` — исходные сцены, концовки и защищённые файлы не изменились.
-- PASS: импорт Godot 4.7.2 без ошибок (новые webp, ogg, шейдер).
-- PASS: Xvfb/OpenGL llvmpipe, реальные прохождения сцен смерти dev-скриптом `godot/tools_dev/play_loop.gd`; он же проверен на восстановление профиля игрока (md5 памяти, концовок, прочитанного и автосейва совпали после запуска): room/burst, store/lull, road/title, train/whisper, cross/false, cliff/мягкий режим, neck/lull после шести смертей. Кадры `dm_*` → `d_*`, скример и возврат в меню с заблокированной «Новой игрой» на скриншотах.
-- UNVERIFIED: звук на слух (`loop_shriek`, `loop_ring`, `loop_breath`; ожидаемо — резкий визг, звон после обрыва, дыхание слева), аппаратный GPU, экспорт EXE/APK, GitHub CI.
+## PASS — выполнено
+
+- Godot 4.7.2 (без смены версии). Android APK экспортирован release-движком без Gradle, выровнен `zipalign -P 16`, подписан локальным тестовым ключом. `apksigner verify --verbose`: v2/v3, один подписант.
+- `aapt dump badging`: `com.soramasora.serap`, versionCode 741, `0.7.4-android.1`, minSdk 24, targetSdk 36, `armeabi-v7a` + `arm64-v8a`. В манифесте нет разрешения INTERNET. Требуется GLES 3.0.
+- Итоговый APK: 260993587 байта (около 249 MiB); SHA256 `b752ad7b4584c0c5e0a43e688c1091a74ddc6c6caeeaf6f0dd39e75862d0ec15`. Точный размер/хеш — для переданного APK, повторная подпись может изменить байты.
+- GUT с `SERA_TOUCH=1` **и отдельно без мобильного флага**: оба прогона **81/81, 2020 asserts**. В том числе 11 мобильных тестов: finger ID, clamp/deadzone, отпускание за пределами кнопки, два пальца, фокус/пауза, скрытие/меню, действие у точки карты, кеш, размеры и safe-area математика. Проверяется и путь через `Viewport.push_input`, не только прямой вызов обработчика.
+- `check_scripts.sh`: CHECK OK. `gdformat --check scripts tests`: 56 files unchanged. `gdlint scripts tests`: Success.
+- Визуальная проверка Xvfb/OpenGL llvmpipe: **1280×720 и 1600×720**, титул → CG/диалог → настройки → карта → меню. Через два `InputEventScreenTouch` действительно двигался герой и удерживался бег; после отпускания ни одна кнопка не оставалась нажатой. Настройки/«Готово» и кнопки помещаются в экран.
+- `verify_preservation.cjs --mobile`: **508 исходных файлов побайтно совпадают + 12 точных SHA256 мобильных адаптаций**, 351 исходная сцена, 11 исходных концовок, все старые ссылки ассетов без изменений. Без `--mobile` legacy-проверка ожидаемо отклоняет намеренные изменения UI/ввода.
+- Полный `story.json` побайтно совпадает с поставленным архивом 0.7.4 (SHA256 `1622ffff4a58178796b0af1d1a3515d68ac6d4b8908aa055fd0d5bd2ca07422f`). Тот же JSON проверен внутри APK; в APK найдены все 7 `dm_*` и оба новых лица скримера.
+- Android staging: изображения BG/CG/портретов ограничены 1280, ETC2, без mipmaps. Исходные изображения в проекте не уменьшались.
+
+## Ограничения / UNVERIFIED
+
+- Физический телефон: реальный GPU/FPS, RAM, нагрев, батарея, вырез, виртуальная клавиатура, системные жесты и пауза/возврат требуют проверки на устройстве пользователя. Десктопная эмуляция не заменяет её.
+- Android-эмулятор API 35 без KVM завис/завершился до успешной установки в ограниченной среде. Установка и запуск на Android НЕ отмечены PASS. QA-сборка x86_64 — не ARM APK для пользователя и не проверка ARM-производительности.
+- Звук на слух не проверен (KI-017). Новые CG имеют прежние ограничения ИИ-арта (KI-016).
+- Известная диагностика завершения AudioStream/ресурса (KI-001) остаётся: это не выдается за чистый shutdown.
+- Google Play/AAB, обновление поверх чужой подписи, Android 7 на реальном устройстве и CI не проверены.
+
+## Команды
+
+См. `docs/ANDROID_074.md`; сборщик `tools/godot/build_android.py`, визуальный smoke `godot/tools_dev/mobile_preview.gd`.

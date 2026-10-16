@@ -66,7 +66,13 @@ func tex(group: String, key: String) -> Texture2D:
 		return null
 	if not _tex_cache.has(path):
 		_tex_cache[path] = load(path)
-	return _tex_cache[path]
+	var texture: Texture2D = _tex_cache[path]
+	if MobileProfile.enabled():
+		_tex_cache.erase(path)
+		_tex_cache[path] = texture
+		while _tex_cache.size() > MobileProfile.TEXTURE_CACHE_LIMIT:
+			_tex_cache.erase(_tex_cache.keys()[0])
+	return texture
 
 
 func has_tex(group: String, key: String) -> bool:
@@ -83,7 +89,7 @@ func _art_path(group: String, key: String) -> String:
 
 ## Полный экран без чёрных полос (stretch aspect = expand) или окно
 func apply_window() -> void:
-	if DisplayServer.get_name() == "headless":
+	if DisplayServer.get_name() == "headless" or OS.has_feature("android"):
 		return
 	var fs := float(settings.get("fullscreen", 1.0)) > 0.5
 	var mode := DisplayServer.WINDOW_MODE_FULLSCREEN if fs else DisplayServer.WINDOW_MODE_WINDOWED
@@ -137,6 +143,9 @@ func _notification(what: int) -> void:
 		ev.action = "vn_menu"
 		ev.pressed = true
 		Input.parse_input_event(ev)
+		ev = ev.duplicate()
+		ev.pressed = false
+		Input.parse_input_event.call_deferred(ev)
 		return
 	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_PREDELETE:
 		save_seen()

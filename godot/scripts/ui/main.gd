@@ -500,6 +500,7 @@ func set_bg(k: String, instant: bool) -> void:
 
 
 func _process(delta: float) -> void:
+	pixel_map.set_touch_blocked(modal.is_open())
 	if _bg_anim.is_empty():
 		return
 	_bg_anim.t += delta

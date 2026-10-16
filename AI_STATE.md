@@ -1,6 +1,7 @@
 # AI_STATE — текущее состояние (2026-10-15)
 
 ## Сделано
+- Android 0.7.4-android.1: мультитач-джойстик + Бег/Действие, крупный UI, safe area, lifecycle-пауза, LRU/частицы/ETC2. APK ARM32+ARM64 release-движок с тестовой подписью; GUT mobile и desktop 81/81 (2020 asserts каждый), CHECK OK, линт, Xvfb 16:9/вытянутый экран. История 0.7.4 побайтно сохранена. См. docs/ANDROID_074.md и docs/verification/android-0.7.4.md. Реальный телефон/звук/FPS ещё UNVERIFIED.
 - Godot 0.7.4 death-cg: 7 CG последнего мгновения смертей Серы (`dm_*`) перед прежними `d_*`, лица скримера `x_face`/`x_smile`, 5 вариантов скримера по счёту смертей (burst/lull/title/whisper/false), глитч-шейдер, тряска, зум, новый визг и звон; мягкий режим — один статичный кадр. Текст: только вставки в `L_d_*`. GUT 70/70 (1981 asserts), CHECK OK, линт, preservation PASS, Xvfb-прохождение 7 смертей. См. docs/GODOT_073_GATED_LOOP.md (раздел 0.7.4).
 - Godot 0.7.3 + gated-memory-loop: сохранены все 351 исходная сцена, 11 концовок и 67 CG. Добавлены 92 сцены; порог 7 разных концовок; истинный финал сохраняется и закрывает игру, следующие запуски без смертей. GUT 61/61 (1832 asserts), CHECK OK, линт, 520 защищённых файлов совпадают, реальное закрытие/повторный запуск проверены. См. docs/GODOT_073_GATED_LOOP.md.
 - v0.7.3: дополнительно отключены 6 CG — дневной/ночной ангел (все показанные ответы) и молчаливое ожидание на платформе. 67 активных кадров, сюжет идентичен 0.7.2; GUT 38/38, 332 asserts; CHECK OK, линт, web 0 errors.
@@ -34,13 +35,13 @@
 - Нет.
 
 ## Следующий шаг (одна команда)
-`cd godot && godot --path .` — проверить вручную на ПК (см. `state.json.next_task`).
+Установить `SERAPS-0.7.4-Android.apk` на телефон и проверить управление, звук, нагрев и сворачивание; см. `docs/ANDROID_074.md`.
 
 ## Блокеры
 - Нет GPU в песочнице агента (KI-003); CI не запускался (KI-007).
 
 ## Последний зелёный статус
-GUT 70/70 (1981 asserts) · CHECK OK · gdlint/gdformat чисто · verify_preservation PASS · Xvfb: 7 смертей и 5 вариантов скримера — 2026-10-15.
+Android 0.7.4: GUT mobile/desktop по 81/81 (2020 asserts) · CHECK OK · gdlint/gdformat чисто · preservation --mobile PASS · APK export/signature/alignment/content PASS · Xvfb touch smoke на двух форматах. Android runtime/физический телефон UNVERIFIED.
 
 ## Последний SHA
 См. `git log -1` ветки `godot-update`.

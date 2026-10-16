@@ -396,7 +396,7 @@ func _update(dt: float) -> void:
 		return
 	var dx := Input.get_axis("map_left", "map_right")
 	var dy := Input.get_axis("map_up", "map_down")
-	var run := Input.is_action_pressed("map_run")
+	var run := Input.is_action_pressed("map_run") or Input.is_action_pressed("mobile_run")
 	if dx != 0 or dy != 0:
 		hero.target = null
 		hero.auto = ""

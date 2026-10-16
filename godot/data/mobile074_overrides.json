@@ -1,0 +1,50 @@
+{
+  "godot/export_presets.cfg": {
+    "sha256": "e56a6fd244016e4364e5c8134eb1bf2036c455cf6409bd6b84746d8e3b26df97",
+    "reason": "Android mobile input/layout/performance adaptation; original story unchanged"
+  },
+  "godot/project.godot": {
+    "sha256": "2f7d3975908d52c439a9e1c2292d53bb8f52a9f5d5082e00f2fcbef6d24e9c5e",
+    "reason": "Android mobile input/layout/performance adaptation; original story unchanged"
+  },
+  "godot/scenes/pixel/pixel_map.tscn": {
+    "sha256": "8c9b4091cf04d1fa3479e8cf4a2e9570d98c7482b23acf067a95937a6753d8d1",
+    "reason": "Android mobile input/layout/performance adaptation; original story unchanged"
+  },
+  "godot/scripts/pixel/pixel_map.gd": {
+    "sha256": "b5f0441f94ac3212689145c882a45d3cb267c6734731a96f320716894a21a70c",
+    "reason": "Android mobile input/layout/performance adaptation; original story unchanged"
+  },
+  "godot/scripts/pixel/pixel_world.gd": {
+    "sha256": "ef2e7c8c270edb2ba68327006f880ad98023c738f79f081da6a3c3e5056a5868",
+    "reason": "Android mobile input/layout/performance adaptation; original story unchanged"
+  },
+  "godot/scripts/pixel/touch_stick.gd": {
+    "sha256": "fd6f43473f94e63bd75247b7822f064a369b5ef08909914770db798228f222cb",
+    "reason": "Android mobile input/layout/performance adaptation; original story unchanged"
+  },
+  "godot/scripts/ui/dust.gd": {
+    "sha256": "0c478c30fe3b4d68ae2b68fc9261f729e7438dd6e426272f685593ab7ba8be7a",
+    "reason": "Android mobile input/layout/performance adaptation; original story unchanged"
+  },
+  "godot/scripts/ui/main.gd": {
+    "sha256": "6c928515fe19223f8f62232f3b28815f3930b318175c3cc58d16013c952b1d4c",
+    "reason": "Android mobile input/layout/performance adaptation; original story unchanged"
+  },
+  "godot/scripts/ui/modal.gd": {
+    "sha256": "4823dc14e004a0464b6f9e7d1781cbc46bbea8ece278c6999c281097828f1ac9",
+    "reason": "Android mobile input/layout/performance adaptation; original story unchanged"
+  },
+  "godot/scripts/ui/rain_fx.gd": {
+    "sha256": "24ebfc6e053649ec206591516ad1c7b32b65c7ae586233595eca6e00ea33ac79",
+    "reason": "Android mobile input/layout/performance adaptation; original story unchanged"
+  },
+  "godot/scripts/ui/text_box.gd": {
+    "sha256": "ac5a2b68a7ace24aab315eb2e82ee19ae154f74310a4db6b1d1c0098ece64f3e",
+    "reason": "Android mobile input/layout/performance adaptation; original story unchanged"
+  },
+  "godot/tests/unit/test_text_box.gd": {
+    "sha256": "f26d97155b636e8035c6487fc0489e371aa1e18a411fb59e98461a9ac3375556",
+    "reason": "Android mobile input/layout/performance adaptation; original story unchanged"
+  }
+}

@@ -56,6 +56,16 @@ func _ready() -> void:
 		var b := c as Button
 		if b:
 			b.pressed.connect(func() -> void: control_pressed.emit(String(b.name).to_lower()))
+	if MobileProfile.enabled():
+		anchor_top = 0.60
+		controls.anchor_left = 0.055
+		controls.offset_left = 20.0
+		controls.offset_top = -82.0
+		controls.offset_bottom = -16.0
+		controls.add_theme_constant_override("separation", 8)
+		$Body.offset_bottom = -90.0
+		text.add_theme_font_size_override("normal_font_size", 26)
+		text.add_theme_font_size_override("italics_font_size", 26)
 	# сердечко «дальше»: мягкая пульсация и покачивание
 	var mark: Control = $Next/Mark
 	mark.pivot_offset = Vector2(8, 8)

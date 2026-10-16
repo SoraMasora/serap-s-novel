@@ -1,14 +1,24 @@
 {
   "project": "serap-s-novel",
   "route": "B",
-  "phase": "content-0.7.4-death-cg-screamer",
+  "phase": "android-0.7.4-touch-optimization",
   "status": "green-with-known-issues",
-  "next_task": "Прослушать новый визг/звон/дыхание скримера и пройти смерти на ПК (F5); при желании заменить dm_* своими кадрами в godot/art/bg/. Основа 0.7.3 сохранена.",
+  "next_task": "Установить Android APK на физический телефон: FPS/RAM/нагрев/звук, вырез, клавиатура, жест Назад, сворачивание/возврат. Не удалять старую установку без резервной копии при конфликте подписей.",
   "blocked_by": [
     "нет GPU в среде агента (KI-003)",
     "CI не запускался (KI-007)"
   ],
   "verification": [
+    {
+      "cmd": "SERA_TOUCH=1 GUT; check_scripts; gdformat/gdlint; Xvfb mobile_preview at 1280x720/1600x720; APK export/apksigner/zipalign/aapt; verify_preservation --mobile",
+      "result": "mobile and desktop: 81/81, 2020 asserts each; CHECK OK; lint clean; two-finger viewport input moves hero and releases; signed ARMv7+ARM64 APK (API24/target36); 508 identical files + 12 exact mobile hashes; 351 scenes/11 endings; entire 0.7.4 story.json identical",
+      "status": "PASS"
+    },
+    {
+      "cmd": "Install APK on a physical Android phone; play, background/resume, check audio, FPS/RAM/heat/battery and notch",
+      "result": "Physical phone unavailable; desktop mobile QA is not device verification; API35 software emulator hung/exited before installation, no Android runtime PASS",
+      "status": "UNVERIFIED"
+    },
     {
       "cmd": "GUT + check_scripts + gdformat/gdlint + verify_preservation + Xvfb playthrough of 7 deaths (play_loop dev script)",
       "result": "70/70; 1981 asserts; CHECK OK; 52 files unchanged, no lint problems; preservation PASS; room/burst, store/lull, road/title, train/whisper, cross/false, cliff/soft, neck/lull reached the locked title",
