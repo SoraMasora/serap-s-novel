@@ -1,0 +1,33 @@
+name: Restore store product labels
+on:
+  push:
+    branches: ["fix/store-labels"]
+    paths: [".github/workflows/restore-store-labels.yml"]
+permissions:
+  contents: write
+jobs:
+  restore:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install image codec
+        run: pip install 'Pillow>=11,<13'
+      - name: Apply exact label-region pixel patches
+        run: |
+          test "$GITHUB_REF_NAME" = "fix/store-labels"
+          python3 .github/scripts/store_labels/apply.py
+          python3 tools/validate_assets.py
+      - name: Commit verified image corrections to the fix branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add godot/art/bg godot/assets/bg source_assets/SHA256.json source_assets/manifests/store_labels_fixed.json
+          git commit -m "fix(art): restore intact store product labels from original background" -m "Correct nine affected illustration frames and three matching fallback textures. Pixels outside product-label patches remain unchanged; save as lossless WebP."
+          if ! git push origin HEAD:refs/heads/fix/store-labels > /tmp/store-push.log 2>&1; then
+            while IFS= read -r line; do echo "::error::$line"; done < /tmp/store-push.log
+            exit 1
+          fi
