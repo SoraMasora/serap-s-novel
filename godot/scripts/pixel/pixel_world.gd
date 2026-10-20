@@ -63,7 +63,7 @@ var _sw_line := 0
 func _ready() -> void:
 	var f := FileAccess.open(BAKE_PATH, FileAccess.READ)
 	if f == null:
-		push_error("Нет %s — запустите tools/godot/bake_web.cjs" % BAKE_PATH)
+		push_error("Нет %s — восстановите отсутствующие файлы проекта из Git" % BAKE_PATH)
 	else:
 		bake = JSON.parse_string(f.get_as_text())
 

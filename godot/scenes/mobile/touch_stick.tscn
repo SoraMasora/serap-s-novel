@@ -1,8 +1,0 @@
-[gd_scene load_steps=2 format=3]
-
-[ext_resource type="Script" path="res://scripts/pixel/touch_stick.gd" id="1"]
-
-[node name="TouchStick" type="Control"]
-offset_right = 230.0
-offset_bottom = 230.0
-script = ExtResource("1")

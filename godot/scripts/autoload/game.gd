@@ -48,7 +48,7 @@ func _ready() -> void:
 func _load_manifest() -> void:
 	var f := FileAccess.open(MANIFEST_PATH, FileAccess.READ)
 	if f == null:
-		push_error("Нет %s — запустите node tools/godot/export_data.cjs --assets" % MANIFEST_PATH)
+		push_error("Нет %s — восстановите отсутствующие файлы проекта из Git" % MANIFEST_PATH)
 		return
 	var d: Variant = JSON.parse_string(f.get_as_text())
 	if d is Dictionary:
