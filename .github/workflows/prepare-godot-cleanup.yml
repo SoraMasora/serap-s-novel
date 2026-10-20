@@ -1,0 +1,34 @@
+name: Prepare standalone Godot cleanup
+on:
+  push:
+    branches: ["cleanup/godot-only"]
+    paths: [".github/workflows/prepare-godot-cleanup.yml", ".github/scripts/organize_godot.py"]
+permissions:
+  contents: write
+jobs:
+  organize:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Restore resources and organize the standalone project
+        run: |
+          test "$GITHUB_REF_NAME" = "cleanup/godot-only"
+          test "$(git rev-parse HEAD^)" = "5f585b86815805ff84e1f1b3f2c404cb351162fb"
+          python3 .github/scripts/organize_godot.py
+      - name: Commit the verified layout to the cleanup branch only
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --stat | tail -1
+          git commit -m "refactor(godot): keep standalone game and preserve all resource sources" -m "Restore all runtime resources as normal files; preserve original asset libraries and art sources with SHA256 checks. Remove obsolete browser application, old build scripts and duplicate backups. No history rewrite."
+          git push origin HEAD:refs/heads/cleanup/godot-only
