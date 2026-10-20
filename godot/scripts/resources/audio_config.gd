@@ -46,14 +46,6 @@ extends Resource
 		"cloth",
 		"paper",
 		"latch",
-		"unlock",
-		"scream",
-		"glitch",
-		"whisper",
-		"brake",
-		"toll",
-		"thud",
-		"wings",
-		"gust"
+		"unlock"
 	]
 )

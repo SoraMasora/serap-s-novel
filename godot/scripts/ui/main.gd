@@ -6,6 +6,25 @@ const CHARACTER := preload("res://scenes/ui/character_view.tscn")
 const CHOICE := preload("res://scenes/ui/choice_button.tscn")
 const HEART := preload("res://scenes/ui/heart.tscn")
 const PAT_FRAMES := ["sera_pat2", "sera_pat3", "sera_pat4", "sera_pat3"]
+## Анимированные фоны: ключ фона → кадры (godot/art/bg) и fps. Сюжет пишет {bg:'bal_talk'}.
+const BG_ANIM := {
+	"bal_s0": {"frames": ["bal_l0", "bal_l1", "bal_l2", "bal_l3"], "fps": 6.0},
+	"bal_talk": {"frames": ["bal_t0", "bal_t1", "bal_t2", "bal_t3"], "fps": 2.5},
+	"m2_rs": {"frames": ["m2_rs0", "m2_rs1", "m2_rs2", "m2_rs3"], "fps": 2.5},
+	# 0.6: крыша заново — дым от кончиков сигарет (m2_rx) / некурящий вариант с чаем (m2_rt)
+	"m2_rx": {"frames": ["m2_rx0", "m2_rx1", "m2_rx2", "m2_rx3"], "fps": 2.5},
+	"m2_rt": {"frames": ["m2_rt0", "m2_rt1", "m2_rt2", "m2_rt3"], "fps": 2.0},
+	"m2_sn":
+	{
+		"frames": ["m2_sn0", "m2_sn1", "m2_sn2", "m2_sn3", "m2_sn4", "m2_sn5"],
+		"fps": 5.0,
+	},
+	"m2_hug":
+	{
+		"frames": ["m2_hug0", "m2_hug1", "m2_hug2", "m2_hug3", "m2_hug4", "m2_hug5"],
+		"fps": 5.0,
+	},
+}
 
 @export var bg_fade_sec := 1.2
 @export var cam_default_ms := 1400.0
@@ -33,7 +52,12 @@ var _options: Array = []
 var _bg_front: TextureRect
 var _bg_back: TextureRect
 var _toast_tw: Tween
+var _ui_hidden := false
+var _bg_anim: Dictionary = {}
+var _line_key := ""
+var _choice_cg := ChoiceCGState.new()
 
+@onready var choice_cg_frame: TextureRect = $ChoiceCGFrame
 @onready var stage: Control = $Stage
 @onready var gloom: ColorRect = $Stage/Gloom
 @onready var rain_fx: RainFx = $Stage/Rain
@@ -44,7 +68,7 @@ var _toast_tw: Tween
 @onready var chapter_label: Label = $Hud/Chapter
 @onready var toast: Label = $Toast
 @onready var side: Control = $Side
-@onready var side_img: TextureRect = $Side/Img
+@onready var side_img: TextureRect = $Side/Clip/Img
 @onready var textbox: TextBox = $TextBox
 @onready var choices: Control = $Choices
 @onready var choice_list: VBoxContainer = $Choices/List
@@ -55,15 +79,12 @@ var _toast_tw: Tween
 @onready var title: TitleScreen = $TitleScreen
 @onready var name_screen: NameScreen = $NameScreen
 @onready var modal: Modal = $Modal
-@onready var loop_overlay: LoopOverlay = $LoopOverlay
-
 @onready var ending: EndingScreen = $EndingScreen
 
 
 func _ready() -> void:
 	cfg = Game.config
 	runner = StoryRunner.new(Game.db, cfg)
-	runner.memory = Game.memory
 	_bg_front = $Stage/BgA
 	_bg_back = $Stage/BgB
 	textbox.speed = Game.settings.speed
@@ -71,12 +92,21 @@ func _ready() -> void:
 	breath.exhale_ms = cfg.breath_exhale_ms
 	breath.ok_ratio = cfg.breath_ok_ratio
 	_connect_signals()
+	for n: Node in [modal, title, ending, name_screen, pixel_map]:
+		UiFx.decorate(n)
 	if _cli_autoplay():
 		return
 	to_title()
 
 
 func _connect_signals() -> void:
+	Game.progress_changed.connect(
+		func() -> void:
+			if title.visible:
+				title.refresh(SaveSystem.has_slot("auto"))
+			if modal.visible and modal.endings_panel.visible:
+				modal.open_endings(SaveSystem.endings(), Game.db.endings)
+	)
 	textbox.clicked.connect(_on_textbox_click)
 	textbox.typing_done.connect(_on_typing_done)
 	textbox.control_pressed.connect(_on_control)
@@ -98,10 +128,7 @@ func _connect_signals() -> void:
 	modal.setting_changed.connect(_on_setting)
 	modal.menu_action.connect(_on_menu)
 	modal.rollback_confirmed.connect(rollback)
-	ending.back.connect(_ending_back)
-	loop_overlay.finished.connect(_resume_after_overlay)
-	loop_overlay.death_finished.connect(_death_done)
-	loop_overlay.warning_accepted.connect(_warning_accepted)
+	ending.back.connect(to_title)
 
 
 ## Безголовый автоплей для CI/отладки: godot --headless --path godot -- --autoplay=SEED
@@ -117,9 +144,8 @@ func _cli_autoplay() -> bool:
 
 # ── Экраны ──
 func to_title() -> void:
-	loop_overlay.kill()
-	$Snow.visible = false
-	in_choice = false
+	_choice_cg.reset()
+	choice_cg_frame.visible = false
 	playing = false
 	auto = false
 	skip = false
@@ -132,8 +158,7 @@ func to_title() -> void:
 	pixel_map.close()
 	_clear_chars()
 	Audio.set_loc("title")
-	Audio.music("drone" if Game.memory.haunted() else "calm")
-	Audio.wind(false)
+	Audio.music("calm")
 	Audio.rain(false)
 	_set_rain(false)
 	title.visible = true
@@ -154,12 +179,10 @@ func begin() -> void:
 func _on_title_action(a: String) -> void:
 	match a:
 		"new":
-			if Game.memory.haunted():
-				show_toast("Начать заново нельзя. Я всё помню.")
-			else:
-				_guard_warning("new")
+			title.visible = false
+			name_screen.open(cfg.max_name_length, cfg.default_name)
 		"continue":
-			_guard_warning("continue")
+			load_slot("auto")
 		"load":
 			modal.open_slots("load", _slot_infos())
 		"endings":
@@ -177,6 +200,8 @@ func _on_name(n: String) -> void:
 func run() -> void:
 	if not playing:
 		return
+	_choice_cg.clear()
+	choice_cg_frame.visible = false
 	for e: Dictionary in runner.step():
 		_apply(e)
 
@@ -188,7 +213,6 @@ func _apply(e: Dictionary) -> void:
 		"card":
 			textbox.visible = false
 			side.visible = false
-			card.get_node("Box/Loop").text = str(Game.db.loop.CARD[Game.memory.level()])
 			card.show_card(e.big, e.small, 300.0 if skip else cfg.card_ms)
 		"note":
 			if not skip:
@@ -205,36 +229,6 @@ func _apply(e: Dictionary) -> void:
 			textbox.visible = false
 			side.visible = false
 			cut.play(e.frames, skip, runner.fmt)
-		"snow":
-			_update_snow()
-		"subl":
-			if not skip:
-				loop_overlay.subliminal(e.id)
-		"sms":
-			_hide_loop_text()
-			var data: Dictionary = e.data.duplicate(true)
-			data.text = Game.memory.text(data.text, runner.st)
-			runner.log_push(
-				{
-					"n": "✉ " + str(data.get("from", "")),
-					"t": str(data.text),
-					"s": runner.snap_lite(-1)
-				}
-			)
-			autosave()
-			loop_overlay.sms(data, runner.fmt)
-		"omen":
-			_hide_loop_text()
-			loop_overlay.omen(e.data, runner.fmt, skip)
-		"montage":
-			_hide_loop_text()
-			loop_overlay.montage(Game.memory.data.deaths, skip)
-		"scream":
-			_hide_loop_text()
-			auto = false
-			skip = false
-			_sync_btns()
-			loop_overlay.scream()
 		"music":
 			Audio.music(e.mode)
 		"rain":
@@ -272,6 +266,9 @@ func _resume_after_overlay() -> void:
 
 # ── Реплики ──
 func _say(e: Dictionary) -> void:
+	var cg_key := _choice_cg.response(str(runner.st.scene))
+	choice_cg_frame.texture = Game.tex("bg", cg_key) if cg_key != "" else null
+	choice_cg_frame.visible = choice_cg_frame.texture != null
 	for ch: Dictionary in e.changes:
 		_show_view(ch.who, ch.expr, ch.pos)
 	var speaker: String = e.name
@@ -282,8 +279,6 @@ func _say(e: Dictionary) -> void:
 		kind = "gg"
 	elif speaker == "Пастор":
 		kind = "father"
-	elif speaker == "!":
-		kind = "unk"
 	elif speaker == "???":
 		kind = "unk"
 	elif who != "" and speaker != "Сера":
@@ -291,26 +286,68 @@ func _say(e: Dictionary) -> void:
 	var hero_on: bool = runner.st.chars.has("hero")
 	_set_speaker("" if (speaker == "P" and not hero_on) or thought else speaker)
 	if speaker == "P" and not hero_on:
-		var t := Game.tex("sprites", "hero_" + str(e.expr if e.expr else "neutral"))
+		var bird := str(e.expr) == "bird"
+		var t := Game.tex(
+			"sprites", "side_bird" if bird else "hero_" + str(e.expr if e.expr else "neutral")
+		)
+		_side_frame(bird)
 		if t and (not side.visible or side_img.texture != t):
 			side_img.texture = t
 			side.modulate.a = 0.0
 			create_tween().tween_property(side, "modulate:a", 1.0, 0.35)
+			if bird:
+				_bird_pop()
 		side.visible = true
 	else:
 		side.visible = false
 	textbox.set_side_padding(side.visible)
 	textbox.visible = true
 	waiting = false
-	textbox.show_line(
-		e.display, kind, e.text, thought, skip or Game.settings.speed <= 0 or speaker == "!"
-	)
-	if speaker == "!":
-		textbox.name_box.visible = false
-		textbox.text.add_theme_color_override("default_color", Color(1.0, 0.16, 0.2))
+	_line_key = "%s:%d" % [runner.st.scene, runner.st.i]
+	if skip and not Game.is_seen(_line_key):
+		skip = false
+		_sync_btns()
+		show_toast("Новый текст — пропуск остановлен")
+	textbox.show_line(e.display, kind, e.text, thought, skip or Game.settings.speed <= 0)
+	var sv: CharacterView = _chars.get(who)
+	if sv and not skip and not thought and e.changes.is_empty():
+		sv.talk()
 
 
 ## Отложенный переход: только если реплика не сменилась (и авто ещё включено)
+## Портрет: герой (крупно лицо, кадрирование спрайта) или птичка «Вряд ли» (весь кадр)
+func _side_frame(bird: bool) -> void:
+	if bird:
+		side_img.anchor_left = 0.0
+		side_img.anchor_top = 0.0
+		side_img.anchor_right = 1.0
+		side_img.anchor_bottom = 1.0
+		side_img.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	else:
+		side_img.anchor_left = -0.62
+		side_img.anchor_top = -0.03
+		side_img.anchor_right = 1.62
+		side_img.anchor_bottom = 2.45
+		side_img.stretch_mode = TextureRect.STRETCH_SCALE
+	side_img.offset_left = 0
+	side_img.offset_top = 0
+	side_img.offset_right = 0
+	side_img.offset_bottom = 0
+
+
+## Птичка «выскакивает» вместо героя: пружинка и лёгкое покачивание
+func _bird_pop() -> void:
+	side.scale = Vector2(0.55, 0.55)
+	var tw := create_tween()
+	tw.tween_property(side, "scale", Vector2.ONE, 0.45).set_trans(Tween.TRANS_BACK).set_ease(
+		Tween.EASE_OUT
+	)
+	tw.parallel().tween_property(side, "rotation", 0.06, 0.15)
+	tw.tween_property(side, "rotation", -0.09, 0.18)
+	tw.tween_property(side, "rotation", -0.05, 0.2)
+	Audio.sfx("pop")
+
+
 func _advance_if(g: int, need_auto: bool) -> void:
 	if g == _gen and (auto or not need_auto):
 		advance()
@@ -318,6 +355,8 @@ func _advance_if(g: int, need_auto: bool) -> void:
 
 func _on_typing_done() -> void:
 	waiting = true
+	if _line_key != "":
+		Game.mark_seen(_line_key)
 	autosave()
 	var g := _gen
 	if skip:
@@ -332,7 +371,7 @@ func _after(ms: float, f: Callable) -> void:
 
 
 func advance() -> void:
-	if in_choice or modal.is_open() or loop_overlay.visible or not playing:
+	if in_choice or modal.is_open() or not playing:
 		return
 	if textbox.typing:
 		textbox.finish_typing()
@@ -370,18 +409,7 @@ func _choose(options: Array) -> void:
 		var o: Dictionary = options[i]
 		var b: ChoiceButton = CHOICE.instantiate()
 		choice_list.add_child(b)
-		b.setup(runner.fmt(o.t), o.get("hint", ""))
-		if Game.memory.truth():
-			b.modulate = (
-				Color(1.0, 0.8, 0.86)
-				if i == Game.memory.best(options, runner.st.scene)
-				else Color(0.6, 0.45, 0.5)
-			)
-		elif (
-			Game.memory.level() >= 2
-			and (float(o.get("feel", 0)) < 0 or o.get("add", {}).get("press", 0) > 0)
-		):
-			b.modulate = Color(1.0, 0.35, 0.4)
+		b.setup(runner.fmt(o.t), i)
 		b.pressed.connect(_on_choice.bind(i))
 		b.hovered.connect(hover_lean)
 	choices.visible = true
@@ -390,22 +418,18 @@ func _choose(options: Array) -> void:
 func _on_choice(i: int) -> void:
 	if not in_choice:
 		return
-	if Game.memory.truth() and i != Game.memory.best(_options, runner.st.scene):
-		in_choice = false
-		var b := choice_list.get_child(i) as ChoiceButton
-		var rf: Array = Game.db.loop.REFUSE
-		var key := str(runner.st.scene) + ":" + str(i)
-		var refusal: String = rf[int(LoopMemory.hash_text(key) * rf.size())]
-		b.setup("× " + runner.fmt(_options[i].t), "— " + refusal)
-		Audio.sfx("glitch")
-		var g := _gen
-		await get_tree().create_timer(2.1).timeout
-		if g != _gen or not playing:
-			return
-		in_choice = true
-	choices.visible = false
 	in_choice = false
 	hover_lean(false)
+	var last: Tween
+	var kids := choice_list.get_children()
+	for k in kids.size():
+		var b := kids[k] as ChoiceButton
+		if b:
+			last = b.play_chosen() if k == i else b.play_dismiss(k)
+	if last and not skip and is_inside_tree():
+		await get_tree().create_timer(0.36).timeout
+	choices.visible = false
+	_choice_cg.arm()
 	var rk := runner.choose(_options, i)
 	if rk != "":
 		react(rk)
@@ -459,9 +483,13 @@ func _on_map_entered(id: String, pos: Dictionary) -> void:
 func set_bg(k: String, instant: bool) -> void:
 	cam_to(null)
 	Audio.set_loc(k)
-	_update_snow()
 	_apply_rain()
-	var t := Game.tex("bg", k)
+	_bg_anim = {}
+	if BG_ANIM.has(k):
+		_bg_anim = {
+			"frames": BG_ANIM[k].frames, "dt": 1.0 / float(BG_ANIM[k].fps), "t": 0.0, "i": 0
+		}
+	var t := Game.tex("bg", _bg_anim.frames[0] if _bg_anim else k)
 	if t == null:
 		push_warning("Нет фона: " + k)
 	if instant:
@@ -476,6 +504,17 @@ func set_bg(k: String, instant: bool) -> void:
 	var tmp := _bg_front
 	_bg_front = _bg_back
 	_bg_back = tmp
+
+
+func _process(delta: float) -> void:
+	if _bg_anim.is_empty():
+		return
+	_bg_anim.t += delta
+	if _bg_anim.t < _bg_anim.dt:
+		return
+	_bg_anim.t -= _bg_anim.dt
+	_bg_anim.i = (int(_bg_anim.i) + 1) % _bg_anim.frames.size()
+	_bg_front.texture = Game.tex("bg", str(_bg_anim.frames[_bg_anim.i]))
 
 
 func cam_to(c: Variant) -> void:
@@ -625,8 +664,6 @@ func finish(kind: String) -> void:
 	auto = false
 	skip = false
 	_sync_btns()
-	Game.memory.finish(kind, runner.st.name)
-	Game.save_memory()
 	SaveSystem.unlock_ending(kind)
 	SaveSystem.delete_slot("auto")
 	var e: Dictionary = Game.db.endings.get(kind, {"title": kind, "text": ""})
@@ -634,13 +671,7 @@ func finish(kind: String) -> void:
 		"%s\n\nЗаметок о Сере собрано: %d из %d"
 		% [e.text, runner.st.notes.size(), Game.db.notes_total]
 	)
-	var g := _gen
-	_after(
-		ending_delay_sec * 1000.0,
-		func() -> void:
-			if g == _gen and playing:
-				ending.open(e.title, text)
-	)
+	_after(ending_delay_sec * 1000.0, func() -> void: ending.open(e.title, text))
 
 
 # ── Сохранения ──
@@ -652,6 +683,7 @@ func autosave() -> void:
 
 func save_to(slot: String) -> void:
 	var s := runner.save_snapshot()
+	s["presentation_cg"] = _choice_cg.key
 	if runner.st.mode == "map" and pixel_map.is_open():
 		s.map.pos = pixel_map.current_pos()
 	SaveSystem.save_slot(slot, s, runner.log.slice(-save_log_tail))
@@ -668,12 +700,16 @@ func load_slot(slot: String) -> void:
 
 func _restore(s: Dictionary) -> void:
 	_reset_presentation()
-	runner.restore(s)
+	_choice_cg.restore_next = str(s.get("presentation_cg", ""))
+	var story_state := s.duplicate(true)
+	story_state.erase("presentation_cg")
+	runner.restore(story_state)
 	_present_state()
 
 
 func _reset_presentation() -> void:
-	loop_overlay.kill()
+	_choice_cg.reset()
+	choice_cg_frame.visible = false
 	auto = false
 	skip = false
 	_sync_btns()
@@ -699,7 +735,6 @@ func _present_state() -> void:
 	for w: String in st.chars:
 		_show_view(w, st.chars[w].expr, st.chars[w].pos)
 	_set_rain(bool(st.rain))
-	_update_snow()
 	if str(st.music) != "":
 		Audio.music(st.music)
 	chapter_label.text = st.chapter
@@ -746,9 +781,14 @@ func _on_control(a: String) -> void:
 		"skip":
 			skip = not skip
 			auto = false
+			if skip and not waiting and not Game.is_seen(_line_key):
+				skip = false
+				show_toast("Пропуск — только по прочитанному")
 			_sync_btns()
 			if skip and (waiting or textbox.typing):
 				advance()
+		"hide":
+			set_ui_hidden(true)
 		"notes":
 			modal.open_notes(runner.st.notes, Game.db.notes_total)
 		"log":
@@ -763,12 +803,6 @@ func _on_control(a: String) -> void:
 
 func _on_menu(a: String) -> void:
 	match a:
-		"forget":
-			modal.open_forget()
-		"forget_confirm":
-			Game.forget_memory()
-			runner.new_game(cfg.default_name)
-			to_title()
 		"resume":
 			modal.close()
 		"settings":
@@ -780,6 +814,8 @@ func _on_menu(a: String) -> void:
 
 func _on_setting(k: String, v: float) -> void:
 	Game.set_setting(k, v)
+	if k == "fullscreen":
+		Game.apply_window()
 	textbox.speed = Game.settings.speed
 
 
@@ -798,8 +834,45 @@ func show_toast(t: String) -> void:
 	_toast_tw.tween_property(toast, "modulate:a", 0.0, 0.4)
 
 
+## Режим «Кадр»: прячет весь интерфейс, любой клик/клавиша возвращает
+func set_ui_hidden(on: bool) -> void:
+	_ui_hidden = on
+	if on:
+		auto = false
+		skip = false
+		_sync_btns()
+	var a := 0.0 if on else 1.0
+	for n: CanvasItem in [textbox, side, hud, choices]:
+		create_tween().tween_property(n, "modulate:a", a, 0.25)
+	textbox.mouse_filter = Control.MOUSE_FILTER_IGNORE if on else Control.MOUSE_FILTER_STOP
+	choices.mouse_filter = Control.MOUSE_FILTER_IGNORE if on else Control.MOUSE_FILTER_PASS
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		var k := event as InputEventKey
+		if k.keycode == KEY_F11 or (k.keycode == KEY_ENTER and k.alt_pressed):
+			Game.toggle_fullscreen()
+			get_viewport().set_input_as_handled()
+			return
+	if not _ui_hidden:
+		return
+	var press: bool = (
+		(event is InputEventKey and event.pressed)
+		or (event is InputEventMouseButton and event.pressed)
+	)
+	if press:
+		set_ui_hidden(false)
+		get_viewport().set_input_as_handled()
+
+
 # ── Клавиатура ──
 func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		if (event as InputEventKey).keycode == KEY_H and textbox.visible and playing:
+			if not modal.is_open() and not pixel_map.is_open():
+				set_ui_hidden(true)
+				return
 	if modal.is_open():
 		if event.is_action_pressed("vn_menu"):
 			modal.close()
@@ -828,87 +901,3 @@ func _unhandled_input(event: InputEvent) -> void:
 		modal.open_notes(runner.st.notes, Game.db.notes_total)
 	elif event.is_action_pressed("vn_auto"):
 		_on_control("auto")
-
-
-func _hide_loop_text() -> void:
-	waiting = false
-	_gen += 1
-	textbox.visible = false
-	side.visible = false
-	choices.visible = false
-
-
-func _guard_warning(action: String) -> void:
-	if Game.settings.cw:
-		_continue_action(action)
-	else:
-		set_meta("warning_action", action)
-		loop_overlay.warning()
-
-
-func _warning_accepted() -> void:
-	Game.set_setting("cw", 1.0)
-	_continue_action(get_meta("warning_action", "continue"))
-
-
-func _continue_action(action: String) -> void:
-	if action == "new":
-		title.visible = false
-		name_screen.open(cfg.max_name_length, cfg.default_name)
-	elif SaveSystem.has_slot("auto"):
-		load_slot("auto")
-	elif Game.memory.data.pending != null:
-		_start_death(true)
-	elif Game.memory.haunted():
-		runner.new_game(Game.memory.data.name if Game.memory.data.name != "" else cfg.default_name)
-		_reset_presentation()
-		begin()
-
-
-func _ending_back() -> void:
-	if Game.memory.data.pending != null and not Game.memory.data.freed:
-		var g := _gen
-		ending.open("Нет.", "Это ещё не всё.")
-		Audio.sfx("glitch")
-		await get_tree().create_timer(2.3).timeout
-		if g == _gen:
-			_start_death(false)
-	else:
-		to_title()
-
-
-func _start_death(fresh: bool) -> void:
-	var pending: Variant = Game.memory.data.pending
-	if pending == null:
-		return
-	_reset_presentation()
-	if fresh:
-		runner.new_game(Game.memory.data.name if Game.memory.data.name != "" else cfg.default_name)
-	runner.st.mode = ""
-	runner.st.map = null
-	runner.st.stack = []
-	runner.st.flags.lend = pending.kind
-	runner.st.flags.dth = pending.death
-	runner.jump("L_after_" + str(pending.kind))
-	begin()
-
-
-func _death_done() -> void:
-	Game.memory.commit_death(runner.st.name)
-	Game.save_memory()
-	SaveSystem.delete_slot("auto")
-	runner.st.snow = false
-	to_title()
-
-
-func _update_snow() -> void:
-	var snowy := cfg.outdoor_bgs.has(str(runner.st.bg))
-	snowy = (
-		snowy
-		or (
-			runner.st.bg
-			in ["d_road", "d_train", "d_cliff", "t_roof", "t_sky", "t_sky2", "t_hand", "t_angel"]
-		)
-	)
-	$Snow.visible = bool(runner.st.get("snow", false)) and snowy
-	Audio.wind($Snow.visible)

@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
-[ext_resource type="Script" path="res://scripts/ui/modal.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/ui/loop_modal.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/ui/fancy_panel.gd" id="fp_panel"]
 
 [node name="Modal" type="Control"]
 visible = false
@@ -31,6 +32,7 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="Panel" type="PanelContainer" parent="Center"]
+script = ExtResource("fp_panel")
 layout_mode = 2
 custom_minimum_size = Vector2(760, 0)
 
@@ -297,6 +299,11 @@ max_value = 4000
 step = 100
 value = 600
 
+[node name="Fullscreen" type="CheckButton" parent="Center/Panel/Panels/Settings"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Полноэкранный режим"
+
 [node name="Soft" type="CheckButton" parent="Center/Panel/Panels/Settings"]
 layout_mode = 2
 text = "Смягчить вспышки и мерцание"
@@ -398,7 +405,7 @@ alignment = 1
 layout_mode = 2
 text = "Стереть память семи смертей?
 Текущий автосейв будет удалён.
-Ручные сохранения и открытые концовки останутся."
+Ручные сохранения, открытые концовки\nи пройденный истинный финал останутся."
 horizontal_alignment = 1
 
 [node name="Yes" type="Button" parent="Center/Panel/Panels/ForgetMemory"]

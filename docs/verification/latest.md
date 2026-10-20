@@ -1,25 +1,8 @@
-# Verification — Godot v18.1 (2026-10-15)
+# Проверка v0.7.4 (death-cg + скример)
 
-Godot 4.7.2.stable.official.ed1daf0bf (архив проверен по закреплённому SHA256), GUT v9.7.1, gdtoolkit 4.5.0; Amazon Linux 2023. Прежний веб-runtime не менялся.
-
-| Проверка | Результат |
-|---|---|
-| Экспорт | 322 сцены, 6 правил, 48 заметок; 173 ассета |
-| Сохранность старого контента | все 234 прежние сцены идентичны данным `64f440b` |
-| Дизайн меню | `VineButton`, тема и исходные узлы кнопок не менялись; отдельный UI-тест |
-| Запекание | pixel: ok; audio: ok 33 |
-| Зависимости | закреплённые GUT/шрифты, SHA256 сверены |
-| Импорт | повторный импорт чистый (первый — известный KI-004) |
-| Компиляция и линт | check_scripts.sh; gdformat/gdlint — чисто |
-| GUT | **42/42**, 1405 assertions |
-| Старый паритет JS | 200 сидов совпали по digest/статам/концовке/заметкам |
-| Новый текст | 552 случая совпали с исходными JS-функциями |
-| Смерти | 49 сочетаний концовки/уровня до скримера |
-| Истинная ветка | 200 сидов восьмой петли → truth; дыхание не проваливается, таймер платформы снят |
-| UI | предупреждение, продолжение, перезапуск pending, скример/меню, soft, отмена оверлеев, ручные сейвы, исходный дизайн кнопок |
-| Визуально | Xvfb + OpenGL llvmpipe: обычный/изменённый титул, настройки, предупреждение, телефон, скример; снимки просмотрены |
-
-GUT завершился успешно; при завершении процесса остаётся известное предупреждение об аудиоресурсе KI-001 (не скрывалось). Xvfb также сообщает неподдерживаемый VSync.
-
-## UNVERIFIED
-Звук на слух (KI-010), FPS на реальном GPU, открытие редактора мышью, экспорт новой ревизии для Web/desktop, выполнение GitHub Actions этой ревизии. Старые результаты веб-экспорта v17.2 не выдаются за проверку новой сборки.
+- PASS: GUT 70/70, 1981 asserts (`GODOT_DISABLE_LEAK_CHECKS=1 godot --headless -d --audio-driver Dummy --path . -s res://addons/gut/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit`). Новые: `test_every_death_shows_her_last_moment_before_aftermath`, `test_screamer_variants_are_known_and_rotate`, `tests/integration/test_loop_scare.gd` (7 тестов).
+- PASS: `bash tools/godot/check_scripts.sh` → CHECK OK; `gdformat --check scripts tests` → 52 files unchanged; `gdlint scripts tests` → no problems.
+- PASS: `node tools/godot/verify_preservation.cjs` — исходные сцены, концовки и защищённые файлы не изменились.
+- PASS: импорт Godot 4.7.2 без ошибок (новые webp, ogg, шейдер).
+- PASS: Xvfb/OpenGL llvmpipe, реальные прохождения сцен смерти dev-скриптом `godot/tools_dev/play_loop.gd`; он же проверен на восстановление профиля игрока (md5 памяти, концовок, прочитанного и автосейва совпали после запуска): room/burst, store/lull, road/title, train/whisper, cross/false, cliff/мягкий режим, neck/lull после шести смертей. Кадры `dm_*` → `d_*`, скример и возврат в меню с заблокированной «Новой игрой» на скриншотах.
+- UNVERIFIED: звук на слух (`loop_shriek`, `loop_ring`, `loop_breath`; ожидаемо — резкий визг, звон после обрыва, дыхание слева), аппаратный GPU, экспорт EXE/APK, GitHub CI.

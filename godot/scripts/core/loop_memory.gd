@@ -4,7 +4,9 @@ extends RefCounted
 
 const PATH := "user://serap_meta.json"
 
-var data := {"deaths": [], "name": "", "freed": false, "pending": null}
+var data := {
+	"deaths": [], "name": "", "freed": false, "pending": null, "unlocked": false, "last_ending": ""
+}
 var rules: Dictionary
 
 
@@ -12,8 +14,30 @@ func _init(p_rules: Dictionary) -> void:
 	rules = p_rules
 
 
+func enabled() -> bool:
+	return bool(data.get("unlocked", false)) and not data.freed
+
+
+func base_ending_count(got: Dictionary) -> int:
+	var total := 0
+	for kind: String in rules.BASE_ENDINGS:
+		if got.get(kind, false):
+			total += 1
+	return total
+
+
+func unlock_from_endings(got: Dictionary) -> void:
+	# Completion is also recovered from the ending gallery if meta was reset/lost.
+	if got.get("truth", false):
+		data.freed = true
+	if base_ending_count(got) >= int(rules.get("REQUIRED_ENDINGS", 7)):
+		data.unlocked = true
+	if not enabled():
+		data.pending = null
+
+
 func level() -> int:
-	return 0 if data.freed else mini(7, data.deaths.size())
+	return mini(7, data.deaths.size()) if enabled() else 0
 
 
 func truth() -> bool:
@@ -21,7 +45,7 @@ func truth() -> bool:
 
 
 func haunted() -> bool:
-	return not data.freed and (level() > 0 or data.pending != null)
+	return enabled() and (level() > 0 or data.pending != null)
 
 
 func band() -> String:
@@ -32,17 +56,21 @@ func band() -> String:
 func sync(st: Dictionary) -> void:
 	st.flags.loop = level()
 	st.flags.truth = truth()
-	st.flags.dord = data.deaths.duplicate()
+	st.flags.dord = data.deaths.duplicate() if enabled() else []
 	for id: String in rules.ORDER:
-		st.flags["d_" + id] = data.deaths.has(id)
+		st.flags["d_" + id] = enabled() and data.deaths.has(id)
 
 
 func finish(kind: String, player_name: String) -> void:
 	data.name = player_name
-	if kind == "truth":
+	if kind != "truth":
+		data.last_ending = kind
+	if not enabled():
+		data.pending = null
+	if kind == "truth" and truth():
 		data.freed = true
 		data.pending = null
-	elif not data.freed:
+	elif kind != "truth" and enabled():
 		var death: String = rules.PREF.get(kind, "room")
 		if data.deaths.has(death):
 			for id: String in rules.ORDER:
@@ -53,7 +81,7 @@ func finish(kind: String, player_name: String) -> void:
 
 
 func commit_death(player_name: String) -> void:
-	if data.pending != null and not data.deaths.has(data.pending.death):
+	if enabled() and data.pending != null and not data.deaths.has(data.pending.death):
 		data.deaths.append(data.pending.death)
 	data.pending = null
 	data.name = player_name

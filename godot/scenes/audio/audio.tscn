@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/audio/audio.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/audio/loop_audio.gd" id="1"]
 
 [node name="Audio" type="Node"]
 process_mode = 3
@@ -16,12 +16,6 @@ bus = &"Music"
 bus = &"Music"
 
 [node name="Rain" type="AudioStreamPlayer" parent="."]
-bus = &"Ambience"
-
-[node name="Drone" type="AudioStreamPlayer" parent="."]
-bus = &"Music"
-
-[node name="Wind" type="AudioStreamPlayer" parent="."]
 bus = &"Ambience"
 
 [node name="SfxPool" type="Node" parent="."]
@@ -43,3 +37,9 @@ bus = &"SFX"
 
 [node name="Sfx6" type="AudioStreamPlayer" parent="SfxPool"]
 bus = &"SFX"
+
+[node name="LoopDrone" type="AudioStreamPlayer" parent="."]
+bus = &"Music"
+
+[node name="LoopWind" type="AudioStreamPlayer" parent="."]
+bus = &"Ambience"

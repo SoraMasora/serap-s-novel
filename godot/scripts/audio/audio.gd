@@ -13,9 +13,6 @@ var _active: AudioStreamPlayer
 var _rain_on := false
 var _sfx_i := 0
 
-@onready var drone: AudioStreamPlayer = $Drone
-@onready var wind_player: AudioStreamPlayer = $Wind
-
 @onready var track_a: AudioStreamPlayer = $TrackA
 @onready var track_b: AudioStreamPlayer = $TrackB
 @onready var tense: AudioStreamPlayer = $Tense
@@ -26,8 +23,6 @@ var _sfx_i := 0
 func _ready() -> void:
 	config = load(CONFIG_PATH)
 	_active = track_a
-	drone.stream = _stream("res://assets/sfx_baked/music_drone.ogg", true)
-	wind_player.stream = _stream("res://assets/sfx_baked/wind_loop.ogg", true)
 	tense.stream = _stream(config.tense_path, true)
 	tense.volume_db = config.tense_gain_db
 	rain_player.stream = _stream(config.rain_path, true)
@@ -72,13 +67,6 @@ func set_loc(k: String) -> void:
 
 
 func _update() -> void:
-	if mode == "drone":
-		_play_track("")
-		tense.stop()
-		if not drone.playing:
-			drone.play()
-		return
-	drone.stop()
 	if mode == "tense":
 		_play_track("")
 		if not tense.playing:
@@ -134,24 +122,34 @@ func rain(on: bool) -> void:
 		_fade(rain_player, -80.0, config.rain_fade_out_sec, true)
 
 
-func sfx(k: String) -> void:
+func sfx(k: String, volume_db := 0.0, pitch := 1.0) -> void:
+	# новый звук из godot/art/sfx (например, brake/siren) — в обход запечённого набора
+	var art := "res://art/sfx/%s.ogg" % k
+	if ResourceLoader.exists(art):
+		_play_sfx(_stream(art, false), volume_db, pitch)
+		return
 	if not config.sfx_keys.has(k):
 		push_warning("Неизвестный SFX: " + k)
 		return
 	var key := "door_shop" if k == "door" and config.shop_locs.has(loc) else k
-	var s := _stream(config.sfx_dir + key + ".ogg", false)
+	_play_sfx(_stream(config.sfx_dir + key + ".ogg", false))
+
+
+func _play_sfx(s: AudioStream, volume_db := 0.0, pitch := 1.0) -> void:
 	if s == null:
 		return
 	var p: AudioStreamPlayer = sfx_pool.get_child(_sfx_i % sfx_pool.get_child_count())
 	_sfx_i += 1
 	p.stream = s
+	p.volume_db = volume_db
+	p.pitch_scale = pitch
 	p.play()
 
 
 ## При выходе остановить воспроизведение и отпустить потоки (гигиена; утечку
 ## AudioStreamPlaybackMP3 при --quit-after не устраняет — см. docs/KNOWN_ISSUES.md).
 func _exit_tree() -> void:
-	var players: Array[Node] = [track_a, track_b, tense, rain_player, drone, wind_player]
+	var players: Array[Node] = [track_a, track_b, tense, rain_player]
 	players.append_array(sfx_pool.get_children())
 	for n: Node in players:
 		var p := n as AudioStreamPlayer
@@ -160,20 +158,3 @@ func _exit_tree() -> void:
 			p.stream = null
 	_active = null
 	_streams.clear()
-
-
-func wind(on: bool) -> void:
-	if on and not wind_player.playing:
-		wind_player.play()
-	elif not on:
-		wind_player.stop()
-
-
-func hush() -> void:
-	mode = null
-	cur_track = ""
-	_rain_on = false
-	for p: AudioStreamPlayer in [track_a, track_b, tense, rain_player, drone, wind_player]:
-		p.stop()
-	for p: AudioStreamPlayer in sfx_pool.get_children():
-		p.stop()

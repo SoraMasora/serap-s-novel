@@ -188,6 +188,9 @@ func step() -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	for _guard in MAX_STEPS:
 		memory.sync(st)
+		if not memory.enabled() and not _base_scene():
+			new_game(str(st.name))
+			continue
 		var hk := "%s:%d" % [st.scene, int(st.i)]
 		if memory.level() > 0 and _hooks.has(hk) and not st.hk.has(hk):
 			st.hk[hk] = true
@@ -326,6 +329,9 @@ func step() -> Array[Dictionary]:
 			out.append({"type": "map"})
 			return out
 		if c.has("final"):
+			if memory.truth() and c.final != "truth":
+				jump("L_truth")
+				continue
 			out.append({"type": "final", "kind": c.final})
 			return out
 	push_error("StoryRunner: превышен лимит шагов (зацикливание?) в " + str(st.scene))
@@ -362,14 +368,10 @@ func choose(options: Array, idx: int) -> String:
 	var f: float = float(o.get("feel", 0))
 	var rk: String = o.get("react", "")
 	if rk == "":
-		if f >= 10:
-			rk = "shy"
-		elif f >= 5:
-			rk = "hop"
-		elif f <= -12:
-			rk = "shake"
+		if f >= 3:
+			rk = "clap"
 		elif f < 0:
-			rk = "shiver"
+			rk = "angry"
 	log_push({"n": "→", "t": fmt(o.t), "ch": true, "s": _choice_snap})
 	if f != 0:
 		change_feel(f)
@@ -405,11 +407,20 @@ func map_spot_available(id: String) -> bool:
 	return m.spots.has(id)
 
 
-## Вход в точку карты (id) или служебные '__items'/'__late'
+## Вход в точку карты (id) или служебные: '__items', '__late',
+## '__car' (сбила машина), '__lazy' (качели 1:11)
 func map_enter(id: String, pos: Variant = null) -> void:
 	var m: Dictionary = st.map
 	if pos != null:
 		m.pos = pos
+	if memory.truth() and id in ["__car", "__lazy", "__late"]:
+		st.mode = "map"
+		return
+	if id == "__car" or id == "__lazy":
+		st.map = null
+		st.mode = ""
+		jump("end_car" if id == "__car" else "end_lazy")
+		return
 	if id == "__items" or id == "__late":
 		var a: String = m.get("late", m.after) if id == "__late" else m.after
 		st.map = null
@@ -447,6 +458,9 @@ func restore(s: Dictionary) -> void:
 	base.feel = float(base.get("feel", config.start_feel))
 	st = base
 	memory.sync(st)
+	if not memory.enabled() and not _base_scene():
+		new_game(str(st.get("name", config.default_name)))
+		return
 	if not db.has_scene(str(st.get("scene", ""))):
 		push_error("Сохранение ссылается на неизвестную сцену: " + str(st.get("scene")))
 		st.scene = config.start_scene

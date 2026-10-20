@@ -1,7 +1,9 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
-[ext_resource type="Script" path="res://scripts/ui/title_screen.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/ui/loop_title.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/ui/dust.gd" id="2"]
+
+[ext_resource type="Script" path="res://scripts/ui/loop_snow.gd" id="loop_snow"]
 
 [sub_resource type="Gradient" id="shade_g"]
 offsets = PackedFloat32Array(0.35, 1)
@@ -115,6 +117,15 @@ anchor_bottom = 1.0
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 6
+
+[node name="LoopSnow" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("loop_snow")
 
 [node name="Logo" type="VBoxContainer" parent="."]
 layout_mode = 1

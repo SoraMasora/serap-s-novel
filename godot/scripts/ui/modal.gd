@@ -33,6 +33,7 @@ var _rb_index := -1
 @onready var s_speed: HSlider = $Center/Panel/Panels/Settings/Speed/Slider
 @onready var s_music: HSlider = $Center/Panel/Panels/Settings/Music/Slider
 @onready var s_auto: HSlider = $Center/Panel/Panels/Settings/Auto/Slider
+@onready var s_full: CheckButton = $Center/Panel/Panels/Settings/Fullscreen
 @onready var endings_panel: Control = $Center/Panel/Panels/Endings
 @onready var endings_list: VBoxContainer = $Center/Panel/Panels/Endings/List
 @onready var menu_panel: Control = $Center/Panel/Panels/Menu
@@ -40,13 +41,6 @@ var _rb_index := -1
 
 func _ready() -> void:
 	visible = false
-	$Center/Panel/Panels/Settings/Soft.toggled.connect(
-		func(on: bool) -> void: setting_changed.emit("soft", 1.0 if on else 0.0)
-	)
-	$Center/Panel/Panels/Settings/Forget.pressed.connect(func() -> void: menu_action.emit("forget"))
-	$Center/Panel/Panels/ForgetMemory/Yes.pressed.connect(
-		func() -> void: menu_action.emit("forget_confirm")
-	)
 	for p: Node in panels.get_children():
 		var c := p.get_node_or_null("Close") as Button
 		if c:
@@ -58,6 +52,9 @@ func _ready() -> void:
 	s_speed.value_changed.connect(func(v: float) -> void: setting_changed.emit("speed", v))
 	s_music.value_changed.connect(func(v: float) -> void: setting_changed.emit("music", v))
 	s_auto.value_changed.connect(func(v: float) -> void: setting_changed.emit("auto_delay", v))
+	s_full.toggled.connect(
+		func(on: bool) -> void: setting_changed.emit("fullscreen", 1.0 if on else 0.0)
+	)
 	$Center/Panel/Panels/Confirm/Buttons/Yes.pressed.connect(
 		func() -> void: rollback_confirmed.emit(_rb_index)
 	)
@@ -99,14 +96,6 @@ func open_notes(notes: Array, total: int) -> void:
 		var it: Label = NOTE_ITEM.instantiate()
 		it.text = "✝ " + n
 		notes_list.add_child(it)
-	if Game.memory.level() > 0:
-		var heading: Label = NOTE_ITEM.instantiate()
-		heading.text = "Что я видел · %d из 7" % Game.memory.level()
-		notes_list.add_child(heading)
-		for id: String in Game.memory.data.deaths:
-			var it: Label = NOTE_ITEM.instantiate()
-			it.text = "✝︎ " + str(Game.db.loop.DEATHS[id].m)
-			notes_list.add_child(it)
 	_show(notes_panel)
 
 
@@ -155,24 +144,26 @@ func open_slots(mode: String, infos: Dictionary) -> void:
 
 
 func open_settings(s: Dictionary) -> void:
-	$Center/Panel/Panels/Settings/Soft.set_pressed_no_signal(bool(s.get("soft", 0.0)))
 	s_speed.set_value_no_signal(s.speed)
 	s_music.set_value_no_signal(s.music)
 	s_auto.set_value_no_signal(s.auto_delay)
+	s_full.set_pressed_no_signal(float(s.get("fullscreen", 1.0)) > 0.5)
 	_show(settings_panel)
 
 
 func open_endings(got: Dictionary, endings: Dictionary) -> void:
 	_clear(endings_list)
+	var n := endings.keys().filter(func(k: String) -> bool: return got.get(k, false)).size()
+	$Center/Panel/Panels/Endings/Title.text = "Концовки · %d из %d" % [n, endings.size()]
 	for k: String in endings:
 		var it: Label = NOTE_ITEM.instantiate()
-		it.text = ("✝ " + str(endings[k].title)) if got.get(k) else "??? — не открыта"
+		it.text = ("✝ " + str(endings[k].title)) if got.get(k) else "???  — не открыта"
 		it.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		if got.get(k):
+			it.add_theme_color_override("font_color", Color(1, 0.72, 0.82))
+		else:
+			it.modulate.a = 0.45
 		endings_list.add_child(it)
-	var progress: Label = NOTE_ITEM.instantiate()
-	progress.text = "Первый снег · %d из 7" % Game.memory.data.deaths.size()
-	progress.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	endings_list.add_child(progress)
 	_show(endings_panel)
 
 
@@ -183,7 +174,3 @@ func open_menu() -> void:
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		accept_event()
-
-
-func open_forget() -> void:
-	_show($Center/Panel/Panels/ForgetMemory)

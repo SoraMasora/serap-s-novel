@@ -247,11 +247,9 @@ GitHub MCP `push_files` с `arguments_file_path` (JSON `{owner, repo, branch, me
 - Ассеты Godot не в git: `export_data.cjs --assets` (из assets/*.js и маркеры из css), `bake_web.cjs` (пиксельные слои js/pixel.js и звуки js/audio.js через Chromium), `fetch_deps.sh` (GUT, шрифты).
 - Вёрстка повторяет последние переопределения css: #textbox v4/v4.1/v5, #namebox, #controls, #side, #choices .vbtn с лозами. Приближения — `docs/PORTING_CONTRACT.md`.
 
-## v18 (петля «Это не конец», только веб)
-- Идея пользователя: после любой концовки Сера всё равно умирает; скример серафима с перевёрнутым «это не конец!»; меню без «Новой игры» с красным «ПРОДОЛЖИТЬ!»; герой помнит смерти и меняется; после 7-й — без плохих выборов, признание, истинная концовка. Полная схема — `docs/LOOP_DESIGN.md`.
-- Код: `js/story_loop.js` (константы `LOOP` + 88 сцен `L_*`/`e_*`, подключён после story3.js), новые шаги в `run()` движка, оверлеи `#subl #sms #omen #scream` создаются лениво в `#game`, стили — блок `/* ═══ v18 ═══ */` в конце css. Звук: `Sound.wind/hush`, режим музыки `drone`, SFX scream/glitch/whisper/brake/toll/thud/wings/gust.
-- Память героя — `localStorage.serap_meta` (не слоты!). `lvl()` 0–7, `truthOn()` при 7, `haunted()` — меню после смерти. Флаги `loop/truth/dord/d_*/lend/dth` выставляет `syncLoop()` в `begin()`.
-- Эхо-крючки ищутся по тексту строки (`LOOP.HOOKS.after`) — если править эти строки в story.js/story3.js, крючок молча пропадёт (в консоли будет `loop hook not found`).
-- Арт: `tools/loop_art.py` → `assets/loop1-3.js` (≤1 МБ каждый); `title.te` — пустая комната для меню после смерти.
-- Godot-порт не тронут: `export_data.cjs` читает только story.js/story3.js (KI-009). ENDINGS.truth и правка текста expo живут в story_loop.js.
-- Отладка: `__pix.setMeta / meta / lvl / play / scream`.
+## godot-0.6.0 (2026-10-12)
+- Реакции на выбор: `clap` (feel ≥ 3) / `angry` (feel < 0) — `js/engine.js` (ANIM, CRY_MAP), `godot/scripts/core/story_runner.gd::choose`, `game_config.gd::reactions/cry_map`, движение — `character_view.gd::_play_motion`. Кадры `sera_clap1/2`, `sera_angry1/2` — `assets/anim5.js`.
+- Флаги: `c3nosmoke` (месяц 1, «Не курю») → ветки `*_ns` в `js/story4.js`; `m2cherry` (купил вишнёвый чай) → `m2_tea_q` → `m2_tea` (`m2tea`).
+- Анимированные фоны крыши: `BG_ANIM.m2_rx` (курят), `BG_ANIM.m2_rt` (чай) в `godot/scripts/ui/main.gd`; веб показывает первый кадр (`setBg`: `A.bg[k] || A.bg[k+'0']`).
+- Арт: Тимур 1007×1500 (`npc1.js`), Матвей 1120×1494 (`npc2.js`), `cg_shift` (`cg2.js`), `cg_store_help` (`cg9.js`), `m2_tea` (`cg11.js`), `m2_rx*` (`x7.js`), `m2_rt*` (`x8.js`). Генератор крыши — `tools/art/roof_v06.py` (исходники `tools/art/src/m2/roofsit2.jpg`, `rooftea.jpg`, `teagift.jpg` — не в git).
+
