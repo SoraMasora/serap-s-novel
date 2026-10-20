@@ -1,0 +1,6 @@
+# Consistent source line endings; resource snapshots must retain exact bytes.
+* text=auto eol=lf
+godot/assets/** -text
+godot/art/** -text
+godot/addons/gut/** -text
+source_assets/** -text
