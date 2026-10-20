@@ -10,24 +10,24 @@ let drops = [], splashes = [], cars = [], crows = [], smoke = [], trains = [];
 let world = 'yard', tickT = 0; // v10: 'yard' — двор, 'station' — дорога к станции
 const rnd = seed => { let s = seed; return () => (s = (s * 16807) % 2147483647) / 2147483647; };
 
-// ═══ Спрайт героя (12×26): лохматые чёрные волосы, бледная кожа, чёрная оверсайз-футболка, серые джоггеры ═══
+// ═══ Спрайт героя (10×19, в масштабе NPC и дверей): лохматые чёрные волосы, бледная кожа, чёрная оверсайз-футболка, серые джоггеры ═══
 const PAL = { K:'#121018', k:'#2e2a3a', h:'#4a4560', S:'#f3e3db', s:'#d6bcb2', E:'#1b1622', e:'#8a7f96', T:'#19181f', t:'#2f2d3a', J:'#80808c', j:'#5e5e6b', B:'#0c0c10', W:'#cfcfd6', R:'#c23a58', P:'#cfd3dc' };
 const HEAD = {
-  down: ['...kKKkK....','..KKKKKKKk..','.KKKhKKKKKK.','.KKKKKKKKKKK','KKKSKKKSKKKK','.KSSSSSSSSK.','PKeESSSeESKP','.KSSSSSSSSK.','..SSSssSSS..','...SSSSSS...'],
-  up:   ['...kKKkK....','..KKKKKKKk..','.KKKKhKKKKK.','.KKKKKKKKKKK','KKKKKKKKKKKK','.KKKKKKKKKK.','PKKKKKKKKKKP','.KKKKKKKKKK.','..KKKKKKKK..','...SSSSSS...'],
-  side: ['...kKKkK....','..KKKKKKKk..','.KKKKhKKKKK.','KKKKKKKKKKK.','KKKKKKKSKSKK','.KKKSSSSSSS.','.KKPSSSSeES.','.KKKSSSSSSS.','..KKSSSSss..','...SSSSSS...'],
+  down: ['..kKKKk...','.KKKhKKKKk','KKKKKKKKKK','KKSKKKKSKK','PKeESSeEKP','.KSSssSSK.'],
+  up:   ['..kKKKk...','.KKKhKKKKk','KKKKKKKKKK','KKKKKKKKKK','PKKKKKKKKP','.KKKKKKKK.'],
+  side: ['..kKKKk...','.KKKKhKKk.','KKKKKKKKK.','KKKKKKSKSK','.KKPSSSeE.','..KSSSss..'],
 };
-const TORSO_F = ['....SSSS....','.TTTTTTTTTT.','TTTtTTTTtTTT','TTTTTTTTTTTT','TTTTTTTTTTTT','.TTTTTTTTTT.','.TTTTTTTTTT.','.TtTTTTTTtT.'];
-const TORSO_S = ['....SSSS....','...TTTTTT...','..TTTTTTTT..','..TTtTTTTT..','..TTTTTTTT..','..TTTTTTTT..','..TTTTTTTT..','..TTTTTTTT..'];
+const TORSO_F = ['...SSSS...','.TTTTTTTT.','.TTtTTtTT.','.TTTTTTTT.','.TTTTTTTT.','.TtTTTTtT.'];
+const TORSO_S = ['...SSS....','..TTTTTT..','..TTTTTT..','..TtTTTT..','..TTTTTT..','..TTTTTT..'];
 const LEGS_F = [
-  ['..JJJJJJJJ..','..JJJJJJJJ..','..JJJ..JJJ..','..JJJ..JJJ..','..jJJ..JJj..','..jjj..jjj..','.BBBB..BBBB.','.WWWW..WWWW.'],
-  ['..JJJJJJJJ..','..JJJJJJJJ..','..JJJ..JJJ..','..jJJ..JJJ..','..jjj..JJj..','.BBBB..jjj..','.WWWW.BBBB..','......WWWW..'],
-  ['..JJJJJJJJ..','..JJJJJJJJ..','..JJJ..JJJ..','..JJJ..JJj..','..jJJ..jjj..','..jjj.BBBB..','.BBBB.WWWW..','.WWWW.......'],
+  ['..JJJJJJ..','..JJJJJJ..','..JJ..JJ..','..JJ..JJ..','..jj..jj..','.BBB..BBB.','.WWW..WWW.'],
+  ['..JJJJJJ..','..JJJJJJ..','..JJ..JJ..','..jj..JJ..','.BBB..jj..','.WWW..BBB.','......WWW.'],
+  ['..JJJJJJ..','..JJJJJJ..','..JJ..JJ..','..JJ..jj..','..jj..BBB.','.BBB..WWW.','.WWW......'],
 ];
 const LEGS_S = [
-  ['...JJJJJJ...','...JJJJJJ...','....JJJJ....','....JJJJ....','....JJjJ....','....jjjj....','....BBBBB...','....WWWWW...'],
-  ['...JJJJJJ...','..JJJJJJJ...','..JJJ.JJJ...','.JJJ...JJJ..','.jJJ...JJj..','.jjj...jjj..','BBBB...BBBBB','WWWW...WWWWW'],
-  ['...JJJJJJ...','...JJJJJJ...','...JJJJJ....','...JJJJJ....','...JjjJJ....','...jjjjj....','...BBBBBB...','...WWWWWW...'],
+  ['..JJJJJ...','...JJJJ...','...JJJJ...','...JJJJ...','...jjjj...','...BBBBB..','...WWWWW..'],
+  ['..JJJJJ...','..JJJJJJ..','..JJ..JJ..','.JJ....JJ.','.jj....jj.','BBB....BBB','WWW....WWW'],
+  ['..JJJJJ...','...JJJJ...','...JJJ....','...JJJJ...','...jjjj...','..BBBBB...','..WWWWW...'],
 ];
 function px(x, y, c) { cx.fillStyle = c; cx.fillRect(x, y, 1, 1); }
 function rows(rs, x, y, flip) { rs.forEach((r, j) => { for (let i = 0; i < r.length; i++) { const c = r[flip ? r.length - 1 - i : i]; if (c !== '.') px(x + i, y + j, PAL[c]); } }); }
@@ -35,30 +35,30 @@ function drawHero(x, y) {
   const side = hero.dir === 'left' || hero.dir === 'right', flip = hero.dir === 'left';
   const ph = hero.moving ? (hero.t * 8 | 0) % 4 : 0;          // 0..3 шаг
   const leg = hero.moving ? [1, 0, 2, 0][ph] : 0;
-  const bob = hero.moving ? (ph % 2 ? -1 : 0) : (Math.sin(hero.idleT * 2.2) > .6 ? -0 : 0);
+  const bob = hero.moving ? (ph % 2 ? -1 : 0) : 0;
   const breathe = !hero.moving && (hero.idleT % 3) > 2.6 ? 1 : 0;
-  const ox = x - 6, oy = y - 26 + bob;
+  const ox = x - 5, oy = y - 19 + bob;
   // тень
-  cx.fillStyle = 'rgba(0,0,0,.32)'; cx.fillRect(x - 5, y - 1, 11, 2); cx.fillRect(x - 4, y + 1, 9, 1);
-  rows(side ? LEGS_S[leg] : LEGS_F[leg], ox, oy + 18, flip);
-  rows(side ? TORSO_S : TORSO_F, ox, oy + 10 + breathe, flip);
-  // руки: рукав футболки + бледное предплечье, качаются при ходьбе
+  cx.fillStyle = 'rgba(0,0,0,.32)'; cx.fillRect(x - 5, y - 1, 10, 2); cx.fillRect(x - 4, y + 1, 8, 1);
+  rows(side ? LEGS_S[leg] : LEGS_F[leg], ox, oy + 12, flip);
+  rows(side ? TORSO_S : TORSO_F, ox, oy + 6 + breathe, flip);
+  // руки: рукав футболки + бледная кисть, качаются при ходьбе
   const sw = hero.moving ? [1, 0, -1, 0][ph] : 0;
   if (side) {
-    const ax = flip ? ox + 5 : ox + 6, d = flip ? -sw : sw;
-    px(ax, oy + 12, PAL.t); px(ax, oy + 13, PAL.T); px(ax, oy + 14, PAL.T);
-    px(ax + d, oy + 15, PAL.S); px(ax + d, oy + 16, PAL.S); px(ax + d * 2, oy + 17, PAL.s);
-    if (!flip) px(ax + d, oy + 16, PAL.R);
-  } else if (hero.dir === 'down' || hero.dir === 'up') {
-    [[ox - 1, sw], [ox + 12, -sw]].forEach(([axx, d], i) => {
-      px(axx, oy + 12, PAL.T); px(axx, oy + 13, PAL.T); px(axx, oy + 14, PAL.t);
-      px(axx, oy + 15 + Math.max(0, d), PAL.S); px(axx, oy + 16 + Math.max(0, d), PAL.S);
-      if (i === 1 && hero.dir === 'down') px(axx, oy + 15 + Math.max(0, d), PAL.R);
+    const ax = flip ? ox + 5 : ox + 4, d = flip ? -sw : sw;
+    px(ax, oy + 7, PAL.t); px(ax, oy + 8, PAL.T); px(ax, oy + 9, PAL.T);
+    px(ax + d, oy + 10, PAL.S); px(ax + d, oy + 11, PAL.s);
+    if (!flip) px(ax + d, oy + 10, PAL.R);
+  } else {
+    [[ox, sw], [ox + 9, -sw]].forEach(([axx, d], i) => {
+      px(axx, oy + 7, PAL.T); px(axx, oy + 8, PAL.T); px(axx, oy + 9, PAL.t);
+      px(axx, oy + 10 + Math.max(0, d), PAL.S); px(axx, oy + 11 + Math.max(0, d), PAL.s);
+      if (i === 1 && hero.dir === 'down') px(axx, oy + 10 + Math.max(0, d), PAL.R);
     });
   }
   rows(HEAD[side ? 'side' : hero.dir], ox, oy, flip);
   // моргание
-  if (hero.dir === 'down' && (hero.idleT % 4) > 3.85) { px(ox + 3, oy + 6, PAL.S); px(ox + 4, oy + 6, PAL.s); px(ox + 7, oy + 6, PAL.s); px(ox + 8, oy + 6, PAL.S); }
+  if (hero.dir === 'down' && (hero.idleT % 4) > 3.85) { px(ox + 2, oy + 4, PAL.s); px(ox + 3, oy + 4, PAL.s); px(ox + 6, oy + 4, PAL.s); px(ox + 7, oy + 4, PAL.s); }
 }
 
 // ═══ Мелкие NPC (пиксели) ═══
@@ -81,6 +81,16 @@ function drawNpc(id, x, y, t) {
   n.r.forEach((r, j) => { for (let i = 0; i < r.length; i++) if (r[i] !== '.') { cx.fillStyle = n.p[r[i]]; cx.fillRect(x + i, y + j + (j < 6 ? bob : 0), 1, 1); } });
 }
 
+// качели во дворе: сиденье на цепях качается; вечером/ночью на них мокрая Сера (капли, язык)
+function drawSwing(t, sera) {
+  const sw = Math.sin(t / 650) * (sera ? 2 : .6), dx = Math.round(sw), sy = Math.round(116 - Math.abs(sw) * .3), X = -Math.round(camX);
+  cx.fillStyle = '#7a7a88'; [216, 234].forEach(x0 => { for (let k = 0; k < 12; k++) if (k % 3 !== 2) cx.fillRect(Math.round(x0 + dx * k / 12) + X, Math.round(104 + (sy - 104) * k / 12), 1, 1); });
+  cx.fillStyle = '#6a4426'; cx.fillRect(217 + dx + X, sy, 18, 1); cx.fillStyle = '#3a2414'; cx.fillRect(217 + dx + X, sy + 1, 18, 1);
+  if (!sera) return;
+  const x = 219 + dx + X, y = sy - 13; drawNpc('sera_sit', x, y, t);
+  cx.fillStyle = 'rgba(207,224,255,.9)'; [0, 10, 5].forEach((ox, i) => cx.fillRect(x + ox, Math.round(y + 9 + ((t / 1000 + i * .37) % 1.1) * 14), 1, 1));
+  if ((t / 1000) % 3 < 1.2) { cx.fillStyle = '#e8607e'; cx.fillRect(x + 4, y + 5, 2, 1); cx.fillRect(x + 4, y + 6, 1, 1); }
+}
 // ═══ Фон: рисуется один раз на мир 560 px ═══
 function paintBg(time) {
   if (world === 'station') return paintStation(time);
@@ -92,8 +102,8 @@ function paintBg(time) {
   for (let k = 0; k < 26; k++) { const x = R() * WW, y = R() * 26, w = 30 + R() * 70; g.fillStyle = dark ? `rgba(20,16,36,${.25 + R() * .3})` : `rgba(90,94,108,${.18 + R() * .25})`; g.fillRect(x | 0, y | 0, w | 0, 3 + (R() * 5 | 0)); }
   // дальний план: ТЭЦ и панельки
   g.fillStyle = dark ? '#221e36' : '#8d909c';
-  for (let x = 0; x < WW; x += 26 + (R() * 14 | 0)) { const h = 30 + R() * 24; g.fillRect(x, 92 - h, 22, h); }
-  [[214, 10], [228, 14], [470, 18]].forEach(([x, y]) => { g.fillStyle = dark ? '#2a2540' : '#9a9ca8'; g.fillRect(x, y, 6, 70); g.fillStyle = dark ? '#6a2f44' : '#b8656b'; g.fillRect(x, y + 4, 6, 3); g.fillRect(x, y + 14, 6, 2); });
+  for (let x = 0; x < WW; x += 26 + (R() * 14 | 0)) { const h = 30 + R() * 24; g.fillRect(x, 92 - h, 22, h + 6); } // до тротуара — не «висят» в небе
+  [[214, 10], [228, 14], [470, 18]].forEach(([x, y]) => { g.fillStyle = dark ? '#2a2540' : '#9a9ca8'; g.fillRect(x, y, 6, 98 - y); g.fillStyle = dark ? '#6a2f44' : '#b8656b'; g.fillRect(x, y + 4, 6, 3); g.fillRect(x, y + 14, 6, 2); });
   g.fillStyle = dark ? 'rgba(255,190,120,.35)' : 'rgba(0,0,0,.08)'; for (let x = 0; x < WW; x += 3) for (let y = 50; y < 90; y += 5) if (R() < .06) g.fillRect(x, y, 1, 1);
   const lit = dark ? .5 : .1;
   const win = (x, y, w, h) => { const on = R() < lit; g.fillStyle = on ? (R() < .5 ? '#ffd27a' : '#ffae5a') : (dark ? '#25213a' : '#5b6170'); g.fillRect(x, y, w, h);
@@ -118,10 +128,6 @@ function paintBg(time) {
   g.fillStyle = '#3d4a6a'; g.fillRect(92, 79, 3, 2); // домофон
   // граффити
   g.fillStyle = dark ? '#7a3a5a' : '#8b4a62'; [[118, 88], [121, 87], [124, 88], [127, 86], [130, 88]].forEach(([x, y]) => g.fillRect(x, y, 2, 1));
-  // детская площадка: качели, песочница, горка
-  g.fillStyle = '#7b2d2d'; g.fillRect(212, 102, 2, 18); g.fillRect(238, 102, 2, 18); g.fillRect(212, 102, 28, 2);
-  g.fillStyle = '#4b6b8a'; g.fillRect(250, 104, 2, 16); g.fillRect(262, 108, 2, 12); g.fillStyle = '#b8a040'; for (let k = 0; k < 10; k++) g.fillRect(252 + k, 104 + k, 2, 1);
-  g.fillStyle = '#5a3a1f'; g.fillRect(196, 124, 16, 2); g.fillStyle = '#c4ad7c'; g.fillRect(197, 120, 14, 4);
   // кафе «Луна»
   panel(280, 96, 24, dark ? '#4c4256' : '#ada397');
   g.fillStyle = '#2b1b18'; g.fillRect(286, 70, 84, 28); g.fillStyle = dark ? '#ffbe6e' : '#d9a675'; g.fillRect(290, 74, 24, 15); g.fillRect(344, 74, 22, 15);
@@ -156,6 +162,12 @@ function paintBg(time) {
     g.fillStyle = dark ? '#56628a' : '#a9b6c6'; g.fillRect(x - w / 4 | 0, y - 1, w / 3 | 0, 1); g.fillStyle = 'rgba(0,0,0,.15)'; g.fillRect(x - w / 2 + 2 | 0, y + h / 2 - 1 | 0, w - 4, 1); });
   // опавшие листья
   for (let k = 0; k < 90; k++) { g.fillStyle = ['#b0782a', '#8a5a22', '#c9962e', '#6a4a20'][k % 4]; g.fillRect(R() * WW | 0, 106 + R() * 48 | 0, 2, 1); }
+  // детская площадка (поверх асфальта): каркас качелей (сиденье на цепях рисуется отдельно и качается), горка, песочница
+  g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(210, 120, 32, 2); g.fillRect(248, 120, 18, 2); g.fillRect(195, 126, 18, 2);
+  g.fillStyle = '#7b2d2d'; g.fillRect(212, 102, 2, 19); g.fillRect(238, 102, 2, 19); g.fillRect(212, 102, 28, 2);
+  g.fillStyle = '#5a1f22'; g.fillRect(214, 104, 1, 17); g.fillRect(240, 104, 1, 17); g.fillRect(212, 104, 28, 1);
+  g.fillStyle = '#4b6b8a'; g.fillRect(250, 104, 2, 17); g.fillRect(262, 108, 2, 13); g.fillStyle = '#b8a040'; for (let k = 0; k < 10; k++) g.fillRect(252 + k, 104 + k, 2, 1);
+  g.fillStyle = '#5a3a1f'; g.fillRect(196, 124, 16, 2); g.fillStyle = '#c4ad7c'; g.fillRect(197, 120, 14, 4);
   // люк
   g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(366, 128, 10, 4); g.fillStyle = dark ? '#4a4852' : '#848288'; g.fillRect(367, 129, 8, 2);
   // припаркованная «копейка» у бордюра
@@ -195,9 +207,9 @@ function paintStation(time) {
   for (let k = 0; k < 26; k++) { const x = R() * WW, y = R() * 26, w = 30 + R() * 70; g.fillStyle = dark ? `rgba(20,16,36,${.25 + R() * .3})` : `rgba(90,94,108,${.18 + R() * .25})`; g.fillRect(x | 0, y | 0, w | 0, 3 + (R() * 5 | 0)); }
   // дальний план: панельки и трубы ТЭЦ (как во дворе — тот же город)
   g.fillStyle = dark ? '#221e36' : '#8d909c';
-  for (let x = 0; x < WW; x += 24 + (R() * 16 | 0)) { const h = 22 + R() * 30; g.fillRect(x, 84 - h, 20, h); }
+  for (let x = 0; x < WW; x += 24 + (R() * 16 | 0)) { const h = 22 + R() * 30; g.fillRect(x, 84 - h, 20, h + 14); }
   g.fillStyle = dark ? 'rgba(255,190,120,.4)' : 'rgba(0,0,0,.1)'; for (let x = 0; x < WW; x += 3) for (let y = 40; y < 82; y += 5) if (R() < .05) g.fillRect(x, y, 1, 1);
-  [[214, 10], [228, 14], [470, 18]].forEach(([x, y]) => { g.fillStyle = dark ? '#2a2540' : '#9a9ca8'; g.fillRect(x, y, 6, 66); g.fillStyle = dark ? '#6a2f44' : '#b8656b'; g.fillRect(x, y + 4, 6, 3); g.fillRect(x, y + 14, 6, 2); });
+  [[214, 10], [228, 14], [470, 18]].forEach(([x, y]) => { g.fillStyle = dark ? '#2a2540' : '#9a9ca8'; g.fillRect(x, y, 6, 98 - y); g.fillStyle = dark ? '#6a2f44' : '#b8656b'; g.fillRect(x, y + 4, 6, 3); g.fillRect(x, y + 14, 6, 2); });
   // ряд гаражей (ржавые ворота, граффити)
   const gcol = dark ? ['#3a3236', '#2f3a3a', '#3d3328', '#33303a'] : ['#7a5e4e', '#56706c', '#806a48', '#6a6470'];
   for (let i = 0; i < 7; i++) { const x = 4 + i * 22; g.fillStyle = dark ? '#2a2830' : '#77757a'; g.fillRect(x, 70, 22, 28); g.fillStyle = gcol[i % 4]; g.fillRect(x + 2, 76, 18, 22);
@@ -298,7 +310,7 @@ function drawItems(t) {
 // ═══ Живой мир: дождь, машины, вороны, дым ═══
 function initFx() {
   drops = Array.from({ length: 140 }, () => ({ x: Math.random() * (W + 40), y: Math.random() * H, v: 140 + Math.random() * 90, l: 3 + (Math.random() * 4 | 0) }));
-  splashes = []; cars = []; crows = Array.from({ length: 3 }, (_, i) => ({ x: 60 + i * 170, y: 41 + i, fly: 0, vx: 0, vy: 0, t: Math.random() * 5 }));
+  splashes = []; roadT = 0; roadWarned = false; hitT = -1; cars = []; crows = Array.from({ length: 3 }, (_, i) => ({ x: 60 + i * 170, y: 41 + i, fly: 0, vx: 0, vy: 0, t: Math.random() * 5 }));
   smoke = [];
 }
 function updFx(dt) {
@@ -378,14 +390,14 @@ const ST_SIGNS = [['Гаражи', 80, 62], ['Табак · Шаурма', 207, 
 const SP = () => Object.assign({}, world === 'station' ? ST_SPOTS : SPOTS, cfg.extra || {});
 const avail = id => id === 'home' || (id === 'swing' ? world === 'yard' && cfg.time !== 'day' && !cfg.follow && !cfg.items : cfg.spots.includes(id) || !!(cfg.info && cfg.info[id]));
 function near() { const it = itemNear(); if (it) return it; let best = null, bd = 18; Object.entries(SP()).forEach(([id, s]) => { if (!avail(id)) return; const d = Math.hypot(s.x - hero.x, (s.y - hero.y) * 1.4); if (d < bd) { bd = d; best = id; } }); return best; }
-const SWING_LINES = ['Сера сидит на качелях с альбомом и рисует котов. Увидела меня — показала язык. Увидимся вечером.', 'Сера раскачивается, глядя в небо. «Не мешай, я ловлю вдохновение», — говорит она, не оборачиваясь.'];
+const SWING_LINES = ['Сера качается под дождём — промокла до нитки и уходить не собирается. Увидела меня — показала язык.', 'Сера раскачивается, подставив лицо дождю. «Не мешай, я ловлю вдохновение», — и показывает мне язык.'];
 function act(id) {
   if (!id) return;
   if (id === '__allitems' && cfg.items) { cfg.items.forEach((_, i) => { if (!cfg.got.includes(i)) cfg.got.push(i); }); stop(); onEnter && onEnter('__items'); return; }
   if (id.startsWith('it') && cfg.items) return pickItem(id);
   if (cfg.info && cfg.info[id] && !cfg.spots.includes(id)) { const v = cfg.info[id]; const k = (cfg.infoN = cfg.infoN || {})[id] = ((cfg.infoN[id] || 0) + 1); return say(Array.isArray(v) ? v[(k - 1) % v.length] : v); }
   if (id === 'home') return say(cfg.home || (cfg.items ? 'Сначала — листовки. Все до одной.' : 'Рано возвращаться. Хочется ещё куда-нибудь заглянуть.'));
-  if (id === 'swing') return say(SWING_LINES[(cfg.title || '').length % 2]);
+  if (id === 'swing') return say(cfg.noSera ? 'Качели пустые. Сиденье мокрое — на нём никто не сидит. Её здесь нет.' : SWING_LINES[(cfg.title || '').length % 2]);
   if (cfg.done.includes(id)) return say('Сегодня я тут уже был.');
   window.Sound && Sound.sfx('enter'); stop(); onEnter && onEnter(id);
 }
@@ -401,7 +413,18 @@ function blocked(x, y) { // препятствия: лавочка, баки, п
   if (world === 'station') return false;
   return [[52, 104, 82, 113], [234, 134, 270, 150], [170, 98, 196, 111], [196, 119, 212, 127], [211, 116, 241, 121]].some(([a, b, c, d]) => x > a && x < c && y > b && y < d);
 }
+// дорога во дворе: можно выйти на проезжую часть — и попасть под машину (концовка «Обочина», '__car')
+const ROAD_Y = 153, ROAD_MAX = 174; let roadT = 0, roadWarned = false, hitT = -1;
+function road(dt) {
+  if (hitT >= 0) { hitT += dt; if (hitT > .7) { hitT = -1; stop(); onEnter && onEnter('__car'); } return true; }
+  if (world !== 'yard' || hero.y <= ROAD_Y) { roadT = 0; return false; }
+  roadT += dt; if (!roadWarned) { roadWarned = true; say('Дорога. Машины тут не тормозят — даже ночью, даже под дождём.'); }
+  if (roadT > .9 && !cars.some(c => c.hunt)) { const dir = hero.dir !== 'right' ? 1 : -1; cars.push({ x: dir > 0 ? camX - 50 : camX + W + 20, y: hero.y > 165 ? 170 : 160, dir, v: 170, c: '#8a2a2a', hunt: 1 }); }
+  for (const c of cars) if (Math.abs(c.x + 15 - hero.x) < 16 && hero.y > c.y - 3 && hero.y < c.y + 10) { c.v = 0; hitT = 0; hero.moving = false; window.Sound && Sound.sfx('brake'); return true; }
+  return false;
+}
 function update(dt) {
+  if (hitT >= 0) { road(dt); updFx(dt); return; }
   let dx = 0, dy = 0;
   if (keys.ArrowLeft || keys.a) dx--; if (keys.ArrowRight || keys.d) dx++; if (keys.ArrowUp || keys.w) dy--; if (keys.ArrowDown || keys.s) dy++;
   if (dx || dy) { hero.target = null; hero.autoEnter = null; }
@@ -419,7 +442,8 @@ function update(dt) {
     const l = trail[trail.length - 1]; if (!l || Math.hypot(l.x - hero.x, l.y - hero.y) > 1.2) { trail.push({ x: hero.x, y: hero.y, m: 1 }); if (trail.length > 60) trail.shift(); }
     folT -= dt; if (folT <= 0 && msgT <= 0) { folT = 9 + Math.random() * 5; say(folLines()[folI++ % folLines().length]); }
   }
-  hero.x = Math.max(6, Math.min(WW - 6, hero.x)); hero.y = Math.max(Y_MIN, Math.min(Y_MAX + 4, hero.y));
+  hero.x = Math.max(6, Math.min(WW - 6, hero.x)); hero.y = Math.max(Y_MIN, Math.min(world === 'yard' ? ROAD_MAX : Y_MAX + 4, hero.y));
+  if (road(dt)) return;
   camX += ((Math.max(0, Math.min(WW - W, hero.x - W / 2))) - camX) * Math.min(1, dt * 5);
   updFx(dt); updTrains(dt);
   if (cfg.timer != null) { cfg.tleft = Math.max(0, (cfg.tleft == null ? cfg.timer : cfg.tleft) - dt); tickT -= dt;
@@ -438,7 +462,8 @@ function render(dt, t) {
   if (world === 'yard' && !cfg.quiet && (cfg.spots.includes('store') || !!(cfg.info && cfg.info.store))) actors.push({ y: 112, d: () => drawNpc('timur', 446 - Math.round(camX), 97, t) });
   if (world === 'yard' && !cfg.quiet && (cfg.spots.includes('college') || !!(cfg.info && cfg.info.college)) && time === 'day') actors.push({ y: 112, d: () => drawNpc('margo', 534 - Math.round(camX), 97, t) });
   if (cfg.follow) { const f = follower(), mv = hero.moving && trail.length > 18; actors.push({ y: f.y, d: () => drawNpc('sera', Math.round(f.x - 5 - camX), Math.round(f.y - 16 + (mv && Math.sin(t / 90) > 0 ? -1 : 0)), t) }); }
-  else if (world === 'yard' && time !== 'day' && !cfg.items && !cfg.noSera) actors.push({ y: 121, d: () => drawNpc('sera', 220 - Math.round(camX), 104 + (Math.sin(t / 500) > 0 ? 0 : 1), t) });
+  const onSwing = world === 'yard' && time !== 'day' && !cfg.items && !cfg.noSera && !cfg.follow;
+  if (world === 'yard') actors.push({ y: 121, d: () => drawSwing(t, onSwing) });
   if (cfg.seraBench) actors.push({ y: 106, d: () => drawNpc('sera_sit', 494 - Math.round(camX), 93 + (Math.sin(t / 700) > .3 ? 1 : 0), t) });
   (cfg.npcs || []).forEach(n => actors.push({ y: n.y + 14, d: () => drawNpc(n.id, Math.round(n.x - camX), n.y, t) }));
   actors.push({ y: hero.y, d: () => drawHero(Math.round(hero.x - camX), Math.round(hero.y)) });
@@ -457,6 +482,7 @@ function render(dt, t) {
   cx.drawImage(fgC, -Math.round(camX), 0);
   drawRain();
   drawLight(time, t);
+  if (hitT >= 0) { cx.fillStyle = `rgba(255,247,230,${Math.max(0, 1 - hitT / .7) * .85})`; cx.fillRect(0, 0, W, H); }
   // HTML-подписи едут вместе с камерой
   document.querySelectorAll('#pixwrap .psign').forEach(el => { const x = +el.dataset.x - camX; el.style.left = (x / W * 100) + '%'; el.style.display = x < -30 || x > W + 30 ? 'none' : ''; });
   const pr = document.getElementById('pixPrompt');

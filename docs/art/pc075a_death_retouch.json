@@ -1,0 +1,198 @@
+[
+  {
+    "key": "dm_road",
+    "box": [
+      450,
+      145,
+      590,
+      265
+    ],
+    "changed_pixels": 1051,
+    "changed_percent": 0.0995,
+    "outside_box_unchanged": true,
+    "webp_lossless_verified": true,
+    "sha256": "fac507c17b1c6a7a8053985b3ac5615aaba6435bbd13265c7fa6e8babec38ef9"
+  },
+  {
+    "key": "dm_train",
+    "box": [
+      810,
+      155,
+      940,
+      265
+    ],
+    "changed_pixels": 1168,
+    "changed_percent": 0.1105,
+    "outside_box_unchanged": true,
+    "webp_lossless_verified": true,
+    "sha256": "c60b189a3734c9da0e8154d9467684465c8512b4eb2ed3841c31d8277bf9fd68"
+  },
+  {
+    "key": "dm_cross",
+    "box": [
+      700,
+      195,
+      850,
+      305
+    ],
+    "changed_pixels": 1496,
+    "changed_percent": 0.1416,
+    "outside_box_unchanged": true,
+    "webp_lossless_verified": true,
+    "sha256": "5c0a1293d4cf5bef35a8eaf7fb91bef1d9e3c509756380e1c5da793c5625cda0"
+  },
+  {
+    "key": "dm_cliff",
+    "box": [
+      690,
+      160,
+      790,
+      255
+    ],
+    "changed_pixels": 935,
+    "changed_percent": 0.0885,
+    "outside_box_unchanged": true,
+    "webp_lossless_verified": true,
+    "sha256": "ed2c19f3eae61af3cf598661b7432fa499c806ec286f86fa0fd282d425228f0a"
+  },
+  {
+    "key": "dm_neck",
+    "box": [
+      790,
+      110,
+      910,
+      220
+    ],
+    "changed_pixels": 1274,
+    "changed_percent": 0.1206,
+    "outside_box_unchanged": true,
+    "webp_lossless_verified": true,
+    "sha256": "3e00698039cc41b68eda89a8bb3a2cd19f256061ff03fa6235967e6caab81f0a"
+  },
+  {
+    "key": "dm_store",
+    "box": [
+      630,
+      260,
+      735,
+      340
+    ],
+    "changed_pixels": 281,
+    "changed_percent": 0.0266,
+    "outside_box_unchanged": true,
+    "webp_lossless_verified": true,
+    "sha256": "53c3235bf56c5380080fc6c026fc791ba5817e3b5cc25a03029d5ef92c0d9d3b"
+  },
+  {
+    "key": "dm_room",
+    "box": [
+      590,
+      485,
+      655,
+      550
+    ],
+    "changed_pixels": 926,
+    "changed_percent": 0.0876,
+    "outside_box_unchanged": true,
+    "webp_lossless_verified": true,
+    "sha256": "fd323f4614a92fb5f1612d12064d1716d149856efb891b36faa0a00d32b31f19"
+  },
+  {
+    "key": "d_road",
+    "box": [
+      285,
+      580,
+      650,
+      768
+    ],
+    "changed_pixels": 5533,
+    "changed_percent": 0.5236,
+    "outside_box_unchanged": true,
+    "webp_lossless_verified": true,
+    "sha256": "881f4e1d2e6f5c7eedeca2b211649eab7f6989cb42db1526764ad5de3d9e9d63"
+  },
+  {
+    "key": "d_train",
+    "box": [
+      660,
+      605,
+      1005,
+      768
+    ],
+    "changed_pixels": 2645,
+    "changed_percent": 0.2503,
+    "outside_box_unchanged": true,
+    "webp_lossless_verified": true,
+    "sha256": "da3d279097290b491071c739461ef50ac11de57ce8aae745dedfd4e9ebff7ea8"
+  },
+  {
+    "key": "d_cross",
+    "box": [
+      650,
+      570,
+      1050,
+      768
+    ],
+    "changed_pixels": 5395,
+    "changed_percent": 0.5105,
+    "outside_box_unchanged": true,
+    "webp_lossless_verified": true,
+    "sha256": "8397039289bc6e27136ca46b129af34cc04c038865815eb553576b319c675229"
+  },
+  {
+    "key": "d_cliff",
+    "box": [
+      765,
+      265,
+      1045,
+      435
+    ],
+    "changed_pixels": 358,
+    "changed_percent": 0.0339,
+    "outside_box_unchanged": true,
+    "webp_lossless_verified": true,
+    "sha256": "0afe8a7b03a1078e1a0e696d154a13b22147168c5ee52481cfb331ecf9f6bcb5"
+  },
+  {
+    "key": "d_room",
+    "box": [
+      500,
+      645,
+      760,
+      768
+    ],
+    "changed_pixels": 1318,
+    "changed_percent": 0.1247,
+    "outside_box_unchanged": true,
+    "webp_lossless_verified": true,
+    "sha256": "df6d52f439a1c7d9f19ab9e02f95b67440659b4f5d303c6134d8f00f3b3decb0"
+  },
+  {
+    "key": "d_store",
+    "box": [
+      680,
+      605,
+      910,
+      768
+    ],
+    "changed_pixels": 3841,
+    "changed_percent": 0.3635,
+    "outside_box_unchanged": true,
+    "webp_lossless_verified": true,
+    "sha256": "cddcc6c85fdc4dbdc6f6d6e62bbdaff979aadd323c1fcde5e2bca90e020cf737"
+  },
+  {
+    "key": "d_neck",
+    "box": [
+      710,
+      580,
+      1010,
+      750
+    ],
+    "changed_pixels": 1149,
+    "changed_percent": 0.1087,
+    "outside_box_unchanged": true,
+    "webp_lossless_verified": true,
+    "sha256": "844c4656becd22738449c9ab51ac05db4d584518a2bd69329dce5ae28605868f"
+  }
+]

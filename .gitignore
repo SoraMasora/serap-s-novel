@@ -3,3 +3,4 @@ ex/
 shots/
 game.html
 *.png
+__pycache__/

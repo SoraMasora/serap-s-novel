@@ -9,6 +9,10 @@ signal said(text: String)
 signal item_picked(count: int, total: int)
 signal ticked(seconds_left: int)
 signal sfx_requested(key: String)
+## Звук с громкостью/высотой (скрип качелей тише при слабом размахе).
+signal sfx_tuned(key: String, volume_db: float, pitch: float)
+## Пиксельный крупный план (godot/art/pixel/closeup_<key>_N.webp) с репликой
+signal closeup(key: String, text: String)
 
 const BAKE_PATH := "res://data/pixel_bake.json"
 const PIX := "res://assets/pixel/"
@@ -25,6 +29,10 @@ var t_ms := 0.0
 var hero := {}
 var msg_t := 0.0
 var bake: Dictionary = {}
+## Качели без Серы: герой садится сам (W — вперёд, A — назад).
+## 1:11 качания — концовка «Ленивый идиот»
+var sitting := false
+var swing_time := 0.0
 var _tex: Dictionary = {}
 var _drops: Array = []
 var _splashes: Array = []
@@ -38,6 +46,15 @@ var _fol_i := 0
 var _tick_t := 0.0
 var _pending_items_done := -1.0
 var _pending_exit := -1.0
+var _say_text := ""
+## Дорога во дворе: можно выйти на проезжую часть — и попасть под машину (концовка «Обочина»)
+var _road_t := 0.0
+var _road_warned := false
+var _hit_t := -1.0
+var _sw_ang := 0.0
+var _sw_vel := 0.0
+var _sw_sign := 0
+var _sw_line := 0
 
 @onready var light: Sprite2D = $"../Light"
 @onready var halo: Sprite2D = $"../Halo"
@@ -67,6 +84,13 @@ func open(p_cfg: Dictionary, p_pc: PixelConfig) -> void:
 	_tick_t = 0.0
 	_pending_items_done = -1.0
 	_pending_exit = -1.0
+	_road_t = 0.0
+	_road_warned = false
+	_hit_t = -1.0
+	sitting = false
+	swing_time = 0.0
+	_sw_ang = 0.0
+	_sw_vel = 0.0
 	if cfg.has("items"):
 		var got: Array = []
 		for g: Variant in cfg.get("got", []):
@@ -140,6 +164,8 @@ func _item_near() -> String:
 
 
 func near() -> String:
+	if sitting:
+		return "swing"
 	var it := _item_near()
 	if it != "":
 		return it
@@ -158,6 +184,7 @@ func near() -> String:
 
 func say(t: String) -> void:
 	msg_t = pc.say_seconds
+	_say_text = t
 	said.emit(t)
 
 
@@ -174,6 +201,8 @@ func act(id: String) -> void:
 		var k := int(cfg.infoN.get(id, 0)) + 1
 		cfg.infoN[id] = k
 		say(v[(k - 1) % v.size()] if v is Array else str(v))
+		if id == "kiosk" and world == "station":
+			closeup.emit("kiosk_sera" if cfg.has("follow") else "kiosk", _say_text)
 		return
 	if id == "home":
 		var def := (
@@ -184,7 +213,11 @@ func act(id: String) -> void:
 		say(cfg.get("home", def))
 		return
 	if id == "swing":
+		if cfg.get("noSera", false):
+			_toggle_sit()
+			return
 		say(pc.swing_lines[str(cfg.get("title", "")).length() % 2])
+		closeup.emit("swing", _say_text)
 		return
 	if cfg.done.has(id):
 		say("Сегодня я тут уже был.")
@@ -192,6 +225,61 @@ func act(id: String) -> void:
 	sfx_requested.emit("enter")
 	stop()
 	entered.emit(id)
+
+
+func spot_label(id: String) -> String:
+	if id == "swing" and cfg.get("noSera", false):
+		return "Встать" if sitting else "Сесть на качели"
+	return str(spots()[id].label)
+
+
+func _toggle_sit() -> void:
+	sitting = not sitting
+	swing_time = 0.0
+	_sw_line = 0
+	_sw_vel = 0.0
+	_sw_ang = 0.0
+	hero.target = null
+	hero.moving = false
+	if sitting:
+		hero.x = 226.0
+		hero.y = 124.0
+		say(pc.sit_hint)
+	else:
+		say(pc.stand_line)
+
+
+## Маятник: W — толкнуться вперёд, A — назад (в такт — раскачивает, невпопад — гасит)
+func _upd_sit(dt: float) -> void:
+	if Input.is_action_just_pressed("map_up"):
+		_sw_vel += pc.swing_push if _sw_vel >= -0.15 else -pc.swing_push * 0.4
+	if Input.is_action_just_pressed("map_left"):
+		_sw_vel -= pc.swing_push if _sw_vel <= 0.15 else -pc.swing_push * 0.4
+	_sw_vel += (-pc.swing_gl * sin(_sw_ang) - pc.swing_damp * _sw_vel) * dt
+	_sw_ang = clampf(_sw_ang + _sw_vel * dt, -1.1, 1.1)
+	var e := 0.5 * _sw_vel * _sw_vel + pc.swing_gl * (1.0 - cos(_sw_ang))
+	var amp := acos(clampf(1.0 - e / pc.swing_gl, -1.0, 1.0))
+	var sg := signi(int(signf(_sw_vel)))
+	if sg != 0 and sg != _sw_sign:
+		_sw_sign = sg
+		if amp > 0.12:
+			var k := "swing_%s%d" % ["fwd" if sg > 0 else "back", randi_range(1, 3)]
+			var vol := lerpf(-16.0, -3.0, clampf((amp - 0.12) / 0.8, 0.0, 1.0))
+			sfx_tuned.emit(k, vol, randf_range(0.94, 1.06))
+	if amp > pc.swing_min_amp:
+		swing_time += dt
+	var lines: Array = pc.sit_lines
+	if _sw_line < lines.size() and swing_time >= float(lines[_sw_line][0]):
+		say(str(lines[_sw_line][1]))
+		_sw_line += 1
+	if swing_time >= pc.lazy_seconds:
+		sitting = false
+		stop()
+		entered.emit("__lazy")
+
+
+func swing_amp() -> float:
+	return absf(_sw_ang)
 
 
 func _pick_item(i: int) -> void:
@@ -228,6 +316,49 @@ func click(p: Vector2) -> void:
 	hero.auto = hit
 
 
+func _upd_road(dt: float) -> void:
+	if _hit_t >= 0.0:
+		_hit_t += dt
+		if _hit_t > pc.hit_delay:
+			_hit_t = -1.0
+			stop()
+			entered.emit("__car")
+		return
+	if world != "yard":
+		return
+	if hero.y <= pc.road_y:
+		_road_t = 0.0
+		return
+	_road_t += dt
+	if not _road_warned:
+		_road_warned = true
+		say(pc.road_warning)
+	if (
+		_road_t > pc.road_car_after
+		and not _cars.any(func(c: Dictionary) -> bool: return c.get("hunt", false))
+	):
+		var lane := 170.0 if hero.y > 165.0 else 160.0
+		var dir := 1 if hero.dir != "right" else -1
+		_cars.append(
+			{
+				"x": cam_x - 50.0 if dir > 0 else cam_x + pc.screen.x + 20.0,
+				"y": lane,
+				"dir": dir,
+				"v": pc.road_car_speed,
+				"c": CAR_COLORS[randi() % 4],
+				"hunt": true
+			}
+		)
+	for c: Dictionary in _cars:
+		var cx0: float = c.x + 15.0
+		if absf(cx0 - hero.x) < 16.0 and hero.y > float(c.y) - 3.0 and hero.y < float(c.y) + 10.0:
+			c.v = 0.0
+			_hit_t = 0.0
+			hero.moving = false
+			sfx_requested.emit("brake")
+			return
+
+
 func _blocked(x: float, y: float) -> bool:
 	for r: Array in pc.obstacles.get(world, []):
 		if x > r[0] and x < r[2] and y > r[1] and y < r[3]:
@@ -248,6 +379,21 @@ func _process(delta: float) -> void:
 
 
 func _update(dt: float) -> void:
+	if _hit_t >= 0.0:
+		_upd_road(dt)
+		_upd_fx(dt)
+		return
+	if sitting:
+		_upd_sit(dt)
+		if not running:
+			return
+		if msg_t > 0:
+			msg_t -= dt
+		var tg := clampf(hero.x - pc.screen.x / 2.0, 0, pc.world_width - pc.screen.x)
+		cam_x += (tg - cam_x) * minf(1.0, dt * 5.0)
+		_upd_fx(dt)
+		_upd_trains(dt)
+		return
 	var dx := Input.get_axis("map_left", "map_right")
 	var dy := Input.get_axis("map_up", "map_down")
 	var run := Input.is_action_pressed("map_run")
@@ -303,7 +449,13 @@ func _update(dt: float) -> void:
 			say(lines[_fol_i % lines.size()])
 			_fol_i += 1
 	hero.x = clampf(hero.x, 6, pc.world_width - 6)
-	hero.y = clampf(hero.y, pc.walk_y_min, pc.walk_y_max + 4)
+	var y_max := pc.walk_y_max + 4
+	if world == "yard":
+		y_max = pc.road_y_max
+	hero.y = clampf(hero.y, pc.walk_y_min, y_max)
+	_upd_road(dt)
+	if not running:
+		return
 	var tgt := clampf(hero.x - pc.screen.x / 2.0, 0, pc.world_width - pc.screen.x)
 	cam_x += (tgt - cam_x) * minf(1.0, dt * 5.0)
 	if msg_t > 0:
@@ -480,21 +632,29 @@ func _draw() -> void:
 		var mv: bool = hero.moving and _trail.size() > 18
 		var bob := -1.0 if mv and sin(t_ms / 90.0) > 0 else 0.0
 		actors.append([f.y, "npc", "sera", roundf(f.x - 5 - cx), roundf(f.y - 16 + bob)])
-	elif world == "yard" and dark and not cfg.has("items") and not cfg.get("noSera", false):
-		actors.append(
-			[121.0, "npc", "sera", 220 - cx, 104.0 + (0.0 if sin(t_ms / 500.0) > 0 else 1.0)]
-		)
+	var on_swing: bool = (
+		world == "yard"
+		and dark
+		and not cfg.has("items")
+		and not cfg.get("noSera", false)
+		and not cfg.has("follow")
+	)
+	if world == "yard":
+		actors.append([121.0, "swing_sera" if on_swing else "swing", cx])
 	if cfg.get("seraBench", false):
 		actors.append(
 			[106.0, "npc", "sera_sit", 494 - cx, 93.0 + (1.0 if sin(t_ms / 700.0) > 0.3 else 0.0)]
 		)
 	for e: Dictionary in cfg.get("npcs", []):
 		actors.append([float(e.y) + 14, "npc", e.id, roundf(e.x - cx), float(e.y)])
-	actors.append([float(hero.y), "hero"])
+	if not sitting:
+		actors.append([float(hero.y), "hero"])
 	actors.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
 	for a: Array in actors:
 		if a[1] == "hero":
 			_draw_hero(roundf(hero.x - cx), roundf(hero.y))
+		elif a[1] == "swing" or a[1] == "swing_sera":
+			_draw_swing(cx, a[1] == "swing_sera", dark)
 		else:
 			_draw_npc(a[2], a[3], a[4])
 	_draw_world_fx(dark, cx)
@@ -511,6 +671,9 @@ func _draw() -> void:
 		draw_rect(
 			Rect2(0, 0, pc.screen.x, pc.screen.y), Color(40 / 255.0, 50 / 255.0, 70 / 255.0, 0.12)
 		)
+	if _hit_t >= 0.0:
+		var a := clampf(1.0 - _hit_t / pc.hit_delay, 0.0, 1.0)
+		draw_rect(Rect2(0, 0, pc.screen.x, pc.screen.y), Color(1, 0.97, 0.9, a * 0.85))
 
 
 func _draw_hero(x: float, y: float) -> void:
@@ -531,6 +694,67 @@ func _draw_hero(x: float, y: float) -> void:
 	draw_texture_rect_region(
 		tex, Rect2(x - hb.anchor[0], y - hb.anchor[1], fw, fh), Rect2(col * fw, row * fh, fw, fh)
 	)
+
+
+## Качели во дворе: сиденье на цепях качается; вечером/ночью на них мокрая Сера (капли, язык)
+func _draw_swing(cx: float, with_sera: bool, dark: bool) -> void:
+	var sw := sin(t_ms / 650.0) * (2.0 if with_sera else 0.6)
+	var dx := roundf(sw)
+	var seat_y := 116.0 - absf(sw) * 0.3
+	if sitting:
+		dx = roundf(sin(_sw_ang) * 12.0)
+		seat_y = 104.0 + cos(_sw_ang) * 12.0
+	var chain := Color("#8a8a96") if not dark else Color("#6a6a78")
+	for x0: float in [216.0, 234.0]:
+		for k in 12:
+			var f := k / 12.0
+			if k % 3 != 2:
+				_r(x0 + dx * f - cx, 104 + (seat_y - 104) * f, 1, 1, chain)
+	_r(217 + dx - cx, seat_y, 18, 1, Color("#6a4426"))
+	_r(217 + dx - cx, seat_y + 1, 18, 1, Color("#3a2414"))
+	if sitting:
+		_draw_sitting_hero(220.0 + dx - cx, seat_y, dark)
+	if with_sera:
+		var sx := 219.0 + dx - cx
+		var sy := seat_y - 13.0
+		_draw_npc("sera_sit", sx, sy)
+		# мокрая: капли срываются с волос и падают
+		var drip := Color(0.81, 0.88, 1.0, 0.9)
+		for i in 3:
+			var ph := fmod(t_ms / 1000.0 + i * 0.37, 1.1)
+			_r(sx + [0.0, 10.0, 5.0][i], sy + 9 + ph * 14.0, 1, 1, drip)
+		# показывает язык
+		if fmod(t_ms / 1000.0, 3.0) < 1.2:
+			_r(sx + 4, sy + 5, 2, 1, Color("#e8607e"))
+			_r(sx + 4, sy + 6, 1, 1, Color("#e8607e"))
+
+
+## Герой на сиденье (тот же масштаб, что и спрайт героя): лохматая чёлка, чёрная футболка, кеды
+func _draw_sitting_hero(sx: float, seat_y: float, dark: bool) -> void:
+	var hair := Color("#121018")
+	var skin := Color("#f3e3db") if not dark else Color("#d8c4bc")
+	var tee := Color("#19181f")
+	var pants := Color("#6a6a78")
+	var y := seat_y - 15.0
+	var lean := roundf(clampf(_sw_vel * 0.6, -1.0, 1.0))
+	_r(sx + 2 + lean, y, 7, 2, hair)
+	_r(sx + 1 + lean, y + 1, 9, 4, hair)
+	_r(sx + 2 + lean, y + 3, 7, 4, skin)
+	_r(sx + 2 + lean, y + 3, 7, 1, hair)
+	_r(sx + 2 + lean, y + 4, 1, 1, hair)
+	_r(sx + 6 + lean, y + 4, 1, 1, hair)
+	_r(sx + 3 + lean, y + 5, 1, 1, Color("#2a2436"))
+	_r(sx + 6 + lean, y + 5, 1, 1, Color("#2a2436"))
+	_r(sx + 1, y + 7, 9, 7, tee)
+	_r(sx - 2, y + 4, 2, 4, tee)
+	_r(sx + 11, y + 4, 2, 4, tee)
+	_r(sx - 2, y + 3, 1, 1, skin)
+	_r(sx + 12, y + 3, 1, 1, skin)
+	var kick := roundf(clampf(_sw_vel * 1.5, -2.0, 2.0))
+	for lx: float in [sx + 2, sx + 6]:
+		_r(lx, seat_y + 1, 3, 2, pants)
+		_r(lx + kick * 0.5, seat_y + 3, 2, 3, pants)
+		_r(lx + kick - 0.0, seat_y + 6, 3, 1, Color("#0c0c10"))
 
 
 func _draw_npc(id: String, x: float, y: float) -> void:

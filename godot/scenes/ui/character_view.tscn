@@ -19,7 +19,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="Idle" type="Control" parent="Motion"]
+[node name="Emote" type="Control" parent="Motion"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -28,7 +28,16 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="Base" type="TextureRect" parent="Motion/Idle"]
+[node name="Idle" type="Control" parent="Motion/Emote"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Prev" type="TextureRect" parent="Motion/Emote/Idle"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -39,7 +48,18 @@ mouse_filter = 2
 expand_mode = 1
 stretch_mode = 0
 
-[node name="Blink" type="TextureRect" parent="Motion/Idle"]
+[node name="Base" type="TextureRect" parent="Motion/Emote/Idle"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
+
+[node name="Blink" type="TextureRect" parent="Motion/Emote/Idle"]
 layout_mode = 1
 anchor_left = 0.37946
 anchor_top = 0.1506

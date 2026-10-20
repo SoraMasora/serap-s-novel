@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/name_screen.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/ui/fancy_panel.gd" id="fp_panel"]
 
 [node name="NameScreen" type="Control"]
 visible = false
@@ -30,6 +31,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Panel" type="PanelContainer" parent="Center"]
+script = ExtResource("fp_panel")
 layout_mode = 2
 
 [node name="Box" type="VBoxContainer" parent="Center/Panel"]

@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[node name="EndingRow" type="CheckButton"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "Концовка"

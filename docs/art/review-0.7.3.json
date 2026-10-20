@@ -1,0 +1,25 @@
+{
+  "disabled": [
+    "c3_calm_wings",
+    "c3_calm_notyou",
+    "c3_calm_photo",
+    "c3_pl_wait",
+    "c3_angel_a",
+    "c3_angel_b"
+  ],
+  "screenshots": {
+    "1": [
+      "c3_calm_wings",
+      "c3_calm_notyou",
+      "c3_calm_photo"
+    ],
+    "2": [
+      "c3_pl_wait"
+    ],
+    "3": [
+      "c3_angel_a",
+      "c3_angel_b"
+    ]
+  },
+  "active_count": 67
+}

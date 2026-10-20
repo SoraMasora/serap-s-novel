@@ -6,7 +6,7 @@
 const fs = require('fs'), path = require('path'), vm = require('vm'), crypto = require('crypto');
 const ROOT = path.resolve(__dirname, '..', '..');
 const ctx = vm.createContext({ window: {}, console });
-for (const s of ['js/story.js', 'js/story3.js']) vm.runInContext(fs.readFileSync(path.join(ROOT, s), 'utf8'), ctx);
+for (const s of ['js/story.js', 'js/story3.js', 'js/story4.js']) vm.runInContext(fs.readFileSync(path.join(ROOT, s), 'utf8'), ctx);
 vm.runInContext('this.__o = { STORY, ENDINGS, pickEnding };', ctx);
 const { STORY, pickEnding } = ctx.__o;
 

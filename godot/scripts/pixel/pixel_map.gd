@@ -10,8 +10,16 @@ const SIGN := preload("res://scenes/pixel/pixel_sign.tscn")
 const CONFIG_PATH := "res://data/pixel_config.tres"
 
 var pc: PixelConfig
+var closeup_rect: TextureRect
 var _base_task := ""
 var _msg := ""
+var _close_frames: Array[Texture2D] = []
+var _close_t := 0.0
+var _close_k := 0
+var _touch: HBoxContainer
+var _touch_act: Button
+var _touch_swing: Array[Button] = []
+var _stick: TouchStick
 
 @onready var view: SubViewportContainer = $View
 @onready var pworld: PixelWorld = $View/Viewport/World
@@ -30,15 +38,94 @@ func _ready() -> void:
 	pworld.entered.connect(_on_entered)
 	pworld.said.connect(func(t: String) -> void: _msg = t)
 	pworld.sfx_requested.connect(func(k: String) -> void: Audio.sfx(k))
+	pworld.sfx_tuned.connect(func(k: String, v: float, p: float) -> void: Audio.sfx(k, v, p))
 	pworld.item_picked.connect(
 		func(n: int, total: int) -> void:
 			task_label.text = "%s · %d/%d" % [_base_task, n, total]
 			item_picked.emit()
 	)
 	pworld.ticked.connect(_on_tick)
+	pworld.closeup.connect(show_closeup)
+	closeup_rect = TextureRect.new()
+	closeup_rect.name = "Closeup"
+	closeup_rect.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	closeup_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	closeup_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	closeup_rect.mouse_filter = Control.MOUSE_FILTER_STOP
+	closeup_rect.visible = false
+	closeup_rect.gui_input.connect(
+		func(e: InputEvent) -> void:
+			if e is InputEventMouseButton and e.pressed:
+				hide_closeup()
+	)
+	add_child(closeup_rect)
+	move_child(closeup_rect, view.get_index() + 1)
 	view.gui_input.connect(_on_view_input)
+	resized.connect(_fit)
+	if _is_touch():
+		_make_touch()
 	for b: Button in $Hud/Buttons.get_children():
 		b.pressed.connect(func() -> void: button_pressed.emit(String(b.name).to_lower()))
+
+
+func _is_touch() -> bool:
+	if OS.get_environment("SERA_TOUCH") == "1":  # для проверки на ПК
+		return true
+	return OS.has_feature("mobile") or DisplayServer.is_touchscreen_available()
+
+
+## Сенсорные кнопки (телефон): действие (E) и качели (W/A) — шлют те же input-actions.
+func _make_touch() -> void:
+	_touch = HBoxContainer.new()
+	_touch.name = "Touch"
+	_touch.add_theme_constant_override("separation", 18)
+	_touch.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	_touch.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	_touch.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	_touch.position = Vector2(-24, -24)
+	add_child(_touch)
+	for d: Array in [["◀ Назад", "map_left"], ["Вперёд ▶", "map_up"]]:
+		var b := _touch_btn(d[0], d[1])
+		_touch_swing.append(b)
+	_touch_act = _touch_btn("Действие", "map_interact")
+	_stick = TouchStick.new()
+	_stick.name = "Stick"
+	add_child(_stick)
+	help.text = "Джойстик — идти (до края — бег) · касание — идти к месту · «Действие» — войти"
+
+
+func _touch_btn(text: String, action: String) -> Button:
+	var b := Button.new()
+	b.text = text
+	b.focus_mode = Control.FOCUS_NONE
+	b.custom_minimum_size = Vector2(190, 96)
+	b.add_theme_font_size_override("font_size", 30)
+	b.button_down.connect(_send.bind(action, true))
+	b.button_up.connect(_send.bind(action, false))
+	_touch.add_child(b)
+	return b
+
+
+func _send(action: String, down: bool) -> void:
+	var ev := InputEventAction.new()
+	ev.action = action
+	ev.pressed = down
+	Input.parse_input_event(ev)
+
+
+func _upd_touch() -> void:
+	if _touch == null:
+		return
+	var sit := pworld.sitting and not is_closeup()
+	for b in _touch_swing:
+		b.visible = sit
+	_touch_act.text = "Встать" if sit else ("Назад" if is_closeup() else "Действие")
+	_touch_act.visible = sit or is_closeup() or pworld.near() != ""
+	var r := _touch.get_combined_minimum_size()
+	_touch.size = r
+	_touch.position = size - r - Vector2(24, 24)
+	_stick.visible = not sit and not is_closeup()
+	_stick.position = Vector2(24.0, size.y - _stick.size.y - 24.0)
 
 
 func open(m: Dictionary) -> void:
@@ -63,12 +150,73 @@ func open(m: Dictionary) -> void:
 		var l: Label = SIGN.instantiate()
 		l.text = s[0]
 		l.set_meta("wx", float(s[1]))
-		l.position.y = float(s[2]) / pc.screen.y * size.y
+		l.set_meta("wy", float(s[2]))
 		signs.add_child(l)
+	_fit()
 	mini.setup(pworld)
 
 
+## Пиксельный кадр 320×180 растягивается «с обрезкой», без чёрных полос на любом экране
+func _fit() -> void:
+	if pc == null:
+		return
+	var scr := Vector2(pc.screen)
+	var k := maxf(size.x / scr.x, size.y / scr.y)
+	view.size = scr
+	view.scale = Vector2(k, k)
+	view.position = ((size - scr * k) / 2.0).floor()
+
+
+## Пиксельный крупный план: кадры closeup_<key>_0..N из godot/art/pixel, мир на паузе
+func show_closeup(key: String, _text: String) -> void:
+	_close_frames.clear()
+	for i in 8:
+		var t := Game.tex("pixel", "closeup_%s_%d" % [key, i])
+		if t == null:
+			break
+		_close_frames.append(t)
+	if _close_frames.is_empty():
+		return
+	_close_k = 0
+	_close_t = 0.0
+	closeup_rect.texture = _close_frames[0]
+	closeup_rect.position = view.position
+	closeup_rect.size = Vector2(pc.screen) * view.scale.x
+	closeup_rect.visible = true
+	closeup_rect.modulate.a = 0.0
+	create_tween().tween_property(closeup_rect, "modulate:a", 1.0, 0.25)
+	pworld.set_process(false)
+	pworld.msg_t = maxf(pworld.msg_t, pc.say_seconds)
+	signs.visible = false
+	mini.visible = false
+	help.visible = false
+
+
+func hide_closeup() -> void:
+	if not closeup_rect.visible:
+		return
+	var tw := create_tween()
+	tw.tween_property(closeup_rect, "modulate:a", 0.0, 0.2)
+	tw.tween_callback(func() -> void: closeup_rect.visible = false)
+	pworld.set_process(true)
+	signs.visible = true
+	mini.visible = true
+	help.visible = true
+
+
+func is_closeup() -> bool:
+	return closeup_rect != null and closeup_rect.visible
+
+
 func close() -> void:
+	if _stick != null:
+		_stick.release()
+	if closeup_rect:
+		closeup_rect.visible = false
+	signs.visible = true
+	mini.visible = true
+	help.visible = true
+	pworld.set_process(true)
 	pworld.stop()
 	visible = false
 
@@ -93,13 +241,24 @@ func _on_tick(s: int) -> void:
 		task_label.add_theme_color_override("font_color", Color("#ff6b6b"))
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if not visible:
 		return
-	var k := size.x / pc.screen.x
+	_upd_touch()
+	if is_closeup():
+		_close_t += delta
+		if _close_t >= 0.22 and _close_frames.size() > 1:
+			_close_t = 0.0
+			_close_k = (_close_k + 1) % _close_frames.size()
+			closeup_rect.texture = _close_frames[_close_k]
+		prompt.text = _msg + "   ·   E — назад"
+		prompt.visible = true
+		return
+	var k := view.scale.x
 	for l: Label in signs.get_children():
 		var x: float = l.get_meta("wx") - pworld.cam_x
-		l.position.x = x * k - l.size.x / 2.0
+		l.position.x = view.position.x + x * k - l.size.x / 2.0
+		l.position.y = view.position.y + float(l.get_meta("wy")) * k
 		l.visible = x > -30 and x < pc.screen.x + 30
 	if pworld.msg_t > 0:
 		prompt.text = _msg
@@ -111,7 +270,9 @@ func _process(_delta: float) -> void:
 				prompt.text = "E · " + str(pworld.cfg.get("itemLabel", "Сорвать листовку"))
 			else:
 				var done: bool = n != "home" and pworld.cfg.done.has(n)
-				prompt.text = "E · %s%s" % [pworld.spots()[n].label, " (уже был)" if done else ""]
+				prompt.text = "E · %s%s" % [pworld.spot_label(n), " (уже был)" if done else ""]
+				if pworld.sitting:
+					prompt.text = "W — вперёд · A — назад · E — встать"
 			prompt.visible = true
 		else:
 			prompt.visible = false
@@ -125,6 +286,11 @@ func _on_view_input(event: InputEvent) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not is_open():
+		return
+	if is_closeup():
+		if event.is_action_pressed("map_interact") or event.is_action_pressed("vn_menu"):
+			get_viewport().set_input_as_handled()
+			hide_closeup()
 		return
 	if event.is_action_pressed("map_interact"):
 		get_viewport().set_input_as_handled()
