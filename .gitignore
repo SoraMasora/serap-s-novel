@@ -1,6 +1,13 @@
-push/
-ex/
-shots/
-game.html
-*.png
+# Godot-generated cache and exports
+.godot/
+build/
+exports/
+# Local tools, OS files and private export configuration
 __pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+.env
+.env.*
+export_credentials.cfg
+# Keep game textures, audio, fonts, import settings and addon dependencies tracked.
