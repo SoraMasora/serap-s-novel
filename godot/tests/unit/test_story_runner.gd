@@ -193,22 +193,22 @@ func test_choice_cg_assets_and_scene_coverage() -> void:
 			missing.append(scene_id)
 		elif not FileAccess.file_exists(manifest.bg[key]):
 			missing.append(key)
-	assert_eq(cg.catalog.size(), 67)
+	assert_eq(cg.catalog.size(), 42)
 	assert_eq(missing, [], "reply frames are available; story presentation unchanged")
 
 
 func test_choice_cg_only_one_reply_after_choice() -> void:
 	var cg := ChoiceCGState.new()
-	assert_eq(cg.response("c1_room_good"), "", "ordinary dialogue has no frame")
+	assert_eq(cg.response("c1_cafe_good"), "", "ordinary dialogue has no frame")
 	cg.arm()
-	assert_eq(cg.response("c1_room_good"), "cg_c1_room_good")
+	assert_eq(cg.response("c1_cafe_good"), "cg_c1_cafe_good")
 	cg.clear()
 	assert_eq(cg.key, "", "advance removes the temporary overlay")
-	assert_eq(cg.response("c1_room_good"), "", "second line uses original scene")
+	assert_eq(cg.response("c1_cafe_good"), "", "second line uses original scene")
 	cg.arm()
 	assert_eq(cg.response("start"), "", "location/router choices do not replace scenes")
-	cg.restore_next = "cg_c1_room_good"
-	assert_eq(cg.response("c1_room_good"), "cg_c1_room_good", "save restores reply frame")
+	cg.restore_next = "cg_c1_cafe_good"
+	assert_eq(cg.response("c1_cafe_good"), "cg_c1_cafe_good", "save restores reply frame")
 
 
 func test_choice_cg_keeps_original_guarded_routes_and_stage() -> void:
@@ -260,7 +260,7 @@ func test_reviewed_choices_have_no_frame() -> void:
 		cg.arm()
 		assert_eq(cg.response(scene_id), "", scene_id)
 	cg.arm()
-	assert_eq(cg.response("c1_guests_push"), "cg_c1_guests_push")
+	assert_eq(cg.response("c1_cafe_bad"), "cg_c1_cafe_bad")
 
 
 func test_cold_knock_has_separate_ending() -> void:
@@ -276,3 +276,27 @@ func test_cold_knock_has_separate_ending() -> void:
 	assert_true(r.flag("m2closed"))
 	assert_eq(final_kind, "closed", "closed door does not jump to father ending")
 	assert_eq(r.pick_ending(), "end_closed")
+
+
+func test_expo_replies_have_no_frame_including_old_saves() -> void:
+	var cg := ChoiceCGState.new()
+	for scene_id: String in ["eve3_expo_a", "eve3_expo_b"]:
+		cg.arm()
+		assert_eq(cg.response(scene_id), "", "expo reply uses original room and sprite")
+		cg.restore_next = "cg_" + scene_id
+		assert_eq(cg.response(scene_id), "", "old saves cannot restore removed art")
+		assert_eq(cg.restore_next, "")
+
+
+func test_screenshot_replies_have_no_frame_including_old_saves() -> void:
+	var cg := ChoiceCGState.new()
+	var targets: Array = JSON.parse_string(
+		FileAccess.get_file_as_string("res://tests/fixtures/reviewed_reply_frames.json")
+	)
+	assert_eq(targets.size(), 26)
+	for target: String in targets:
+		cg.arm()
+		assert_eq(cg.response(target), "", target)
+		cg.restore_next = "cg_" + target
+		assert_eq(cg.response(target), "", "old save: " + target)
+		assert_eq(cg.restore_next, "")

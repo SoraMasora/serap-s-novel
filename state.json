@@ -1,23 +1,48 @@
 {
   "project": "serap-s-novel",
   "route": "B",
-  "phase": "android-0.7.4-touch-optimization",
+  "phase": "pc075a-death-local-retouch",
   "status": "green-with-known-issues",
-  "next_task": "Установить Android APK на физический телефон: FPS/RAM/нагрев/звук, вырез, клавиатура, жест Назад, сворачивание/возврат. Не удалять старую установку без резервной копии при конфликте подписей.",
+  "next_task": "Проверить в игре локальные детали 14 кадров смерти; не перерисовывать композицию.",
   "blocked_by": [
     "нет GPU в среде агента (KI-003)",
     "CI не запускался (KI-007)"
   ],
   "verification": [
     {
-      "cmd": "SERA_TOUCH=1 GUT; check_scripts; gdformat/gdlint; Xvfb mobile_preview at 1280x720/1600x720; APK export/apksigner/zipalign/aapt; verify_preservation --mobile",
-      "result": "mobile and desktop: 81/81, 2020 asserts each; CHECK OK; lint clean; two-finger viewport input moves hero and releases; signed ARMv7+ARM64 APK (API24/target36); 508 identical files + 12 exact mobile hashes; 351 scenes/11 endings; entire 0.7.4 story.json identical",
+      "cmd": "Godot 4.7.2 import + script check + gdformat/gdlint + full GUT after death-art retouch",
+      "result": "86/86 tests; 2279 asserts; CHECK OK; 55 clean files. All existing scripts, scenes and story.json byte-identical to delivered 0.7.5.",
       "status": "PASS"
     },
     {
-      "cmd": "Install APK on a physical Android phone; play, background/resume, check audio, FPS/RAM/heat/battery and notch",
-      "result": "Physical phone unavailable; desktop mobile QA is not device verification; API35 software emulator hung/exited before installation, no Android runtime PASS",
+      "cmd": "Local pixel audit for 14 death frames; lossless WebP roundtrip; individual visual review",
+      "result": "PASS: original pixels outside local masks preserved; all 14 frames inspected; max 0.524% changed pixels per frame",
+      "status": "PASS"
+    },
+    {
+      "cmd": "Godot 4.7.2 import; check_scripts; gdformat/gdlint; GUT; Xvfb/Mesa runtime QA",
+      "result": "86/86; 2279 asserts; CHECK OK; 55 lint-clean files; physical F9/Esc, pause, seven-ending gate, truth toggle, title/gallery refresh; 8 visual commands differ from supplied 0.7.4; same 443 scene keys and 12 endings",
+      "status": "PASS"
+    },
+    {
+      "cmd": "Full visual playthrough of all 157 graded frames and native Windows build",
+      "result": "Not run; supplied project imported and checked on Linux. Color harmonization is not a full redraw.",
       "status": "UNVERIFIED"
+    },
+    {
+      "cmd": "Godot import + check_scripts + gdformat/gdlint + GUT",
+      "result": "74/74; 2207 asserts; CHECK OK; 52 files lint clean; cg_c1_guests_push disabled incl. old saves; all previous exclusions preserved; story and web catalog unchanged",
+      "status": "PASS"
+    },
+    {
+      "cmd": "Godot import + check_scripts + gdformat --check scripts tests + gdlint scripts tests + GUT",
+      "result": "74/74; 2199 asserts; CHECK OK; 52 files lint clean; 25 screenshot choices and old saves verified; 22 new CG exclusions, 3 already disabled; previous expo fix preserved; story byte-identical",
+      "status": "PASS"
+    },
+    {
+      "cmd": "Godot import + check_scripts + gdformat/gdlint + GUT",
+      "result": "72/72; 1997 asserts; CHECK OK; lint clean; both expo choice handlers and old-save restoration verified; story byte-identical to prior archive",
+      "status": "PASS"
     },
     {
       "cmd": "GUT + check_scripts + gdformat/gdlint + verify_preservation + Xvfb playthrough of 7 deaths (play_loop dev script)",

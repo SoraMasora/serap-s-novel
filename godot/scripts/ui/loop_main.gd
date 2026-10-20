@@ -10,6 +10,7 @@ signal truth_exit_requested
 ## Outdoor loop CGs (snow + wind on top).
 @export var loop_outdoor_bgs := PackedStringArray(
 	[
+		"street_snow",
 		"d_road",
 		"d_train",
 		"d_cliff",

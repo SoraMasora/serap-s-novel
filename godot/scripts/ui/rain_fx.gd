@@ -22,11 +22,6 @@ var raining := false:
 var _drops: Array = []
 
 
-func _ready() -> void:
-	if MobileProfile.enabled():
-		drop_count = mini(drop_count, MobileProfile.RAIN_DROPS)
-
-
 func _new_drop(any: bool) -> Dictionary:
 	var z := randf()
 	return {
@@ -39,7 +34,7 @@ func _new_drop(any: bool) -> Dictionary:
 
 
 func _process(delta: float) -> void:
-	if not raining or not is_visible_in_tree():
+	if not raining:
 		return
 	var k := delta * speed_per_sec
 	var hw := size.y / maxf(1.0, size.x)

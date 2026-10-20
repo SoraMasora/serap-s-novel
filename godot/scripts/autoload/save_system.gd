@@ -95,3 +95,13 @@ func unlock_ending(kind: String) -> void:
 	var got := endings()
 	got[kind] = true
 	write_atomic(ENDINGS_PATH, JSON.stringify(got))
+
+
+## Admin changes use the same gallery file as normal completion.
+func set_ending(kind: String, on: bool) -> Error:
+	var got := endings()
+	if on:
+		got[kind] = true
+	else:
+		got.erase(kind)
+	return write_atomic(ENDINGS_PATH, JSON.stringify(got))

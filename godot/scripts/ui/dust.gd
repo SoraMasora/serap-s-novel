@@ -8,8 +8,6 @@ var _t := 0.0
 
 
 func _ready() -> void:
-	if MobileProfile.enabled():
-		count = mini(count, MobileProfile.PARTICLES)
 	for i in count:
 		(
 			_motes

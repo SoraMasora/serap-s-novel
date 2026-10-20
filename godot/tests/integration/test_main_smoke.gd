@@ -139,7 +139,7 @@ func test_reply_frame_advances_to_original_and_restores_from_save() -> void:
 	main.runner.new_game("Кир")
 	main.runner.st.bg = "room"
 	main.runner.st.chars = {"sera": {"expr": "cold", "pos": "center"}}
-	main._options = [{"t": "Ответ", "go": "c1_room_good"}]
+	main._options = [{"t": "Ответ", "go": "c1_cafe_good"}]
 	main.in_choice = true
 	main.skip = true
 	main.playing = true
@@ -158,3 +158,64 @@ func test_reply_frame_advances_to_original_and_restores_from_save() -> void:
 	)
 	main.run()
 	assert_false(main.choice_cg_frame.visible, "overlay remains one line after load")
+
+
+func test_expo_choices_keep_original_stage_and_hide_removed_frames() -> void:
+	for target: String in ["eve3_expo_a", "eve3_expo_b"]:
+		main.runner.new_game("Кир")
+		main.runner.st.bg = "room"
+		main.runner.st.chars = {"sera": {"expr": "sad", "pos": "center"}}
+		main._options = [{"t": "Ответ", "go": target}]
+		main.in_choice = true
+		main.skip = true
+		main.playing = true
+		main._on_choice(0)
+		assert_eq(main.runner.st.scene, target)
+		assert_false(main.choice_cg_frame.visible, "removed expo art is not displayed")
+		assert_eq(main.runner.st.bg, "room")
+		assert_true(main.runner.st.chars.has("sera"))
+		var saved: Dictionary = main.runner.save_snapshot()
+		saved["presentation_cg"] = "cg_" + target
+		main._restore(saved)
+		assert_false(main.choice_cg_frame.visible, "old save keeps original stage too")
+
+
+func test_screenshot_choices_preserve_story_and_restore_without_frames() -> void:
+	var targets: Array = JSON.parse_string(
+		FileAccess.get_file_as_string("res://tests/fixtures/reviewed_reply_frames.json")
+	)
+	var checked: Array = []
+	for target: String in targets:
+		var option: Dictionary = {}
+		for scene_id: String in Game.db.scenes:
+			for command: Dictionary in Game.db.scene(scene_id):
+				for candidate: Dictionary in command.get("choice", []):
+					if candidate.get("go", "") == target:
+						option = candidate.duplicate(true)
+		assert_false(option.is_empty(), "real choice exists: " + target)
+		if option.is_empty():
+			continue
+		main.runner.new_game("Кир")
+		main.runner.st.bg = "room"
+		main.runner.st.chars = {"sera": {"expr": "neutral", "pos": "center"}}
+		var baseline := StoryRunner.new(Game.db, Game.config)
+		baseline.st = main.runner.st.duplicate(true)
+		baseline.choose([option], 0)
+		baseline.step()
+		main._options = [option]
+		main.in_choice = true
+		main.skip = true
+		main.playing = true
+		main._on_choice(0)
+		assert_false(main.choice_cg_frame.visible, target)
+		assert_eq(main.runner.st, baseline.st, "text, flags and stage unchanged: " + target)
+		var saved: Dictionary = main.runner.save_snapshot()
+		saved["presentation_cg"] = "cg_" + target
+		main._restore(saved)
+		assert_false(main.choice_cg_frame.visible, "old save: " + target)
+		# Compare against the same save normalization (feel is restored as float).
+		baseline.restore(baseline.save_snapshot())
+		baseline.step()
+		assert_eq(main.runner.st, baseline.st, "restore preserves story: " + target)
+		checked.append(target)
+	assert_eq(checked.size(), 26)

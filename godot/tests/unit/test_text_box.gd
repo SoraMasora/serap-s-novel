@@ -14,12 +14,7 @@ func before_each() -> void:
 func test_full_width_subtitles() -> void:
 	assert_eq(tb.anchor_left, 0.0)
 	assert_eq(tb.anchor_right, 1.0)
-	assert_almost_eq(
-		tb.anchor_top,
-		0.60 if MobileProfile.enabled() else 0.70,
-		0.001,
-		"панель — нижние 40% на телефоне, 30% на ПК"
-	)
+	assert_almost_eq(tb.anchor_top, 0.70, 0.001, "панель — нижние 30% экрана")
 	assert_almost_eq(tb.get_node("Body").offset_left, tb._body_left, 0.01)
 	assert_true(tb.panel is Deco)
 

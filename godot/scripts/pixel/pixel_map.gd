@@ -7,8 +7,6 @@ signal item_picked
 signal button_pressed(action: String)
 
 const SIGN := preload("res://scenes/pixel/pixel_sign.tscn")
-const TOUCH_ACTION := preload("res://scenes/mobile/touch_action.tscn")
-const TOUCH_STICK := preload("res://scenes/mobile/touch_stick.tscn")
 const CONFIG_PATH := "res://data/pixel_config.tres"
 
 var pc: PixelConfig
@@ -19,9 +17,7 @@ var _close_frames: Array[Texture2D] = []
 var _close_t := 0.0
 var _close_k := 0
 var _touch: HBoxContainer
-var _touch_act: TouchAction
-var _touch_run: TouchAction
-var _touch_blocked := false
+var _touch_act: Button
 var _touch_swing: Array[Button] = []
 var _stick: TouchStick
 
@@ -75,7 +71,7 @@ func _ready() -> void:
 func _is_touch() -> bool:
 	if OS.get_environment("SERA_TOUCH") == "1":  # для проверки на ПК
 		return true
-	return MobileProfile.enabled() or DisplayServer.is_touchscreen_available()
+	return OS.has_feature("mobile") or DisplayServer.is_touchscreen_available()
 
 
 ## Сенсорные кнопки (телефон): действие (E) и качели (W/A) — шлют те же input-actions.
@@ -91,73 +87,48 @@ func _make_touch() -> void:
 	for d: Array in [["◀ Назад", "map_left"], ["Вперёд ▶", "map_up"]]:
 		var b := _touch_btn(d[0], d[1])
 		_touch_swing.append(b)
-	_touch_run = _touch_btn("Бег", "mobile_run")
 	_touch_act = _touch_btn("Действие", "map_interact")
-	_stick = TOUCH_STICK.instantiate()
+	_stick = TouchStick.new()
 	_stick.name = "Stick"
 	add_child(_stick)
-	help.text = "Джойстик — идти · край / «Бег» — бежать · касание карты — идти к месту"
+	help.text = "Джойстик — идти (до края — бег) · касание — идти к месту · «Действие» — войти"
 
 
-func _touch_btn(text: String, action: String) -> TouchAction:
-	var button: TouchAction = TOUCH_ACTION.instantiate()
-	button.text = text
-	button.action = action
-	button.activated.connect(_on_touch_action)
-	_touch.add_child(button)
-	return button
+func _touch_btn(text: String, action: String) -> Button:
+	var b := Button.new()
+	b.text = text
+	b.focus_mode = Control.FOCUS_NONE
+	b.custom_minimum_size = Vector2(190, 96)
+	b.add_theme_font_size_override("font_size", 30)
+	b.button_down.connect(_send.bind(action, true))
+	b.button_up.connect(_send.bind(action, false))
+	_touch.add_child(b)
+	return b
 
 
-func _on_touch_action(action: String) -> void:
-	if action != "map_interact" or not is_open() or _touch_blocked:
-		return
-	if is_closeup():
-		hide_closeup()
-	else:
-		pworld.act(pworld.near())
-
-
-## Menu/notes/save overlay must never leave a held direction or action behind.
-func set_touch_blocked(blocked: bool) -> void:
-	if _touch_blocked == blocked:
-		return
-	_touch_blocked = blocked
-	if is_instance_valid(pworld):
-		pworld.set_process(not blocked and not is_closeup())
-	if _touch == null:
-		return
-	_touch.visible = not blocked
-	if blocked:
-		_stick.release()
-	_stick.visible = not blocked
-	if blocked:
-		for button: TouchAction in _touch.get_children():
-			button.release()
+func _send(action: String, down: bool) -> void:
+	var ev := InputEventAction.new()
+	ev.action = action
+	ev.pressed = down
+	Input.parse_input_event(ev)
 
 
 func _upd_touch() -> void:
-	if _touch == null or _touch_blocked:
+	if _touch == null:
 		return
 	var sit := pworld.sitting and not is_closeup()
 	for b in _touch_swing:
 		b.visible = sit
-	_touch_run.visible = not sit and not is_closeup()
 	_touch_act.text = "Встать" if sit else ("Назад" if is_closeup() else "Действие")
 	_touch_act.visible = sit or is_closeup() or pworld.near() != ""
 	var r := _touch.get_combined_minimum_size()
 	_touch.size = r
 	_touch.position = size - r - Vector2(24, 24)
 	_stick.visible = not sit and not is_closeup()
-	_stick.position = Vector2(24.0, size.y - _stick.size.y - 32.0)
-	help.visible = false
-	prompt.offset_left = -300.0
-	prompt.offset_right = 300.0
-	prompt.offset_top = -160.0
-	prompt.offset_bottom = -100.0
+	_stick.position = Vector2(24.0, size.y - _stick.size.y - 24.0)
 
 
 func open(m: Dictionary) -> void:
-	set_touch_blocked(false)
 	visible = true
 	_base_task = m.get("task", "")
 	_msg = ""
@@ -238,7 +209,6 @@ func is_closeup() -> bool:
 
 
 func close() -> void:
-	set_touch_blocked(true)
 	if _stick != null:
 		_stick.release()
 	if closeup_rect:
@@ -261,7 +231,6 @@ func current_pos() -> Dictionary:
 
 func _on_entered(id: String) -> void:
 	var pos := current_pos()
-	set_touch_blocked(true)
 	visible = false
 	entered.emit(id, pos)
 
@@ -307,11 +276,6 @@ func _process(delta: float) -> void:
 			prompt.visible = true
 		else:
 			prompt.visible = false
-	if _is_touch():
-		prompt.text = prompt.text.replace("E · ", "Действие · ")
-		prompt.text = prompt.text.replace(
-			"W — вперёд · A — назад · E — встать", "Кнопки «Назад» / «Вперёд» · «Встать»"
-		)
 	mini.queue_redraw()
 
 
@@ -321,7 +285,7 @@ func _on_view_input(event: InputEvent) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not is_open() or _touch_blocked:
+	if not is_open():
 		return
 	if is_closeup():
 		if event.is_action_pressed("map_interact") or event.is_action_pressed("vn_menu"):

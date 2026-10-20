@@ -6,7 +6,6 @@ const R := 95.0
 const KNOB := 40.0
 const DEAD := 0.18
 
-var _finger := -1
 var _down := false
 var _vec := Vector2.ZERO
 
@@ -21,31 +20,7 @@ func _center() -> Vector2:
 	return size / 2.0
 
 
-func _input(event: InputEvent) -> void:
-	if not is_visible_in_tree():
-		return
-	if event is InputEventScreenTouch:
-		if event.pressed and _finger == -1:
-			var local: Vector2 = (
-				get_global_transform_with_canvas().affine_inverse() * event.position
-			)
-			if not Rect2(Vector2.ZERO, size).has_point(local):
-				return
-			_finger = event.index
-			_down = true
-			_move(local)
-			get_viewport().set_input_as_handled()
-		elif not event.pressed and event.index == _finger:
-			release()
-			get_viewport().set_input_as_handled()
-	elif event is InputEventScreenDrag and event.index == _finger:
-		_move(get_global_transform_with_canvas().affine_inverse() * event.position)
-		get_viewport().set_input_as_handled()
-
-
 func _gui_input(event: InputEvent) -> void:
-	if _finger != -1:
-		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		_down = event.pressed
 		_move(event.position if _down else _center())
@@ -64,7 +39,6 @@ func _move(p: Vector2) -> void:
 
 
 func release() -> void:
-	_finger = -1
 	_down = false
 	_vec = Vector2.ZERO
 	_apply()
@@ -89,10 +63,6 @@ func _axis(action: String, s: float) -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_VISIBILITY_CHANGED and not is_visible_in_tree():
-		release()
-	elif what in [NOTIFICATION_APPLICATION_FOCUS_OUT, NOTIFICATION_APPLICATION_PAUSED]:
-		release()
-	elif what == NOTIFICATION_EXIT_TREE:
 		release()
 
 

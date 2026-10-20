@@ -112,3 +112,6 @@ var outdoor_bgs := PackedStringArray(["street", "roof", "court", "platform", "ya
 @export var breath_inhale_ms := 3000.0
 @export var breath_exhale_ms := 3400.0
 @export var breath_ok_ratio := 0.6
+
+@export_group("Отладка")
+@export var admin_panel_enabled := true

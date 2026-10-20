@@ -41,9 +41,6 @@ var _rb_index := -1
 
 func _ready() -> void:
 	visible = false
-	if MobileProfile.enabled():
-		s_full.visible = false
-		panels.custom_minimum_size.y = 580.0
 	for p: Node in panels.get_children():
 		var c := p.get_node_or_null("Close") as Button
 		if c:

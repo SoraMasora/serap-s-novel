@@ -100,6 +100,13 @@ func _ready() -> void:
 
 
 func _connect_signals() -> void:
+	Game.progress_changed.connect(
+		func() -> void:
+			if title.visible:
+				title.refresh(SaveSystem.has_slot("auto"))
+			if modal.visible and modal.endings_panel.visible:
+				modal.open_endings(SaveSystem.endings(), Game.db.endings)
+	)
 	textbox.clicked.connect(_on_textbox_click)
 	textbox.typing_done.connect(_on_typing_done)
 	textbox.control_pressed.connect(_on_control)
@@ -500,7 +507,6 @@ func set_bg(k: String, instant: bool) -> void:
 
 
 func _process(delta: float) -> void:
-	pixel_map.set_touch_blocked(modal.is_open())
 	if _bg_anim.is_empty():
 		return
 	_bg_anim.t += delta

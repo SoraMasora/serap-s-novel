@@ -1,6 +1,7 @@
 extends Node
 ## Глобальные данные: конфиг, сценарий, ассеты, настройки игрока, открытые концовки.
 
+signal progress_changed
 signal settings_changed
 
 const CONFIG_PATH := "res://data/game_config.tres"
@@ -66,13 +67,7 @@ func tex(group: String, key: String) -> Texture2D:
 		return null
 	if not _tex_cache.has(path):
 		_tex_cache[path] = load(path)
-	var texture: Texture2D = _tex_cache[path]
-	if MobileProfile.enabled():
-		_tex_cache.erase(path)
-		_tex_cache[path] = texture
-		while _tex_cache.size() > MobileProfile.TEXTURE_CACHE_LIMIT:
-			_tex_cache.erase(_tex_cache.keys()[0])
-	return texture
+	return _tex_cache[path]
 
 
 func has_tex(group: String, key: String) -> bool:
@@ -89,7 +84,7 @@ func _art_path(group: String, key: String) -> String:
 
 ## Полный экран без чёрных полос (stretch aspect = expand) или окно
 func apply_window() -> void:
-	if DisplayServer.get_name() == "headless" or OS.has_feature("android"):
+	if DisplayServer.get_name() == "headless":
 		return
 	var fs := float(settings.get("fullscreen", 1.0)) > 0.5
 	var mode := DisplayServer.WINDOW_MODE_FULLSCREEN if fs else DisplayServer.WINDOW_MODE_WINDOWED
@@ -143,9 +138,6 @@ func _notification(what: int) -> void:
 		ev.action = "vn_menu"
 		ev.pressed = true
 		Input.parse_input_event(ev)
-		ev = ev.duplicate()
-		ev.pressed = false
-		Input.parse_input_event.call_deferred(ev)
 		return
 	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_PREDELETE:
 		save_seen()
@@ -218,3 +210,35 @@ func forget_memory() -> void:
 	}
 	save_memory()
 	SaveSystem.delete_slot("auto")
+
+
+## Only persistent progress is edited; the current scene and save slots are untouched.
+func admin_set_ending(kind: String, on: bool) -> Error:
+	if not db.endings.has(kind):
+		return ERR_INVALID_PARAMETER
+	var err := SaveSystem.set_ending(kind, on)
+	if err != OK:
+		return err
+	if kind == "truth":
+		memory.data.freed = on
+	memory.data.unlocked = (
+		memory.base_ending_count(SaveSystem.endings()) >= int(memory.rules.REQUIRED_ENDINGS)
+	)
+	memory.data.pending = null
+	ensure_loop_entry()
+	err = save_memory()
+	progress_changed.emit()
+	return err
+
+
+func admin_set_deaths(total: int) -> Error:
+	var ordered: Array = []
+	for id: String in memory.data.deaths + memory.rules.ORDER:
+		if memory.rules.ORDER.has(id) and not ordered.has(id):
+			ordered.append(id)
+	memory.data.deaths = ordered.slice(0, clampi(total, 0, memory.rules.ORDER.size()))
+	memory.data.pending = null
+	ensure_loop_entry()
+	var err := save_memory()
+	progress_changed.emit()
+	return err

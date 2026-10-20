@@ -25,7 +25,9 @@ func reset() -> void:
 
 
 func response(scene_id: String) -> String:
-	key = restore_next if restore_next != "" else str(catalog.get(scene_id, "")) if pending else ""
+	# Removed reply art must not reappear when loading an older save.
+	var restored := restore_next if restore_next in catalog.values() else ""
+	key = restored if restored != "" else str(catalog.get(scene_id, "")) if pending else ""
 	pending = false
 	restore_next = ""
 	return key
