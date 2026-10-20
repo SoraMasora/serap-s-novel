@@ -22,7 +22,7 @@ jobs:
       - name: Restore resources and organize the standalone project
         run: |
           test "$GITHUB_REF_NAME" = "cleanup/godot-only"
-          test "$(git rev-parse HEAD^)" = "5f585b86815805ff84e1f1b3f2c404cb351162fb"
+          git merge-base --is-ancestor 5f585b86815805ff84e1f1b3f2c404cb351162fb HEAD
           python3 .github/scripts/organize_godot.py
       - name: Commit the verified layout to the cleanup branch only
         run: |
@@ -31,4 +31,7 @@ jobs:
           git add -A
           git diff --cached --stat | tail -1
           git commit -m "refactor(godot): keep standalone game and preserve all resource sources" -m "Restore all runtime resources as normal files; preserve original asset libraries and art sources with SHA256 checks. Remove obsolete browser application, old build scripts and duplicate backups. No history rewrite."
-          git push origin HEAD:refs/heads/cleanup/godot-only
+          if ! git push origin HEAD:refs/heads/cleanup/godot-only > /tmp/cleanup-push.log 2>&1; then
+            while IFS= read -r line; do echo "::error::$line"; done < /tmp/cleanup-push.log
+            exit 1
+          fi
