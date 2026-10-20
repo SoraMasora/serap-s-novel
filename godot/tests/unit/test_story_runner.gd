@@ -14,8 +14,8 @@ func before_each() -> void:
 
 func test_story_loaded() -> void:
 	assert_eq(db.load_error, "")
-	assert_eq(db.scenes.size(), 322, "число сцен как в веб-версии")
-	assert_eq(db.notes_total, 48)
+	assert_eq(db.scenes.size(), 443, "число сцен как в веб-версии")
+	assert_eq(db.notes_total, 61)
 
 
 func test_all_targets_exist() -> void:
@@ -36,7 +36,7 @@ func test_all_conditions_parse_and_run() -> void:
 				e.execute([50.0, 0.0], r, true)
 				assert_false(e.has_execute_failed(), c.when)
 				n += 1
-	assert_eq(n, 50)
+	assert_eq(n, 88)
 
 
 func test_tier_thresholds() -> void:
@@ -96,11 +96,12 @@ func test_name_substitution() -> void:
 func test_choice_applies_effects_and_react() -> void:
 	var opts := [{"t": "a", "feel": 10, "set": {"x": true}, "go": "c1_store"}]
 	r.mark_choice_shown()
-	assert_eq(r.choose(opts, 0), "shy")
+	assert_eq(r.choose(opts, 0), "clap")
 	assert_eq(r.st.feel, 60.0)
 	assert_true(r.flag("x"))
 	assert_eq(r.st.scene, "c1_store")
-	assert_eq(r.choose([{"t": "b", "feel": -12, "go": "start"}], 0), "shake")
+	assert_eq(r.choose([{"t": "b", "feel": -12, "go": "start"}], 0), "angry")
+	assert_eq(r.choose([{"t": "c", "feel": 1, "go": "start"}], 0), "")
 
 
 func test_map_visits_counter() -> void:
@@ -131,3 +132,171 @@ func test_breath_result() -> void:
 	r.breath_result(b, 0.2)
 	assert_false(r.flag("plBreath"))
 	assert_eq(r.st.scene, "c1_store")
+
+
+## v20: главы → месяцы; во 2 месяце нет «ни разу не уронил», Сера в магазине злится, а не плачет.
+func test_months_and_m2_dialogue() -> void:
+	var bad: Array = []
+	for key: String in db.scenes:
+		for c: Dictionary in db.scenes[key]:
+			if c.has("chapter"):
+				var ch := str(c.chapter)
+				if not (ch.begins_with("Месяц ") or ch.begins_with("Концовка")):
+					bad.append(ch)
+	assert_eq(bad, [], "все главы названы «Месяц N · …» или «Концовка · …»")
+	for key: String in ["m2_roof_a", "m2_roof_b", "m2_roof_c"]:
+		assert_false(str(db.scenes[key]).contains("не уронил"), key)
+	assert_false(str(db.scenes["m2_door"]).contains("shout"), "без плачущего крика")
+	assert_false(str(db.scenes["m2_door_quiet"]).contains("мышь"), "клички появляются позже")
+
+
+## 0.6: «Не курю» в Месяце 1 → в Месяце 2 на крыше чай, а не сигареты
+func test_m2_nosmoke_roof_is_tea() -> void:
+	r.st.flags = {"c3nosmoke": true}
+	r.jump("m2_roof")
+	r.step()
+	assert_eq(r.st.bg, "m2_rt")
+	r.st.flags = {}
+	r.jump("m2_roof")
+	r.step()
+	assert_eq(r.st.bg, "bal_s0", "сначала прикуривание")
+	r.step()
+	assert_eq(r.st.bg, "m2_rx")
+
+
+## 0.6: купленный вишнёвый чай можно отдать Сере ночью — отдельный CG m2_tea
+func test_m2_cherry_tea_can_be_given() -> void:
+	r.st.flags = {"m2cherry": true}
+	r.jump("m2_tea_q")
+	var ev := r.step()
+	ev = r.step()
+	assert_eq(ev[-1].type, "choice")
+	r.mark_choice_shown()
+	var f: float = r.st.feel
+	r.choose(ev[-1].options, 0)
+	assert_true(r.flag("m2tea"))
+	assert_eq(r.st.feel, f + 4.0)
+	assert_eq(r.st.scene, "m2_tea")
+	r.step()
+	assert_eq(r.st.bg, "m2_tea")
+
+
+func test_choice_cg_assets_and_scene_coverage() -> void:
+	var cg := ChoiceCGState.new()
+	var manifest: Dictionary = JSON.parse_string(
+		FileAccess.get_file_as_string("res://data/assets_manifest.json")
+	)
+	var missing: Array = []
+	for scene_id: String in cg.catalog:
+		var key: String = cg.catalog[scene_id]
+		if not db.has_scene(scene_id) or not manifest.bg.has(key):
+			missing.append(scene_id)
+		elif not FileAccess.file_exists(manifest.bg[key]):
+			missing.append(key)
+	assert_eq(cg.catalog.size(), 42)
+	assert_eq(missing, [], "reply frames are available; story presentation unchanged")
+
+
+func test_choice_cg_only_one_reply_after_choice() -> void:
+	var cg := ChoiceCGState.new()
+	assert_eq(cg.response("c1_cafe_good"), "", "ordinary dialogue has no frame")
+	cg.arm()
+	assert_eq(cg.response("c1_cafe_good"), "cg_c1_cafe_good")
+	cg.clear()
+	assert_eq(cg.key, "", "advance removes the temporary overlay")
+	assert_eq(cg.response("c1_cafe_good"), "", "second line uses original scene")
+	cg.arm()
+	assert_eq(cg.response("start"), "", "location/router choices do not replace scenes")
+	cg.restore_next = "cg_c1_cafe_good"
+	assert_eq(cg.response("c1_cafe_good"), "cg_c1_cafe_good", "save restores reply frame")
+
+
+func test_choice_cg_keeps_original_guarded_routes_and_stage() -> void:
+	var cg := ChoiceCGState.new()
+	r.st.scene = "c1_hand"
+	r.st.feel = 90.0
+	r.st.bg = "roof"
+	r.st.chars = {"sera": {"expr": "soft", "pos": "center"}}
+	cg.arm()
+	r.step()
+	assert_eq(cg.response(r.st.scene), "cg_c1_hand_ok")
+	assert_eq(r.st.bg, "roof", "CG does not overwrite original background")
+	assert_true(r.st.chars.has("sera"), "CG does not remove the original sprite")
+	r.new_game("Кир")
+	r.st.scene = "m2_roof_b"
+	r.st.flags.c3nosmoke = true
+	cg.arm()
+	r.step()
+	assert_eq(cg.response(r.st.scene), "cg_m2_roof_b_ns", "no-smoking route unchanged")
+
+
+func test_reviewed_choices_have_no_frame() -> void:
+	var cg := ChoiceCGState.new()
+	var removed := [
+		"c1_gift_hang",
+		"c1_gift_joke",
+		"c1_gift_keep",
+		"c1_shift_joke",
+		"c1_shift_honest",
+		"c1_guests_ignore",
+		"c1_roof_under",
+		"c1_roof_aggr",
+		"c3_ms_def",
+		"c3_ms_stand",
+		"c3_ms_doubt",
+		"c3_q_soft",
+		"c3_q_silent",
+		"c3_panic_leave",
+		"ch3_force",
+		"m2_cold_knock",
+		"c3_calm_wings",
+		"c3_calm_notyou",
+		"c3_calm_photo",
+		"c3_pl_wait",
+		"c3_angel_a",
+		"c3_angel_b"
+	]
+	for scene_id: String in removed:
+		cg.arm()
+		assert_eq(cg.response(scene_id), "", scene_id)
+	cg.arm()
+	assert_eq(cg.response("c1_cafe_bad"), "cg_c1_cafe_bad")
+
+
+func test_cold_knock_has_separate_ending() -> void:
+	r.st.scene = "m2_cold_knock"
+	r.st.i = 0
+	r.st.feel = 10.0
+	var final_kind := ""
+	for i in range(40):
+		var events := r.step()
+		if events[-1].type == "final":
+			final_kind = events[-1].kind
+			break
+	assert_true(r.flag("m2closed"))
+	assert_eq(final_kind, "closed", "closed door does not jump to father ending")
+	assert_eq(r.pick_ending(), "end_closed")
+
+
+func test_expo_replies_have_no_frame_including_old_saves() -> void:
+	var cg := ChoiceCGState.new()
+	for scene_id: String in ["eve3_expo_a", "eve3_expo_b"]:
+		cg.arm()
+		assert_eq(cg.response(scene_id), "", "expo reply uses original room and sprite")
+		cg.restore_next = "cg_" + scene_id
+		assert_eq(cg.response(scene_id), "", "old saves cannot restore removed art")
+		assert_eq(cg.restore_next, "")
+
+
+func test_screenshot_replies_have_no_frame_including_old_saves() -> void:
+	var cg := ChoiceCGState.new()
+	var targets: Array = JSON.parse_string(
+		FileAccess.get_file_as_string("res://tests/fixtures/reviewed_reply_frames.json")
+	)
+	assert_eq(targets.size(), 26)
+	for target: String in targets:
+		cg.arm()
+		assert_eq(cg.response(target), "", target)
+		cg.restore_next = "cg_" + target
+		assert_eq(cg.response(target), "", "old save: " + target)
+		assert_eq(cg.restore_next, "")

@@ -86,9 +86,6 @@ const Sound = (() => {
     platform:'roofs', underpass:'roofs', cg_platform:'roofs', cg_train1:'roofs', cg_train2:'roofs', cg_reconcile:'roofs', cg_angel:'roofs',
     clinic:'sudno', cg_clinic:'sudno', cg_leaflet1:'sudno', cg_leaflet2:'sudno', cg_quarrel:'sudno', cg_panic:'sudno',
     cg_store_help:'elektro', cg_roof_quiet:'roofs', cg_guests:'sudno', cg_tea:'sudno', cg_sing:'roofs', cg_take:'roofs', cg_dumplings:'sudno', cg_canvas:'sudno' };
-  // v18: CG петли «Это не конец»
-  ['d_room', 'd_store', 'd_cross', 'd_neck', 'x_scream', 'c_sketch', 'c_icon', 'h_snow', 't_landing'].forEach(k => LOC[k] = 'sudno');
-  ['d_road', 'd_train', 'd_cliff', 't_roof', 't_sky', 't_sky2', 't_hand', 't_angel'].forEach(k => LOC[k] = 'roofs');
   let loc = 'title', curTrack = null; const T = {};
   function trackEl(k) {
     if (T[k]) return T[k];
@@ -112,50 +109,9 @@ const Sound = (() => {
   }
   function update() {
     if (!ctx) return;
-    droneOn(mode === 'drone'); // v18: меню после смерти — гул вместо музыки
     if (mode === 'tense') { playTrack(null); if (!timer) { step = 0; tick(); } return; }
     clearTimeout(timer); timer = null;
-    playTrack(mode && mode !== 'drone' ? (LOC[loc] || 'sudno') : null);
-  }
-  // v18: «гул» — расстроенные пилы на 37 Гц под дышащим фильтром, тонкий звон сверху, шорох; живёт на шине музыки
-  let drone = null;
-  function droneOn(on) {
-    if (on && !drone) {
-      const out = ctx.createGain(); out.gain.value = 0.0001; out.connect(musicGain);
-      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 260; lp.Q.value = 2.2; lp.connect(out);
-      const lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = 0.07; lg.gain.value = 120; lfo.connect(lg); lg.connect(lp.frequency);
-      const all = [lfo];
-      [[36.7, 'sawtooth', 0.15], [36.95, 'sawtooth', 0.15], [55.1, 'triangle', 0.12], [73.2, 'triangle', 0.07]].forEach(([fr, ty, v]) => {
-        const o = ctx.createOscillator(), g = ctx.createGain(); o.type = ty; o.frequency.value = fr; g.gain.value = v; o.connect(g); g.connect(lp); all.push(o); });
-      const hi = ctx.createOscillator(), hg = ctx.createGain(), tr = ctx.createOscillator(), tg = ctx.createGain();
-      hi.frequency.value = 1567; hg.gain.value = 0.004; tr.frequency.value = 5.3; tg.gain.value = 0.0035; tr.connect(tg); tg.connect(hg.gain); hi.connect(hg); hg.connect(out); all.push(hi, tr);
-      const ns = ctx.createBufferSource(); ns.buffer = noiseBuf(4); ns.loop = true; const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 700; bp.Q.value = 0.6;
-      const ng = ctx.createGain(); ng.gain.value = 0.035; ns.connect(bp); bp.connect(ng); ng.connect(out); all.push(ns);
-      all.forEach(n => n.start()); out.gain.linearRampToValueAtTime(0.55, ctx.currentTime + 2.5); drone = { out, all };
-    } else if (!on && drone) {
-      const d = drone, n = ctx.currentTime; drone = null; d.out.gain.cancelScheduledValues(n); d.out.gain.setValueAtTime(d.out.gain.value, n); d.out.gain.linearRampToValueAtTime(0.0001, n + 1.4);
-      setTimeout(() => d.all.forEach(x => { try { x.stop(); } catch (e) {} }), 1600);
-    }
-  }
-  // v18: ветер со снегом — шум под «качающимся» фильтром
-  let windSrc = null, windG = null, windLfo = null;
-  function wind(on) {
-    if (!on && !ctx) return; init();
-    if (on && !windSrc) {
-      windSrc = ctx.createBufferSource(); windSrc.buffer = noiseBuf(5); windSrc.loop = true;
-      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 520; lp.Q.value = 4;
-      windLfo = ctx.createOscillator(); const lg = ctx.createGain(); windLfo.frequency.value = 0.13; lg.gain.value = 260; windLfo.connect(lg); lg.connect(lp.frequency);
-      windG = ctx.createGain(); windG.gain.value = 0.0001; windSrc.connect(lp); lp.connect(windG); windG.connect(master); windSrc.start(); windLfo.start();
-      windG.gain.linearRampToValueAtTime(0.14 * vol.rain * 2, ctx.currentTime + 2.5);
-    } else if (!on && windSrc) {
-      const s = windSrc, l = windLfo, g = windG.gain, n = ctx.currentTime; windSrc = windLfo = null;
-      g.cancelScheduledValues(n); g.setValueAtTime(g.value, n); g.linearRampToValueAtTime(0.0001, n + 1.5); setTimeout(() => { s.stop(); l.stop(); }, 1600);
-    }
-  }
-  // v18: тишина перед скримером — общий звук гаснет на sec секунд (сам скример идёт мимо этой шины)
-  function hush(sec) {
-    if (!ctx) return; const g = master.gain, n = ctx.currentTime;
-    g.cancelScheduledValues(n); g.setValueAtTime(g.value, n); g.linearRampToValueAtTime(0.0001, n + 0.08); g.setValueAtTime(0.0001, n + sec); g.linearRampToValueAtTime(0.8, n + sec + 1.2);
+    playTrack(mode ? (LOC[loc] || 'sudno') : null);
   }
   function music(m) {
     init(); if (ctx.state === 'suspended') ctx.resume();
@@ -226,39 +182,8 @@ const Sound = (() => {
   SFX.phone = t => { [0, 0.5].forEach(d => { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'square'; o.frequency.value = 120; g.gain.setValueAtTime(0.0001, t + d); g.gain.linearRampToValueAtTime(0.04, t + d + 0.02); g.gain.setValueAtTime(0.04, t + d + 0.32); g.gain.exponentialRampToValueAtTime(0.0001, t + d + 0.36);
     const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 400; o.connect(fl); fl.connect(g); g.connect(sfxOut()); o.start(t + d); o.stop(t + d + 0.4); }); };
   ['keys', 'steps', 'step', 'bump', 'drop', 'knock', 'creak', 'cloth', 'paper', 'latch', 'unlock'].forEach(k => { SFX[k] = t => { sample(k, t, k === 'steps' ? 0.8 : 1) || (FALLBACK[k] && FALLBACK[k](t)); }; });
-  // ── v18: звуки петли ──
-  // скример серафима: кольцевая модуляция расстроенных пил + свист шума + перегруз + удар; мимо master (не глохнет от hush)
-  SFX.scream = t => {
-    const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -12; comp.ratio.value = 8; const out = ctx.createGain(); out.gain.value = 0.75; comp.connect(out); out.connect(ctx.destination);
-    const sh = ctx.createWaveShaper(), c = new Float32Array(1024); for (let i = 0; i < 1024; i++) c[i] = Math.tanh((i / 512 - 1) * 3.5); sh.curve = c; sh.connect(comp);
-    const env = ctx.createGain(); env.gain.setValueAtTime(0.0001, t); env.gain.exponentialRampToValueAtTime(1, t + 0.025); env.gain.setValueAtTime(1, t + 1.9); env.gain.exponentialRampToValueAtTime(0.0001, t + 2.7); env.connect(sh);
-    const rm = ctx.createGain(); rm.gain.value = 0; rm.connect(env);
-    const car = ctx.createOscillator(); car.frequency.setValueAtTime(97, t); car.frequency.linearRampToValueAtTime(61, t + 2.6); car.connect(rm.gain);
-    const vib = ctx.createOscillator(), vg = ctx.createGain(); vib.frequency.value = 7.5; vg.gain.value = 38; vib.connect(vg);
-    [0, 7, -9, 13].forEach(det => { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sawtooth';
-      o.frequency.setValueAtTime(420 + det, t); o.frequency.exponentialRampToValueAtTime(990 + det * 3, t + 0.3); o.frequency.linearRampToValueAtTime(820 + det * 2, t + 1.6); o.frequency.exponentialRampToValueAtTime(300, t + 2.7);
-      vg.connect(o.frequency); g.gain.value = 0.2; o.connect(g); g.connect(rm); o.start(t); o.stop(t + 2.8); });
-    const ns = ctx.createBufferSource(); ns.buffer = noiseBuf(3); const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 3;
-    bp.frequency.setValueAtTime(600, t); bp.frequency.exponentialRampToValueAtTime(3800, t + 0.4); bp.frequency.exponentialRampToValueAtTime(1200, t + 2.6);
-    const ngn = ctx.createGain(); ngn.gain.value = 0.8; ns.connect(bp); bp.connect(ngn); ngn.connect(env);
-    const b = ctx.createOscillator(), bg = ctx.createGain(); b.frequency.setValueAtTime(90, t); b.frequency.exponentialRampToValueAtTime(28, t + 1.2); bg.gain.setValueAtTime(1, t); bg.gain.exponentialRampToValueAtTime(0.0001, t + 1.4); b.connect(bg); bg.connect(comp);
-    [car, vib, ns, b].forEach(n => n.start(t)); [car, vib, ns].forEach(n => n.stop(t + 2.8)); b.stop(t + 1.5);
-  };
-  SFX.glitch = t => { for (let i = 0; i < 6; i++) ping(t + i * 0.045 + Math.random() * 0.02, 200 + Math.random() * 3000, 0.04, 0.05, 'square'); nz(t, 0.2, 0.16, 2400, 0.7, 'highpass'); };
-  SFX.whisper = t => { for (let i = 0; i < 5; i++) { const tt = t + i * 0.16 + Math.random() * 0.05, s = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), g = ctx.createGain(); s.buffer = noiseBuf(0.3);
-    bp.type = 'bandpass'; bp.frequency.value = 1800 + Math.random() * 2200; bp.Q.value = 6; g.gain.setValueAtTime(0.0001, tt); g.gain.linearRampToValueAtTime(0.12, tt + 0.06); g.gain.exponentialRampToValueAtTime(0.0001, tt + 0.2);
-    let last = g; if (ctx.createStereoPanner) { const p = ctx.createStereoPanner(); p.pan.value = i % 2 ? -0.8 : 0.8; g.connect(p); last = p; }
-    s.connect(bp); bp.connect(g); last.connect(sfxOut()); s.start(tt); s.stop(tt + 0.3); } };
-  SFX.brake = t => { const o = ctx.createOscillator(), g = ctx.createGain(), bp = ctx.createBiquadFilter(), v = ctx.createOscillator(), vg = ctx.createGain();
-    o.type = 'sawtooth'; o.frequency.setValueAtTime(2300, t); o.frequency.linearRampToValueAtTime(1900, t + 1.4); v.frequency.value = 23; vg.gain.value = 60; v.connect(vg); vg.connect(o.frequency);
-    bp.type = 'bandpass'; bp.frequency.value = 2400; bp.Q.value = 4; g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.09, t + 0.08); g.gain.setValueAtTime(0.09, t + 1.1); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.5);
-    o.connect(bp); bp.connect(g); g.connect(sfxOut()); o.start(t); v.start(t); o.stop(t + 1.6); v.stop(t + 1.6); nz(t, 1.4, 0.12, 3000, 1.5); };
-  SFX.toll = t => { [[196, 0.16, 6], [392.6, 0.08, 4.5], [466.2, 0.05, 3.5], [587.3, 0.04, 3], [784, 0.03, 2.2], [98, 0.08, 5]].forEach(([fr, v, d]) => ping(t, fr, d, v)); };
-  SFX.thud = t => { thump(t, 1, 90, 30, 0.4); nz(t, 0.15, 0.4, 300, 0.8, 'lowpass'); };
-  SFX.wings = t => { for (let i = 0; i < 4; i++) swell(t + i * 0.42, 0.38, 0.22, 600 + i * 50, 'lowpass', 0.8); };
-  SFX.gust = t => swell(t, 2.4, 0.3, 700, 'bandpass', 0.7);
   function sfx(k) { if (!ctx) return; if (ctx.state === 'suspended') ctx.resume(); const f = SFX[k]; if (f) f(ctx.currentTime + 0.02); }
   function blip() { if (!ctx || mode === null && !rainSrc) return; }
   function setVol(k, v) { vol[k] = v; if (ctx) { if (k === 'music') { musicGain.gain.value = v; trackBus.gain.value = v * TRK; } } }
-  return { init, music, rain, wind, hush, setVol, vol, blip, sfx, loc: setLoc, get mode() { return mode; }, get track() { return curTrack; }, get time() { const t = curTrack && T[curTrack]; return t ? +t.a.currentTime.toFixed(1) : -1; }, get samples() { return Object.keys(BUF); } };
+  return { init, music, rain, setVol, vol, blip, sfx, loc: setLoc, get mode() { return mode; }, get track() { return curTrack; }, get time() { const t = curTrack && T[curTrack]; return t ? +t.a.currentTime.toFixed(1) : -1; }, get samples() { return Object.keys(BUF); } };
 })();

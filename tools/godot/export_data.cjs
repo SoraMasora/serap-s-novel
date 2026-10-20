@@ -11,9 +11,13 @@ const scripts = [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map(m =>
 
 // ── 1. Сценарий ──
 const ctx = vm.createContext({ window: {}, console });
-for (const s of ['js/story.js', 'js/story3.js', 'js/story_loop.js']) vm.runInContext(fs.readFileSync(path.join(ROOT, s), 'utf8'), ctx, { filename: s });
+for (const s of ['js/story.js', 'js/story3.js', 'js/story4.js']) vm.runInContext(fs.readFileSync(path.join(ROOT, s), 'utf8'), ctx, { filename: s });
+const originalEndings=vm.runInContext('JSON.parse(JSON.stringify(ENDINGS))',ctx);
+for(const s of ['js/story_loop.js','js/story_loop_godot.js']) vm.runInContext(fs.readFileSync(path.join(ROOT,s),'utf8'),ctx,{filename:s});
 vm.runInContext('this.__o = { STORY, ENDINGS, LOOP, pickEnding: pickEnding.toString() };', ctx);
 const { STORY, ENDINGS, LOOP, pickEnding } = ctx.__o;
+Object.assign(ENDINGS,originalEndings);
+fs.copyFileSync(path.join(ROOT, "docs/art/choice-cg.json"),path.join(OUT,"data/choice_cg.json"));
 
 // JS-лямбда условия → выражение Godot Expression (база — StoryRunner: flag(), num(), notes_count(); входы feel, press)
 function convCond(src, sVar, fVar) {
@@ -80,7 +84,7 @@ for (const [k, sc] of Object.entries(scenes)) sc.forEach((c, i) => {
 for (const r of rules) if (!scenes[r.go]) missing.push('ending ' + r.go);
 if (missing.length) { console.error('MISSING', missing); process.exit(1); }
 const notes = new Set(); Object.values(STORY).forEach(sc => sc.forEach(c => { if (c && c.note) notes.add(c.note); }));
-const story = { version: 2, source: 'js/story.js + js/story3.js + js/story_loop.js', loop: Object.fromEntries(Object.entries(LOOP).filter(([,v]) => typeof v !== 'function')), start: 'start', notes_total: notes.size, ending_rules: rules, endings: ENDINGS, scenes };
+const story = { version: 2, source: '0.7.3: story.js + story3.js + story4.js; additive story_loop.js + story_loop_godot.js', loop: {...Object.fromEntries(Object.entries(LOOP).filter(([,v]) => typeof v !== 'function')), BASE_ENDINGS:Object.keys(originalEndings), REQUIRED_ENDINGS:7}, start: 'start', notes_total: notes.size, ending_rules: rules, endings: ENDINGS, scenes };
 fs.mkdirSync(path.join(OUT, 'data'), { recursive: true });
 fs.writeFileSync(path.join(OUT, 'data', 'story.json'), JSON.stringify(story, null, 1) + '\n');
 console.log('story.json: scenes', Object.keys(scenes).length, 'rules', rules.length, 'notes', notes.size);
@@ -89,6 +93,7 @@ console.log('story.json: scenes', Object.keys(scenes).length, 'rules', rules.len
 if (process.argv.includes('--assets')) {
   const actx = vm.createContext({ window: {}, console }); actx.window = actx;
   for (const s of scripts.filter(s => s.startsWith('assets/'))) vm.runInContext(fs.readFileSync(path.join(ROOT, s), 'utf8'), actx, { filename: s });
+  for(const s of ['assets/loop1.js','assets/loop2.js','assets/loop3.js','assets/loop4.js','assets/loop5.js','assets/loop6.js']) vm.runInContext(fs.readFileSync(path.join(ROOT,s),'utf8'),actx,{filename:s});
   const A = actx.ASSETS; const manifest = {}; let n = 0, bytes = 0;
   const EXT = { 'image/webp': 'webp', 'image/png': 'png', 'image/jpeg': 'jpg' };
   for (const [group, items] of Object.entries(A)) {

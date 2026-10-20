@@ -3,7 +3,7 @@
 const fs = require('fs'), vm = require('vm'), path = require('path');
 const root = path.resolve(__dirname, '../..');
 const ctx=vm.createContext({window:{},console});
-for(const file of ['js/story.js','js/story3.js','js/story_loop.js']) vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),ctx);
+for(const file of ['js/story.js','js/story3.js','js/story4.js','js/story_loop.js','js/story_loop_godot.js']) vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),ctx);
 const {STORY,LOOP}=vm.runInContext('({STORY,LOOP})',ctx);
 const cases=[];
 for(const order of [LOOP.ORDER, [...LOOP.ORDER].reverse(), ['train','road','cross','room','cliff','neck','store']]) {

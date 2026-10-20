@@ -8,6 +8,7 @@ var r: StoryRunner
 func before_each() -> void:
 	db = StoryDB.load_from()
 	r = StoryRunner.new(db, load("res://data/game_config.tres"))
+	r.memory.data.unlocked = true
 
 
 func test_all_dynamic_dialogue_matches_original_js() -> void:
@@ -22,6 +23,7 @@ func test_all_dynamic_dialogue_matches_original_js() -> void:
 func test_seven_unique_deaths_for_every_ending() -> void:
 	for kind: String in db.loop.PREF:
 		var m := LoopMemory.new(db.loop)
+		m.data.unlocked = true
 		for n in 7:
 			m.finish(kind, "Май")
 			assert_not_null(m.data.pending)
@@ -55,6 +57,36 @@ func test_each_bridge_and_death_reaches_screamer() -> void:
 			assert_eq(ending, "scream", kind + ":" + str(n))
 			r.memory.commit_death("Тест")
 			assert_eq(r.memory.level(), n + 1)
+
+
+func test_every_death_shows_her_last_moment_before_aftermath() -> void:
+	for id: String in db.loop.ORDER:
+		var death: Dictionary = db.loop.DEATHS[id]
+		var cg := str(death.get("cg", ""))
+		assert_true(cg.begins_with("dm_"), id)
+		assert_true(Game.has_tex("bg", cg), cg)
+		var bgs: Array = []
+		for e: Dictionary in db.scene("L_d_" + id):
+			if e.has("bg"):
+				bgs.append(e.bg)
+		assert_has(bgs, cg, id)
+		assert_gt(
+			bgs.rfind(death.img), bgs.find(cg), id + ": aftermath comes after the last moment"
+		)
+
+
+func test_screamer_variants_are_known_and_rotate() -> void:
+	var scare: Dictionary = db.loop.SCARE
+	var kinds := ["burst", "lull", "title", "whisper", "false"]
+	assert_eq(scare.order.size(), db.loop.ORDER.size())
+	for kind: String in kinds:
+		assert_has(scare.order, kind)
+	for kind: String in scare.order:
+		assert_has(kinds, kind)
+	assert_eq(scare.order[0], "burst", "the first death keeps the classic hit")
+	assert_string_contains(str(scare.whisper), "{P}")
+	for key: String in ["x_face", "x_smile", "x_scream"]:
+		assert_true(Game.has_tex("bg", key), key)
 
 
 func test_memory_survives_restore_and_rollback() -> void:
@@ -109,6 +141,6 @@ func test_truth_cannot_fail_breathing_or_end_badly() -> void:
 	r.new_game("Тест")
 	r.breath_result({"flag": "plBreath"}, 0.0)
 	assert_true(r.st.flags.plBreath)
-	for seed in 200:
-		var play := AutoPlayer.new(r).play(seed + 1)
-		assert_eq(play.ending, "truth", "eighth loop seed %d" % seed)
+	for trial_seed in 200:
+		var play := AutoPlayer.new(r).play(trial_seed + 1)
+		assert_eq(play.ending, "truth", "eighth loop trial_seed %d" % trial_seed)

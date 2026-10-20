@@ -93,8 +93,6 @@ async function renderAudio(page, job) {
     await new Promise(r => setTimeout(r, 400)); // декодирование сэмплов Kenney
     const ctx = window.__ctx;
     if (job.kind === 'sfx') { if (job.loc) Sound.loc(job.loc); Sound.sfx(job.key); }
-    if (job.kind === 'drone') Sound.music('drone');
-    if (job.kind === 'wind') Sound.wind(true);
     if (job.kind === 'tense') { window.__vt = 0; Sound.music('tense'); }
     if (job.kind === 'rain') { const n = ctx.createBufferSource(); const b = ctx.createBuffer(1, SR * job.dur, SR); const d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
       n.buffer = b; const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1400; const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 300;
@@ -106,9 +104,9 @@ async function renderAudio(page, job) {
 }
 async function bakeAudio(page) {
   const dir = path.join(OUT, 'assets', 'sfx_baked'); fs.mkdirSync(dir, { recursive: true });
-  const SFX = ['door', 'enter', 'bell', 'train', 'horn', 'slam', 'heart', 'tear', 'phone', 'keys', 'steps', 'step', 'bump', 'drop', 'knock', 'creak', 'cloth', 'paper', 'latch', 'unlock', 'scream', 'glitch', 'whisper', 'brake', 'toll', 'thud', 'wings', 'gust'];
-  const DUR = { train: 7.5, heart: 2.4, steps: 3.0, door: 2.0, scream: 3.0, toll: 6.2, gust: 2.8, wings: 2.0, brake: 1.8 };
-  const jobs = SFX.map(k => ({ kind: 'sfx', key: k, dur: DUR[k] || 1.6, name: k })).concat([{ kind: 'sfx', key: 'door', loc: 'store', dur: 2.0, name: 'door_shop' }, { kind: 'tense', dur: 9.6 + 0.6, name: 'music_tense' }, { kind: 'rain', dur: 6, name: 'rain_loop' }, {kind:'drone',dur:16,name:'music_drone'}, {kind:'wind',dur:12,name:'wind_loop'}]);
+  const SFX = ['door', 'enter', 'bell', 'train', 'horn', 'slam', 'heart', 'tear', 'phone', 'keys', 'steps', 'step', 'bump', 'drop', 'knock', 'creak', 'cloth', 'paper', 'latch', 'unlock'];
+  const DUR = { train: 7.5, heart: 2.4, steps: 3.0, door: 2.0 };
+  const jobs = SFX.map(k => ({ kind: 'sfx', key: k, dur: DUR[k] || 1.6, name: k })).concat([{ kind: 'sfx', key: 'door', loc: 'store', dur: 2.0, name: 'door_shop' }, { kind: 'tense', dur: 9.6 + 0.6, name: 'music_tense' }, { kind: 'rain', dur: 6, name: 'rain_loop' }]);
   for (const j of jobs) {
     const chs = await renderAudio(page, j);
     // обрезаем хвостовую тишину у SFX

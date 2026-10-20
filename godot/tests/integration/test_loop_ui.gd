@@ -6,12 +6,17 @@ const MAIN := preload("res://scenes/main/main.tscn")
 var main: Control
 var _memory: Dictionary
 var _settings: Dictionary
+var _endings: Dictionary
 
 
 func before_each() -> void:
 	_memory = Game.memory.data.duplicate(true)
 	_settings = Game.settings.duplicate(true)
-	Game.memory.data = {"deaths": [], "name": "Тест", "freed": false, "pending": null}
+	_endings = SaveSystem.endings()
+	SaveSystem.write_atomic(SaveSystem.ENDINGS_PATH, "{}")
+	Game.memory.data = {
+		"deaths": [], "name": "Тест", "freed": false, "pending": null, "unlocked": true
+	}
 	Game.settings.cw = 1.0
 	Game.settings.speed = 0.0
 	SaveSystem.delete_slot("auto")
@@ -25,6 +30,7 @@ func after_each() -> void:
 	main.loop_overlay.kill()
 	Game.memory.data = _memory
 	Game.settings = _settings
+	SaveSystem.write_atomic(SaveSystem.ENDINGS_PATH, JSON.stringify(_endings))
 	Game.save_memory()
 	SaveSystem.delete_slot("auto")
 	Engine.time_scale = 1.0
